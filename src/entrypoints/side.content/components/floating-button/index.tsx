@@ -416,7 +416,9 @@ export default function FloatingButton() {
             src={readFrogLogoUrl}
             alt={APP_NAME}
             className={cn(
-              "h-8 w-8 rounded-full",
+              // 照片是方形不透明图，裁成圆形需要 object-cover 避免拉伸，
+              // 再加一圈半透明描边和轻微阴影，圆边才不会显得生硬。
+              "h-8 w-8 rounded-full object-cover ring-1 ring-black/10 shadow-sm",
               !isDraggingButton && (floatingButtonSide === "right" ? "ml-1" : "mr-1"),
             )}
           />

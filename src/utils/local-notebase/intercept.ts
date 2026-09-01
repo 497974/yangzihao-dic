@@ -2,7 +2,7 @@
  * 本地笔记库 · 请求拦截层
  *
  * 所有本该发往远端 API 的请求，在后台被截下来就地处理：
- *   - /api/rpc/*      → 内嵌的 ORPC 路由（数据存 chrome.storage）
+ *   - /api/rpc/*      → 内嵌的 ORPC 路由（笔记库 + 闪卡，数据存 chrome.storage）
  *   - /api/identity/* → 本地身份，永远处于已登录状态
  *
  * 因此本扩展不需要任何服务器，也不需要联网账号。
@@ -12,8 +12,13 @@ import { RPCHandler } from "@orpc/server/fetch"
 import { AUTH_BASE_PATH, ORPC_PREFIX } from "@read-frog/definitions"
 import type { ProxyResponse } from "@/types/proxy-fetch"
 import { localNotebaseRouter } from "./router"
+import { localSrsRouter } from "./srs-router"
 
-const rpcHandler = new RPCHandler(localNotebaseRouter)
+// 笔记库 + 闪卡/间隔重复，合并成一个本地路由树
+const rpcHandler = new RPCHandler({
+  ...localNotebaseRouter,
+  ...localSrsRouter,
+})
 
 /** 本地用户 —— 不对应任何真实账号，仅用于满足界面上的登录态判断。 */
 export const LOCAL_ACCOUNT = {

@@ -34,7 +34,9 @@ export function SubtitlesTranslateButton() {
         src={logo}
         alt="Subtitle Toggle"
         className={cn(
-          "block h-8 w-8 object-contain transition-all duration-200",
+          // 原图是透明青蛙用 object-contain 合适；换成方形照片后需要
+          // rounded-full + object-cover，否则方图嵌在圆形按钮里会留白边。
+          "block h-8 w-8 rounded-full object-cover transition-all duration-200",
           isVisible ? "opacity-100 saturate-110" : "opacity-75 saturate-90",
           panelOpen && "scale-[1.02]",
         )}
