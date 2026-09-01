@@ -456,7 +456,8 @@ export const NotebaseConnectionField = withForm({
                         <a
                           href={new URL(
                             `/notebase/${encodeURIComponent(sanitizedConnection.notebaseId)}`,
-                            env.WXT_WEBSITE_URL,
+                            // 本地化改动：笔记库在本地服务器上
+                            env.WXT_API_URL,
                           ).toString()}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -559,7 +560,7 @@ export const NotebaseConnectionField = withForm({
                     type="button"
                     size="sm"
                     variant="outline"
-                    onClick={() => window.open(`${env.WXT_WEBSITE_URL}/notebase`, "_blank")}
+                    onClick={() => window.open(`${env.WXT_API_URL}/notebase`, "_blank")}
                   >
                     {t("openNotebaseAction")}
                   </Button>

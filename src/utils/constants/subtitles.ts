@@ -17,17 +17,17 @@ export const PROCESS_LOOK_AHEAD_MS = 60_000
 export const MAX_LOOKAHEAD_RATE = 4
 
 // DOM IDs
-export const READ_FROG_SUBTITLES_UI_HOST_ID = "read-frog-subtitles-ui-host"
-export const TRANSLATE_BUTTON_CONTAINER_ID = "read-frog-subtitles-translate-button-container"
-export const HIDE_NATIVE_CAPTIONS_STYLE_ID = "read-frog-hide-native-captions"
+export const READ_FROG_SUBTITLES_UI_HOST_ID = "yangzihao-dic-subtitles-ui-host"
+export const TRANSLATE_BUTTON_CONTAINER_ID = "yangzihao-dic-subtitles-translate-button-container"
+export const HIDE_NATIVE_CAPTIONS_STYLE_ID = "yangzihao-dic-hide-native-captions"
 
 // Class names
-export const SUBTITLES_VIEW_CLASS = "read-frog-subtitles-view"
+export const SUBTITLES_VIEW_CLASS = "yangzihao-dic-subtitles-view"
 // The box the two subtitle lines sit in. Everything else about it is Tailwind utilities, but
 // custom CSS needs a name it can hold on to, so this one is part of the public contract.
-export const SUBTITLES_BOX_CLASS = "read-frog-subtitles-box"
-export const STATE_MESSAGE_CLASS = "read-frog-subtitles-state-message"
-export const TRANSLATE_BUTTON_CLASS = "read-frog-subtitles-translate-button"
+export const SUBTITLES_BOX_CLASS = "yangzihao-dic-subtitles-box"
+export const STATE_MESSAGE_CLASS = "yangzihao-dic-subtitles-state-message"
+export const TRANSLATE_BUTTON_CLASS = "yangzihao-dic-subtitles-translate-button"
 
 // YouTube specific
 export const YOUTUBE_WATCH_URL_PATTERN = "youtube.com/watch"

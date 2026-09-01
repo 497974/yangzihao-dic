@@ -23,7 +23,7 @@ const downloadTranslatedSubtitlesMessageVariants = cva(
 
 export function DownloadTranslatedSubtitles() {
   const { message, messageTone, progress, isRunning, download } = useDownloadTranslatedSubtitles()
-  const buttonId = "read-frog-download-translated-subtitles"
+  const buttonId = "yangzihao-dic-download-translated-subtitles"
   const title = i18n.t("subtitles.actions.downloadTranslated")
 
   return (

@@ -1,12 +1,12 @@
 export function migrate(oldConfig: any): any {
   const isUsingDefaultPrompt =
-    oldConfig.translate.promptsConfig.prompt === "Read Frog: TRANSLATE_DEFAULT_PROMPT"
+    oldConfig.translate.promptsConfig.prompt === "Yang Zihao Dic: TRANSLATE_DEFAULT_PROMPT"
 
   const newPromptConfig = {
     ...oldConfig.translate.promptsConfig,
     prompt: isUsingDefaultPrompt ? "default" : oldConfig.translate.promptsConfig.prompt,
     patterns: oldConfig.translate.promptsConfig.patterns.map((pattern: any) => {
-      if (pattern.id === "Read Frog: TRANSLATE_DEFAULT_PROMPT") {
+      if (pattern.id === "Yang Zihao Dic: TRANSLATE_DEFAULT_PROMPT") {
         return {
           id: "default",
           name: "default",

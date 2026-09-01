@@ -15,10 +15,10 @@ import { sendMessage } from "@/utils/message"
 import { ensureInitializedConfig } from "./config"
 import { getPageTranslationEnabled, setPageTranslationEnabled } from "./page-translation-state"
 
-export const MENU_ID_TRANSLATE = "read-frog-translate"
-export const MENU_ID_SELECTION_TRANSLATE = "read-frog-selection-translate"
-export const MENU_ID_SELECTION_READ_ALOUD = "read-frog-selection-read-aloud"
-export const MENU_ID_SELECTION_CUSTOM_ACTION_PREFIX = "read-frog-selection-custom-action:"
+export const MENU_ID_TRANSLATE = "yangzihao-dic-translate"
+export const MENU_ID_SELECTION_TRANSLATE = "yangzihao-dic-selection-translate"
+export const MENU_ID_SELECTION_READ_ALOUD = "yangzihao-dic-selection-read-aloud"
+export const MENU_ID_SELECTION_CUSTOM_ACTION_PREFIX = "yangzihao-dic-selection-custom-action:"
 
 function getSelectionCustomActionMenuId(actionId: string) {
   return `${MENU_ID_SELECTION_CUSTOM_ACTION_PREFIX}${actionId}`

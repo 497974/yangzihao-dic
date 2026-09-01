@@ -144,13 +144,13 @@ export function ensurePresetStyles(root: StyleRoot): void {
   if (supportsConstructableStyleSheets(root)) {
     root.adoptedStyleSheets = [...root.adoptedStyleSheets, getPresetStyleSheet(root)]
   } else {
-    injectStyleElement(root, "read-frog-preset-styles", getPresetCSS(root))
+    injectStyleElement(root, "yangzihao-dic-preset-styles", getPresetCSS(root))
   }
 }
 
 // ============ Site Rule CSS Injection ============
 
-const SITE_RULE_STYLE_ID = "read-frog-site-rule-styles"
+const SITE_RULE_STYLE_ID = "yangzihao-dic-site-rule-styles"
 const siteRuleCSSMap = new WeakMap<StyleRoot, CSSStyleSheet>()
 
 /**
@@ -186,7 +186,7 @@ export function removeSiteRuleCSS(root: StyleRoot): void {
 
 // ============ Subtitles Custom CSS Injection ============
 
-const SUBTITLES_CUSTOM_STYLE_ID = "read-frog-subtitles-custom-styles"
+const SUBTITLES_CUSTOM_STYLE_ID = "yangzihao-dic-subtitles-custom-styles"
 const subtitlesCustomCSSMap = new WeakMap<StyleRoot, CSSStyleSheet>()
 
 /**
@@ -216,7 +216,7 @@ export async function ensureSubtitlesCustomCSS(root: StyleRoot, cssText: string)
 
 // ============ Custom CSS Injection ============
 
-const CUSTOM_STYLE_ID = "read-frog-custom-styles"
+const CUSTOM_STYLE_ID = "yangzihao-dic-custom-styles"
 const customCSSMap = new WeakMap<StyleRoot, CSSStyleSheet>()
 let documentCachedCSS: string | null = null
 

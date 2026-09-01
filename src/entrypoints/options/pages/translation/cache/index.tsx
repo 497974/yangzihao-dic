@@ -17,7 +17,7 @@ import { sendMessage } from "@/utils/message"
 import { ConfigItem } from "../../../components/config-item"
 import { ConfigSection } from "../../../components/config-section"
 
-/** Translations Read Frog keeps so a page it has seen before costs nothing to open again. */
+/** Translations Yang Zihao Dic keeps so a page it has seen before costs nothing to open again. */
 export function CacheSection() {
   const [open, setOpen] = useState(false)
   const [isClearing, setIsClearing] = useState(false)

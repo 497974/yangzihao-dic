@@ -1,0 +1,482 @@
+{
+  "txid": 7,
+  "notebases": {
+    "497d74e7-c44b-4b06-a272-131009c4c5c8": {
+      "id": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+      "userId": "local-user",
+      "name": "词典",
+      "srsNewPerDay": -1,
+      "srsReviewsPerDay": -1,
+      "srsDesiredRetention": 0.9,
+      "srsEnableShortTerm": true,
+      "srsMaximumInterval": 36500,
+      "srsLearningSteps": [
+        "1m",
+        "10m"
+      ],
+      "srsRelearningSteps": [
+        "10m"
+      ],
+      "srsLeechThreshold": 8,
+      "srsEnableFuzz": false,
+      "srsWeights": null,
+      "createdAt": "2026-08-31T13:04:47.289Z",
+      "updatedAt": "2026-08-31T13:56:21.251Z",
+      "notebaseColumns": [
+        {
+          "id": "85899c64-dec6-42dd-adf9-ae65611c3073",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "name": "词条",
+          "config": {
+            "type": "string"
+          },
+          "position": 0,
+          "isPrimary": true,
+          "width": null,
+          "wrap": false,
+          "createdAt": "2026-08-31T13:04:47.289Z",
+          "updatedAt": "2026-08-31T13:04:47.289Z"
+        },
+        {
+          "id": "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "name": "音标",
+          "config": {
+            "type": "string"
+          },
+          "position": 1,
+          "isPrimary": false,
+          "width": null,
+          "wrap": false,
+          "createdAt": "2026-08-31T13:04:47.289Z",
+          "updatedAt": "2026-08-31T13:04:47.289Z"
+        },
+        {
+          "id": "b0a33f04-4eb2-4ae7-a976-9f42cad27f35",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "name": "词性",
+          "config": {
+            "type": "string"
+          },
+          "position": 2,
+          "isPrimary": false,
+          "width": null,
+          "wrap": false,
+          "createdAt": "2026-08-31T13:04:47.289Z",
+          "updatedAt": "2026-08-31T13:04:47.289Z"
+        },
+        {
+          "id": "af12d6d7-afad-447a-89a9-0d806beede07",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "name": "释义",
+          "config": {
+            "type": "string"
+          },
+          "position": 3,
+          "isPrimary": false,
+          "width": null,
+          "wrap": false,
+          "createdAt": "2026-08-31T13:04:47.289Z",
+          "updatedAt": "2026-08-31T13:04:47.289Z"
+        },
+        {
+          "id": "c7ceacfb-a22a-486a-b5ae-8679852daadf",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "name": "句子",
+          "config": {
+            "type": "string"
+          },
+          "position": 4,
+          "isPrimary": false,
+          "width": null,
+          "wrap": false,
+          "createdAt": "2026-08-31T13:04:47.289Z",
+          "updatedAt": "2026-08-31T13:04:47.289Z"
+        },
+        {
+          "id": "158e7baa-4062-4e2c-97cb-9575753488ac",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "name": "句子翻译",
+          "config": {
+            "type": "string"
+          },
+          "position": 5,
+          "isPrimary": false,
+          "width": null,
+          "wrap": false,
+          "createdAt": "2026-08-31T13:04:47.289Z",
+          "updatedAt": "2026-08-31T13:04:47.289Z"
+        },
+        {
+          "id": "fd209b8e-2b57-4b08-b150-13ed3e205718",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "name": "难度",
+          "config": {
+            "type": "string"
+          },
+          "position": 6,
+          "isPrimary": false,
+          "width": null,
+          "wrap": false,
+          "createdAt": "2026-08-31T13:04:47.289Z",
+          "updatedAt": "2026-08-31T13:04:47.289Z"
+        }
+      ],
+      "notebaseRows": [
+        {
+          "id": "b5ed3473-c9b5-41c5-b8bc-d01b3d5248c1",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "confront",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/kənˈfrʌnt/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "verb",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "正视；面对（挑战、困难、问题）",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Mr. Kamiya isn't confronting the world; he's confronting something that might make the world turn its head.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "神山先生并不是在正视整个世界，而是在直面可能让世界侧目之物。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 0,
+          "createdAt": "2026-08-31T13:04:47.289Z",
+          "updatedAt": "2026-08-31T13:04:47.289Z"
+        },
+        {
+          "id": "ce200932-9185-48dc-a17f-e43f8e93124e",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "comedian",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/kəˈmiː.di.ən/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "noun",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "职业喜剧演员；讲笑话以娱乐观众的人",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "I believe comedians never truly retire.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "我相信喜剧演员永远不会真正退休。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B1"
+          },
+          "position": 1,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "50565478-6fa0-4cda-874b-f3b901ecc9b3",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "estimate",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈes.tɪ.mət/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "noun",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "估计；估算",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "What is a reasonable estimate for the limit of h at x=3?",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "h 在 x=3 处的极限的合理估计值是多少？",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 2,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "1e30e79c-353f-4117-a452-013725e26c1d",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "notation",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/noʊˈteɪʃən/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "noun",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "符号表示法；记法",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "We also have a special notation to talk about limits.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "我们也有一种特殊的符号表示法来讨论极限。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 3,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "646f3d25-4268-49e0-a6e6-d30e02d60f38",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "infinitely",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈɪn.fɪ.nɪt.li/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "adverb",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "无限地；无穷地",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "In limits, we want to get infinitely close.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "在极限中，我们希望无限地接近。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 4,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "a8a68a06-242b-4b78-9be4-9762892020a9",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "mastery",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈmæs.tər.i/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "noun",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "掌握程度；精通",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Course mastery: 0%",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "课程掌握度：0%",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 5,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "703373bc-56e7-4efe-8847-c4997eee6705",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "estimate",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈes.tɪ.meɪt/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "verb",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "估计；估算；推算",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Estimating limit values from graphs",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "从图像中估算极限值",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 6,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "3aa669f4-30ab-4963-829b-c028084b224b",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "approximation",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/əˌprɒk.sɪˈmeɪ.ʃən/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "noun",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "近似值；近似",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Just remember that we're dealing with an approximation, not an exact value.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "只要记住，我们处理的是近似值，而不是精确值。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 7,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "4bfc3024-052d-44db-b6b7-c97b01d981c1",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "zoom",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/zuːm/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "verb",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "放大；缩放",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "We could zoom in further to get a better approximation if we wanted.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "如果我们愿意，可以进一步放大以获得更好的近似值。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 8,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "ac6f147d-ccdc-4da0-afa4-3b70ba35b3b4",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "piecewise",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈpiːs.waɪz/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "adjective",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "分段的（描述函数由多个子区间上的不同规则组成）",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Whenever you're dealing with a piecewise function, it's possible to get a graph like the one below.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "每当处理分段函数时，都有可能得到如下所示的图形。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 9,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "24ea3b0e-1063-4e8d-8a77-a4b6bb6ef209",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "takeaway",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈteɪk.ə.weɪ/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "noun",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "要点；结论",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Big takeaway: It's possible for the function value to be different from the limit value.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "重要要点：函数值有可能不同于极限值。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 10,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "af304687-289c-44ee-bd78-9601986ec65c",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "reinforce",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˌriːɪnˈfɔːs/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "verb",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "加强；强化；使更有力",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Reinforcing the key idea: The function value at x=−4 is irrelevant to finding the limit.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "强化关键概念：x=−4 处的函数值与求极限无关。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 11,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "2d7b6d64-916f-4ee0-8c56-6d79c2b803e8",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "irrelevant",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ɪˈrel.vənt/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "adjective",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "无关的；不相关的",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "The function value at x=−4 is irrelevant to finding the limit.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "函数在 x=−4 处的值与求极限无关。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 12,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "d0b7eb85-72d0-4234-9b58-d293727d46e3",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "flip",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/flɪp/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "noun",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "（on the flip side）另一方面；反之",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "On the flip side, when the function is defined for some x-value, that doesn't mean that the limit necessarily exists.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "另一方面，当函数在某个 x 值处有定义时，并不意味着极限一定存在。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B1"
+          },
+          "position": 13,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "ab13a577-1a0b-42d5-9ed8-6cccedb55290",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "slick",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/slɪk/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "adjective",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "高科技的；功能强大的；精美的",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Graphing calculators are pretty slick these days.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "现在的图形计算器非常先进。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 14,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "ff1b3f9f-93a6-45c7-8955-7c3e49f2cd27",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "certain",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈsɜː.tən/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "adjective",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "特定的；某个",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Graphing calculators like Desmos can give you a feel for what's happening to the y-values as you get closer and closer to a certain x-value.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "像 Desmos 这样的图形计算器能让你感觉到，当你越来越接近某个特定的 x 值时，y 值是如何变化的。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "A2"
+          },
+          "position": 15,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "aeb7efc1-4bab-4702-8800-c19e45f13942",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "Summary",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈsʌm.ər.i/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "noun",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "摘要；概要；总结",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Summary questions",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "摘要问题",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B1"
+          },
+          "position": 16,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "c8276e0c-cb7f-43f9-9e4b-115e200a84bd",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "demonstrate",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈdem.ən.streɪt/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "verb",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "证明；说明；展示",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Some examples above demonstrate that the function value f(a) is not always equal to the limit value.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "上面的有些例子说明了函数值 f(a) 并不总是等于极限值。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 17,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "7ba9a8fe-dee7-464b-8958-2f68cc8af1ba",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "statement",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈsteɪt.mənt/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "noun",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "陈述；说法",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Which statement better describes how graphs help us reason about limits?",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "哪个陈述更好地描述了图表如何帮助我们推断极限？",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 18,
+          "createdAt": "2026-08-31T13:04:47.301Z",
+          "updatedAt": "2026-08-31T13:04:47.301Z"
+        },
+        {
+          "id": "45f84d6b-2dd8-4d35-83b7-fcc157b77e42",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "implementation",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˌɪm.plɪ.menˈteɪ.ʃən/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "noun",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "实现；具体实施方法",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "No check50 for this one, as implementations will vary based on your questions!",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "这项任务没有 check50 测试，因为实现方式会根据你的问题而有所不同！",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 19,
+          "createdAt": "2026-08-31T13:37:50.058Z",
+          "updatedAt": "2026-08-31T13:37:50.058Z"
+        },
+        {
+          "id": "e2a9af0a-4acf-47d4-8675-82cf3600e3e6",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "syllabus",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈsɪl.ə.bəs/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "noun",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "教学大纲；课程大纲",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Syllabus",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "教学大纲",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 20,
+          "createdAt": "2026-08-31T13:39:52.199Z",
+          "updatedAt": "2026-08-31T13:39:52.199Z"
+        },
+        {
+          "id": "4bd9e855-0985-4e38-af68-1a45d9aa55b7",
+          "notebaseId": "497d74e7-c44b-4b06-a272-131009c4c5c8",
+          "cells": {
+            "85899c64-dec6-42dd-adf9-ae65611c3073": "graphically",
+            "519dccb8-7cf6-40e7-a5b6-f4d5526a6b46": "/ˈɡræf.ɪ.kli/",
+            "b0a33f04-4eb2-4ae7-a976-9f42cad27f35": "adverb",
+            "af12d6d7-afad-447a-89a9-0d806beede07": "从图形上；在图表中",
+            "c7ceacfb-a22a-486a-b5ae-8679852daadf": "Graphically, this is the y-value we approach when we look at the graph of f and get closer and closer to the point on the graph where x=3.",
+            "158e7baa-4062-4e2c-97cb-9575753488ac": "从图形上看，这就是当我们观察 f 的图像并越来越接近 x=3 处的图像点时我们所逼近的 y 值。",
+            "fd209b8e-2b57-4b08-b150-13ed3e205718": "B2"
+          },
+          "position": 21,
+          "createdAt": "2026-08-31T13:56:21.251Z",
+          "updatedAt": "2026-08-31T13:56:21.251Z"
+        }
+      ],
+      "notebaseViews": []
+    }
+  }
+}

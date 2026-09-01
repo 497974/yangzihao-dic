@@ -12,4 +12,4 @@ export const TRANSLATION_NODE_STYLE = [
   "background",
 ] as const
 
-export const CUSTOM_TRANSLATION_NODE_ATTRIBUTE = "read-frog-custom-translation-style"
+export const CUSTOM_TRANSLATION_NODE_ATTRIBUTE = "yangzihao-dic-custom-translation-style"

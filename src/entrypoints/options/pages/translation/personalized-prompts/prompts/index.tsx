@@ -7,7 +7,7 @@ import { PageLayout } from "../../../../components/page-layout"
 import { promptAtoms } from "../atoms"
 
 /**
- * Every prompt Read Frog can translate a page with, drilled into from the Translation page.
+ * Every prompt Yang Zihao Dic can translate a page with, drilled into from the Translation page.
  * The community link lives here rather than on the row, which cannot hold a link of its own —
  * the whole row is already one.
  */
@@ -36,16 +36,6 @@ export function PersonalizedPromptsPage() {
           promptAtoms={promptAtoms}
           insertCells={insertCells}
           builtInPrompts={getBuiltInPageTranslatePrompts()}
-          toolbarStart={
-            <a
-              href={i18n.t("options.translation.personalizedPrompts.communityPromptsUrl")}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="text-sm text-link hover:opacity-90"
-            >
-              {i18n.t("options.translation.personalizedPrompts.communityPrompts")}
-            </a>
-          }
         />
       </ConfigDetailSection>
     </PageLayout>

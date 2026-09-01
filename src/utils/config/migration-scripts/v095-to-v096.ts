@@ -17,7 +17,7 @@
  * imports nothing from the evolving application code.
  */
 
-const BUILT_IN_AI_ULTRA_PROVIDER_ID = "read-frog-ultra-ai"
+const BUILT_IN_AI_ULTRA_PROVIDER_ID = "yangzihao-dic-ultra-ai"
 
 // LLM_PROVIDER_TYPES as of v095, frozen.
 const LLM_PROVIDER_TYPES = [

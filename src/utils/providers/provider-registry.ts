@@ -6,7 +6,7 @@ import type {
   ProviderSelectorOption,
   SystemProviderSelectorItem,
 } from "@/utils/providers/provider-display"
-import readFrogLogo from "@/assets/providers/read-frog-provider.png?url&no-inline"
+import readFrogLogo from "@/assets/providers/yangzihao-dic-provider.png?url&no-inline"
 import { isLLMProviderConfig, isTranslateProviderConfig } from "@/types/config/provider"
 import {
   BUILT_IN_AI_PROVIDER_ID,

@@ -17,7 +17,7 @@ import { sendMessage } from "@/utils/message"
 import { ConfigItem } from "../../../components/config-item"
 import { ConfigSection } from "../../../components/config-section"
 
-/** Segmentation results Read Frog keeps so a video it has cut before costs nothing to replay. */
+/** Segmentation results Yang Zihao Dic keeps so a video it has cut before costs nothing to replay. */
 export function CacheSection() {
   const [open, setOpen] = useState(false)
   const [isClearing, setIsClearing] = useState(false)

@@ -12,8 +12,8 @@ import { resolveProviderRefForCapability } from "@/utils/providers/provider-regi
 
 const SPACE_KEY = " "
 const TRIGGER_COUNT = 3
-const LAST_CYCLE_SWAPPED_KEY = "read-frog-input-translation-last-cycle-swapped"
-const SPINNER_ID = "read-frog-input-translation-spinner"
+const LAST_CYCLE_SWAPPED_KEY = "yangzihao-dic-input-translation-last-cycle-swapped"
+const SPINNER_ID = "yangzihao-dic-input-translation-spinner"
 /** Hammering the hotkey must stack one toast, not one per attempt. */
 const HOSTED_UNAVAILABLE_TOAST_ID = "input-translation-hosted-unavailable"
 

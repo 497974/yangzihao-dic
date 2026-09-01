@@ -1,7 +1,14 @@
 import type { LangCodeISO6393 } from "@read-frog/definitions"
-import type { CaptureResult } from "posthog-js/dist/module.no-external"
 import type { AnalyticsFeature, FeatureUsedEventProperties } from "@/types/analytics"
-import posthog from "posthog-js/dist/module.no-external"
+// 本项目不做遥测。原先此处引入 posthog SDK（约 42MB），现以空实现替代：
+// 调用点全部保留（避免大面积改动 34 个文件），但 SDK 不再进入产物，
+// 也不存在任何数据外发的可能。
+type CaptureResult = Record<string, unknown>
+const posthog = {
+  init: (..._args: unknown[]) => undefined,
+  register: (..._args: unknown[]) => undefined,
+  capture: (..._args: unknown[]) => undefined,
+}
 import { storage } from "#imports"
 import { env } from "@/env"
 import { ANALYTICS_FEATURE } from "@/types/analytics"
@@ -38,9 +45,9 @@ const FEATURES_BYPASSING_DAILY_FEATURE_CACHE = new Set<AnalyticsFeature>([
 ])
 
 interface BackgroundAnalyticsClient {
-  capture: (...args: Parameters<typeof posthog.capture>) => void
-  init: (...args: Parameters<typeof posthog.init>) => void
-  register: (...args: Parameters<typeof posthog.register>) => void
+  capture: (...args: unknown[]) => void
+  init: (...args: unknown[]) => void
+  register: (...args: unknown[]) => void
 }
 
 type BackgroundAnalyticsMessageHandler<TData, TResult> = (message: {
@@ -337,6 +344,11 @@ export function createBackgroundAnalytics(
     const apiKey = runtime.apiKey
     const apiHost = runtime.apiHost
 
+    // 本项目不做任何遥测上报。此处硬性返回 null，不依赖"构建时恰好没配
+    // POSTHOG 变量"这种偶然 —— 即使有人补上了配置，也不会有数据发出。
+    return null
+
+    // eslint-disable-next-line no-unreachable
     if (!apiKey || !apiHost) {
       if (!missingConfigWarned) {
         missingConfigWarned = true

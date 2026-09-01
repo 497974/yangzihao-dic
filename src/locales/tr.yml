@@ -1,7 +1,6 @@
-name: Read Frog
-extName: Read Frog - Çevir ve Öğren
-extDescription: Read Frog, herhangi bir web sitesinden dilleri derinlemesine öğrenmenize yardımcı olmak için tasarlanmış açık kaynaklı bir tarayıcı uzantısıdır.
-uninstallSurveyUrl: https://tally.so/r/nPK6Ob
+name: Yang Zihao Dic
+extName: "Yang Zihao Dic - Çevir ve Öğren"
+extDescription: "Tamamen yerel, açık kaynaklı tarayıcı uzantısı. Kendi AI API anahtarınızı kullanır; hesap yok, bulut yok, sınır yok."
 account:
   login: Giriş yap
   webApp: Web uygulaması
@@ -16,7 +15,7 @@ contextMenu:
   readAloudSelection: '"%s" Sesli oku'
   showOriginal: Orijinali Göster
 sidePanel:
-  firefoxUserActionHint: Firefox'ta Read Frog'u tarayıcının kenar çubuğundan açın.
+  firefoxUserActionHint: Firefox'ta Yang Zihao Dic'u tarayıcının kenar çubuğundan açın.
   firefoxUserActionHelpText: Firefox kenar çubuğunu açmayı öğrenin
   firefoxUserActionHelpUrl: https://support.mozilla.org/tr/kb/use-sidebar-access-tools-and-vertical-tabs
 popup:
@@ -51,7 +50,7 @@ popup:
   discord:
     tooltip: Geliştiricilerle bağlantı kurmak ve yeni özelliklere erken erişim sağlamak için Discord'a katılın
   blog:
-    notification: Read Frog'da yenilikler
+    notification: Yang Zihao Dic'da yenilikler
   aiSmartContext: AI Akıllı Bağlam
   aiSmartContextDescription: Çeviri kalitesini artırmak için web sayfası bağlamını kullanır. LLM çeviri sağlayıcısı gerektirir.
   more:
@@ -101,15 +100,15 @@ options:
     roadmap: Yol Haritası
   helpAndCommunity:
     title: Yardım ve topluluk
-    pageDescription: Read Frog'u nasıl kullanacağınızı öğrenin, ekipten yardım alın ya da toplulukta diğer kullanıcılara katılın.
+    pageDescription: Yang Zihao Dic'u nasıl kullanacağınızı öğrenin, ekipten yardım alın ya da toplulukta diğer kullanıcılara katılın.
     help:
       title: Yardım
     tutorial:
       title: Rehber
-      description: Belgeleri okuyun ve Read Frog'u nasıl kullanacağınızı öğrenin
+      description: Belgeleri okuyun ve Yang Zihao Dic'u nasıl kullanacağınızı öğrenin
     email:
       title: Bize e-posta gönderin
-      description: Ekibe doğrudan contact@readfrog.app adresinden ulaşın
+      description: Ekibe doğrudan local adresinden ulaşın
     featureRequest:
       title: Özellik önerisi
       description: Bir fikir önerin ve ekibin sırada ne geliştireceğini oylayın
@@ -127,8 +126,8 @@ options:
       qrCodeAlt: WeChat QR kodu
   apiProviders:
     title: API Sağlayıcıları
-    pageDescription: Read Frog'un çağırdığı yapay zekâ servislerini bağlayın ve her özelliğin hangisini kullanacağını seçin.
-    description: Read Frog'un çağırabileceği sağlayıcıları ekleyin. 20'den fazlası yerleşik gelir; ayrıca Chat Completions uyumlu ve Open Responses API'lerini özel olarak ekleyebilirsiniz.
+    pageDescription: Yang Zihao Dic'un çağırdığı yapay zekâ servislerini bağlayın ve her özelliğin hangisini kullanacağını seçin.
+    description: Yang Zihao Dic'un çağırabileceği sağlayıcıları ekleyin. 20'den fazlası yerleşik gelir; ayrıca Chat Completions uyumlu ve Open Responses API'lerini özel olarak ekleyebilirsiniz.
     configTitle: Sağlayıcı yapılandırması
     addProvider: Sağlayıcı ekle
     builtInProvider: Yerleşik sağlayıcı
@@ -233,8 +232,8 @@ options:
         customChatComplete: Özel Chat Complete
         customResponses: Özel Responses
       attribution:
-        builtInAi: Read Frog tarafından barındırılan standart model. Ultra olmayan kullanıcılar yalnızca özel AI eylemlerinde kullanabilir; Ultra kullanıcıları daha fazla özellikte kullanabilir.
-        builtInAiAdvance: Read Frog tarafından barındırılan gelişmiş model, yalnızca Ultra üyelerine özeldir. Sayfa çevirisi, özel AI eylemleri ve diğer tüm yerleşik AI özelliklerinde çalışır; haftalık kota ortaktır. Kotayı standart modelden daha hızlı tüketir.
+        builtInAi: Yang Zihao Dic tarafından barındırılan standart model. Ultra olmayan kullanıcılar yalnızca özel AI eylemlerinde kullanabilir; Ultra kullanıcıları daha fazla özellikte kullanabilir.
+        builtInAiAdvance: Yang Zihao Dic tarafından barındırılan gelişmiş model, yalnızca Ultra üyelerine özeldir. Sayfa çevirisi, özel AI eylemleri ve diğer tüm yerleşik AI özelliklerinde çalışır; haftalık kota ortaktır. Kotayı standart modelden daha hızlı tüketir.
       description:
         openai: GPT-4o gibi modeller sağlar
         azure: Azure dağıtımlarınız üzerinden OpenAI modelleri
@@ -317,12 +316,12 @@ options:
     duplicate: Bu desen zaten listede
   preference:
     title: Tercihler
-    pageDescription: Read Frog'un görünümünü, nerede çalışacağını ve yapılandırmanızın nasıl eşitlenip yedekleneceğini ayarlayın.
+    pageDescription: Yang Zihao Dic'un görünümünü, nerede çalışacağını ve yapılandırmanızın nasıl eşitlenip yedekleneceğini ayarlayın.
     appearanceAndLanguage:
       title: Görünüm ve dil
       theme:
         title: Tema
-        description: Read Frog için bir tema seçin.
+        description: Yang Zihao Dic için bir tema seçin.
         system: Sistem
         light: Açık
         dark: Koyu
@@ -341,7 +340,7 @@ options:
         description: Sayfaların çevrileceği dil.
     extensionActivation:
       title: Uzantı etkinleştirme
-      description: Read Frog listelediğiniz siteler dışında her yerde mi, yoksa yalnızca listelediğiniz sitelerde mi çalışsın
+      description: Yang Zihao Dic listelediğiniz siteler dışında her yerde mi, yoksa yalnızca listelediğiniz sitelerde mi çalışsın
       manageSites: Siteleri yönet
       mode:
         title: Etkinleştirme modu
@@ -460,8 +459,8 @@ options:
         description: Henüz kararsız olabilecek deneysel özellikleri açın
       analytics:
         title: Kullanıcı deneyimini geliştirmemize yardımcı ol
-        tooltip: Açık olduğunda Read Frog, hataları yakalamak, özelliklerin güvenilir çalıştığını doğrulamak, performansı ve UX ayrıntılarını iyileştirmek ve sıradaki önceliklerimizi belirlemek için anonim kullanım sinyalleri gönderir.
-        description: Hataları bulmamıza, arayüzü iyileştirmemize ve daha fazlasına yardım ederek Read Frog'u geliştirin
+        tooltip: Açık olduğunda Yang Zihao Dic, hataları yakalamak, özelliklerin güvenilir çalıştığını doğrulamak, performansı ve UX ayrıntılarını iyileştirmek ve sıradaki önceliklerimizi belirlemek için anonim kullanım sinyalleri gönderir.
+        description: Hataları bulmamıza, arayüzü iyileştirmemize ve daha fazlasına yardım ederek Yang Zihao Dic'u geliştirin
   shortcuts:
     title: Kısayollar
     pageDescription: Okurken çeviriyi başlatan tuşları belirleyin.
@@ -514,7 +513,7 @@ options:
     demoImageAlt: Yüzen buton demosu
     enable:
       title: Yüzen butonu etkinleştir
-      description: Read Frog özelliklerine hızlı erişim için web sayfalarında yüzen butonu görüntüle
+      description: Yang Zihao Dic özelliklerine hızlı erişim için web sayfalarında yüzen butonu görüntüle
     display:
       title: Görünüm
       side:
@@ -640,7 +639,7 @@ options:
           title: Notebase bağlantısı
           description: Bu eylemin yapılandırılmış sonuçlarını uzak bir Notebase'e kaydedin.
           loginRequiredTitle: Notebase yapılandırmak için giriş yapın
-          loginRequiredDescription: notebase seçmeden veya eşlemeleri düzenlemeden önce readfrog.app'te oturum açın.
+          loginRequiredDescription: notebase seçmeden veya eşlemeleri düzenlemeden önce local'te oturum açın.
           loginRequiredConnectedDescription: Bu bağlantı aşağıdaki hesapla oluşturuldu. Aynı hesapla giriş yaparsanız alan eşlemeleri geri yüklenir. Başka bir hesapla giriş yaparsanız Notebase oluştururken veya bağlarken önceki eşlemeler temizlenir.
           loginAction: Giriş yap
           connectedAccountLabel: Bağlı hesap
@@ -652,7 +651,7 @@ options:
           clearConnectionAction: Bağlantıyı temizle
           refreshAction: Yenile
           emptyTitle: Henüz Notebase yok
-          emptyDescription: readfrog.app'te bir notebase oluşturun, sonra alanları eşlemek için buraya dönün.
+          emptyDescription: local'te bir notebase oluşturun, sonra alanları eşlemek için buraya dönün.
           openNotebaseAction: Notebase'i aç
           accessDeniedTitle: Notebase'e erişilemiyor
           accessDeniedDescription: Bu hesabın Notebase verilerini yükleme izni yok.
@@ -703,7 +702,7 @@ options:
         duplicateFieldKey: Alan adları benzersiz olmalıdır
   contextMenu:
     title: Bağlam Menüsü
-    pageDescription: Tarayıcının sağ tık menüsündeki Read Frog seçeneklerini yönetin.
+    pageDescription: Tarayıcının sağ tık menüsündeki Yang Zihao Dic seçeneklerini yönetin.
     demoImageAlt: Bağlam menüsü demosu
     enable:
       title: Bağlam menüsü çevirisini etkinleştir
@@ -760,7 +759,7 @@ options:
         editor:
           placeholder: |
             /* Örnek: Renk ve arka planlı özel stil */
-            [data-read-frog-custom-translation-style='custom'] {
+            [data-yangzihao-dic-custom-translation-style='custom'] {
               color: #414535;
               background-color: light-dark(#F2E3BC, #C19875);
               padding: 2px 4px;
@@ -780,7 +779,6 @@ options:
       description: Farklı türde Promptları özelleştirmek, çeviri sırasında Prompt türünü kendiniz ayarlamanıza olanak tanır. Prompt, kullanıcının LLM'ye gönderdiği metni temsil eder.
       managePrompts: Promptları yönet
       communityPrompts: Topluluktan prompt al veya paylaş
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/821
       addPrompt: Prompt ekle
       default: Varsayılan
       builtIn: Yerleşik
@@ -919,9 +917,9 @@ options:
       noVoicesFound: Ses bulunamadı
       language:
         title: Dil sesi
-        description: Bir dil seçin, ardından o dili okuyacak sesi belirleyin. Sıfırlamak, Read Frog'un o dil için seçtiği sesi geri getirir.
+        description: Bir dil seçin, ardından o dili okuyacak sesi belirleyin. Sıfırlamak, Yang Zihao Dic'un o dil için seçtiği sesi geri getirir.
         reset: Sıfırla
-        previewSample: Read Frog'dan merhaba! Yüksek sesle okurken böyle ses çıkaracağım.
+        previewSample: Yang Zihao Dic'dan merhaba! Yüksek sesle okurken böyle ses çıkaracağım.
       fallback:
         title: Yedek ses
         description: Kendine ait bir ses atamadığınız diller bu sesle okunur.
@@ -1008,7 +1006,7 @@ options:
               filter: none;
             }
 
-            /* Kullanabileceğiniz seçiciler: .read-frog-subtitles-box, .subtitles-main, .subtitles-translation */
+            /* Kullanabileceğiniz seçiciler: .yangzihao-dic-subtitles-box, .subtitles-main, .subtitles-translation */
           docsLink: Nasıl yapılandırılır?
           saveButton: Kaydet
           savedButton: Kaydedildi
@@ -1063,7 +1061,7 @@ options:
   rateUs:
     title: Bizi Değerlendirin
   configMigration:
-    versionTooNew: İçe aktarılan yapılandırma sürümü daha yeni, lütfen Read Frog'u en son sürüme yükseltin
+    versionTooNew: İçe aktarılan yapılandırma sürümü daha yeni, lütfen Yang Zihao Dic'u en son sürüme yükseltin
     validationError: Yapılandırma doğrulaması başarısız
 side:
   sourceLang: Kaynak Dil
@@ -1117,7 +1115,7 @@ action:
   saveToNotebaseSaving: Kaydediliyor...
   saveToNotebaseSuccess: Notebase'e kaydedildi
   saveToNotebaseFailed: Notebase'e kaydetme başarısız oldu
-  saveToNotebaseLoginRequired: Notebase'e kaydetmek için readfrog.app'te oturum açın
+  saveToNotebaseLoginRequired: Notebase'e kaydetmek için local'te oturum açın
   saveToNotebaseAccessDenied: Bu hesap seçilen Notebase'e erişemiyor
   saveToNotebaseLimitExceeded: Daha fazla Notebase notu kaydetmek için yükseltme gerekir
   saveToNotebaseTableUnavailable: Seçilen Notebase artık kullanılamıyor
@@ -1137,8 +1135,8 @@ action:
   saveToNotebaseMissingNotebaseDescription: Eski Notebase artık yok veya bu hesapla açılamıyor. Yeni bir Notebase oluşturup kaydedin ya da Custom AI Actions içinde mevcut bir Notebase bağlayın.
   saveToNotebaseAccountUnavailableDescription: Giriş yapılan hesap aşağıdaki bağlı hesapla eşleşmiyor. Oluşturup kaydetmek önceki bağlantıyı ve alan eşlemelerini değiştirir. Custom AI Actions içinde mevcut bir Notebase de bağlayabilirsiniz.
   saveToNotebasePendingLogin: Kaydetmeyi tamamlamak için giriş yapın
-  saveToNotebasePendingLoginDescription: Giriş yaptıktan sonra Read Frog Notebase'i oluşturur ve bu sonucu otomatik olarak kaydeder.
-  saveToNotebasePendingConnectedLoginDescription: Girişten sonra Read Frog mümkünse bağlı Notebase'e kaydeder. Bu hesap onu kullanamazsa yeni bir Notebase oluşturup kaydeder.
+  saveToNotebasePendingLoginDescription: Giriş yaptıktan sonra Yang Zihao Dic Notebase'i oluşturur ve bu sonucu otomatik olarak kaydeder.
+  saveToNotebasePendingConnectedLoginDescription: Girişten sonra Yang Zihao Dic mümkünse bağlı Notebase'e kaydeder. Bu hesap onu kullanamazsa yeni bir Notebase oluşturup kaydeder.
   upgrade: Yükselt
   updatePayment: Ödemeyi güncelle
   openCustomActions: Custom AI Actions'ı aç
@@ -1177,7 +1175,7 @@ subtitles:
     downloadTranslatedComplete: Çevrilmiş altyazılar indirildi
     downloadSource: Kaynak altyazıları indir
   state:
-    loading: Read Frog altyazılar yükleniyor
+    loading: Yang Zihao Dic altyazılar yükleniyor
     translating: Çevriliyor…
     error: Bir hata oluştu
   errors:

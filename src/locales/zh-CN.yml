@@ -1,7 +1,6 @@
-name: 陪读蛙
-extName: 陪读蛙 - 翻译与学习
-extDescription: 陪读蛙是一款开放源代码的浏览器插件，旨在帮助您从任何网站深入学习语言。
-uninstallSurveyUrl: https://tally.so/r/3E9XDL
+name: 大傻豪词典
+extName: "大傻豪词典 - 翻译与学习"
+extDescription: "完全本地化的开源浏览器插件，用你自己的 AI API Key 深入学习语言。无需账号、不上传云端、生词本无数量上限。"
 account:
   login: 登录
   webApp: 网页应用
@@ -16,7 +15,7 @@ contextMenu:
   readAloudSelection: 朗读”%s”
   showOriginal: 显示原文
 sidePanel:
-  firefoxUserActionHint: 在 Firefox 中，请从浏览器侧边栏打开陪读蛙。
+  firefoxUserActionHint: 在 Firefox 中，请从浏览器侧边栏打开大傻豪词典。
   firefoxUserActionHelpText: 查看 Firefox 侧边栏说明
   firefoxUserActionHelpUrl: https://support.mozilla.org/zh-CN/kb/use-sidebar-access-tools-and-vertical-tabs
 popup:
@@ -51,7 +50,7 @@ popup:
   discord:
     tooltip: 加入 Discord 与开发者交流，抢先体验新功能
   blog:
-    notification: 陪读蛙更新动态
+    notification: 大傻豪词典更新动态
   aiSmartContext: AI 智能上下文
   aiSmartContextDescription: 结合网页上下文提升翻译效果。需要配置 LLM 翻译服务商。
   more:
@@ -101,15 +100,15 @@ options:
     roadmap: 路线图
   helpAndCommunity:
     title: 帮助与社区
-    pageDescription: 了解怎么使用陪读蛙、向团队寻求帮助，或者加入社区和其他用户交流。
+    pageDescription: 了解怎么使用大傻豪词典、向团队寻求帮助，或者加入社区和其他用户交流。
     help:
       title: 帮助
     tutorial:
       title: 使用教程
-      description: 阅读文档，了解怎么使用陪读蛙
+      description: 阅读文档，了解怎么使用大傻豪词典
     email:
       title: 邮件联系
-      description: 通过 contact@readfrog.app 直接联系团队
+      description: 通过 本地运行，无需联系服务方 直接联系团队
     featureRequest:
       title: 功能建议
       description: 提出想法，并为团队接下来要做的功能投票
@@ -127,8 +126,8 @@ options:
       qrCodeAlt: 微信二维码
   apiProviders:
     title: API 提供商
-    pageDescription: 接入 Read Frog 调用的 AI 服务，并为每项功能指定使用哪一个。
-    description: 添加 Read Frog 可以调用的提供商。内置 20 多个，也可以添加兼容 Chat Completions 的自定义 API 和 Open Responses 自定义 API。
+    pageDescription: 接入 Yang Zihao Dic 调用的 AI 服务，并为每项功能指定使用哪一个。
+    description: 添加 Yang Zihao Dic 可以调用的提供商。内置 20 多个，也可以添加兼容 Chat Completions 的自定义 API 和 Open Responses 自定义 API。
     configTitle: 提供商配置
     addProvider: 添加提供商
     builtInProvider: 内置提供商
@@ -234,8 +233,8 @@ options:
         customChatComplete: 自定义 Chat Complete
         customResponses: 自定义 Responses
       attribution:
-        builtInAi: 由 Read Frog 托管的普通模型。非 Ultra 用户仅支持在自定义 AI 指令使用，Ultra 用户支持在更多功能上使用。
-        builtInAiAdvance: 由 Read Frog 托管的高级模型，Ultra 会员专属。网页翻译、自定义 AI 指令等全部内置 AI 功能均可使用，共享每周额度，额度消耗比标准模型更快。
+        builtInAi: 由 Yang Zihao Dic 托管的普通模型。非 Ultra 用户仅支持在自定义 AI 指令使用，Ultra 用户支持在更多功能上使用。
+        builtInAiAdvance: 由 Yang Zihao Dic 托管的高级模型，Ultra 会员专属。网页翻译、自定义 AI 指令等全部内置 AI 功能均可使用，共享每周额度，额度消耗比标准模型更快。
       description:
         openai: 提供 GPT-4o 等模型
         azure: 通过 Azure 部署使用 OpenAI 模型
@@ -318,12 +317,12 @@ options:
     duplicate: 该模式已在列表中
   preference:
     title: 偏好设置
-    pageDescription: 设置陪读蛙的外观与生效范围，以及配置的同步与备份方式。
+    pageDescription: 设置大傻豪词典的外观与生效范围，以及配置的同步与备份方式。
     appearanceAndLanguage:
       title: 外观与语言
       theme:
         title: 主题
-        description: 为陪读蛙选择主题。
+        description: 为大傻豪词典选择主题。
         system: 跟随系统
         light: 浅色
         dark: 深色
@@ -335,7 +334,7 @@ options:
       title: 翻译语言
       sourceCode:
         title: 源语言
-        description: 网页原文的语言。选择“自动检测”则由陪读蛙从页面本身判断。
+        description: 网页原文的语言。选择“自动检测”则由大傻豪词典从页面本身判断。
         auto: 自动检测
       targetCode:
         title: 目标语言
@@ -461,8 +460,8 @@ options:
         description: 开启可能还不稳定的实验性功能
       analytics:
         title: 帮助改进用户体验
-        tooltip: 开启后，Read Frog 会发送匿名的产品使用信号，用于发现 bug、验证功能是否稳定、优化性能与交互细节，并帮助我们决定接下来优先投入的方向。
-        description: 通过帮助我们定位 bug、优化界面布局等改善 Read Frog
+        tooltip: 开启后，Yang Zihao Dic 会发送匿名的产品使用信号，用于发现 bug、验证功能是否稳定、优化性能与交互细节，并帮助我们决定接下来优先投入的方向。
+        description: 通过帮助我们定位 bug、优化界面布局等改善 Yang Zihao Dic
   shortcuts:
     title: 快捷键
     pageDescription: 设置阅读时触发翻译的按键。
@@ -515,7 +514,7 @@ options:
     demoImageAlt: 悬浮按钮演示
     enable:
       title: 启用悬浮按钮
-      description: 在网页上显示悬浮按钮，快速访问陪读蛙功能
+      description: 在网页上显示悬浮按钮，快速访问大傻豪词典功能
     display:
       title: 显示
       side:
@@ -641,7 +640,7 @@ options:
           title: 笔记库连接
           description: 将这个指令的结构化结果保存到远程笔记库。
           loginRequiredTitle: 登录后才能配置笔记库
-          loginRequiredDescription: 先在 readfrog.app 登录，然后再选择笔记库和编辑映射。
+          loginRequiredDescription: 先在 本地 登录，然后再选择笔记库和编辑映射。
           loginRequiredConnectedDescription: 这个连接来自下面的账号。如果登录原账号，会恢复字段映射；如果登录其他账号，创建或连接笔记库时会清空之前的字段映射。
           loginAction: 去登录
           connectedAccountLabel: 已连接账号
@@ -653,7 +652,7 @@ options:
           clearConnectionAction: 清空连接
           refreshAction: 刷新
           emptyTitle: 还没有笔记库
-          emptyDescription: 先去 readfrog.app 创建一个笔记库，再回来映射字段。
+          emptyDescription: 先去 本地 创建一个笔记库，再回来映射字段。
           openNotebaseAction: 打开笔记库
           accessDeniedTitle: 无法访问笔记库
           accessDeniedDescription: 当前账号没有权限加载笔记库数据。
@@ -819,7 +818,7 @@ options:
         duplicateFieldKey: 字段名不能重复
   contextMenu:
     title: 右键菜单
-    pageDescription: 控制浏览器右键菜单里的 Read Frog 选项。
+    pageDescription: 控制浏览器右键菜单里的 Yang Zihao Dic 选项。
     demoImageAlt: 右键菜单演示
     enable:
       title: 启用右键翻译
@@ -876,7 +875,7 @@ options:
         editor:
           placeholder: |
             /* 示例：自定义颜色和背景样式 */
-            [data-read-frog-custom-translation-style='custom'] {
+            [data-yangzihao-dic-custom-translation-style='custom'] {
               color: #414535;
               background-color: light-dark(#F2E3BC, #C19875);
               padding: 2px 4px;
@@ -896,7 +895,6 @@ options:
       description: 自定义不同类型的 Prompt，可以在翻译时自行调整 Prompt 类型。Prompt 表示以用户身份发送给 LLM 的文本。
       managePrompts: 管理 Prompt
       communityPrompts: 获取或分享社区 Prompt
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/820
       addPrompt: 添加 Prompt
       default: 通用
       builtIn: 内置
@@ -1035,9 +1033,9 @@ options:
       noVoicesFound: 未找到语音
       language:
         title: 语言语音
-        description: 先选择一种语言，再挑选朗读它时使用的语音。重置会换回陪读蛙为该语言选定的语音。
+        description: 先选择一种语言，再挑选朗读它时使用的语音。重置会换回大傻豪词典为该语言选定的语音。
         reset: 重置
-        previewSample: 来自 Read Frog 的问候！这是我朗读时的声音。
+        previewSample: 来自 Yang Zihao Dic 的问候！这是我朗读时的声音。
       fallback:
         title: 兜底语音
         description: 你还没有单独指定语音的语言，都用这个语音朗读。
@@ -1124,7 +1122,7 @@ options:
               filter: none;
             }
 
-            /* 可用的选择器：.read-frog-subtitles-box、.subtitles-main、.subtitles-translation */
+            /* 可用的选择器：.yangzihao-dic-subtitles-box、.subtitles-main、.subtitles-translation */
           docsLink: 如何配置?
           saveButton: 保存
           savedButton: 已保存
@@ -1179,7 +1177,7 @@ options:
   rateUs:
     title: 好评支持
   configMigration:
-    versionTooNew: 导入的配置版本较新，请升级 Read Frog 到最新版本
+    versionTooNew: 导入的配置版本较新，请升级 Yang Zihao Dic 到最新版本
     validationError: 配置验证失败
 side:
   sourceLang: 来源语言
@@ -1233,7 +1231,7 @@ action:
   saveToNotebaseSaving: 保存中...
   saveToNotebaseSuccess: 已保存到笔记库
   saveToNotebaseFailed: 保存到笔记库失败
-  saveToNotebaseLoginRequired: 请先在 readfrog.app 登录后再保存到笔记库
+  saveToNotebaseLoginRequired: 请先在 本地 登录后再保存到笔记库
   saveToNotebaseAccessDenied: 当前账号无法访问选中的笔记库
   saveToNotebaseLimitExceeded: 需要升级后才能保存更多笔记库内容
   saveToNotebaseTableUnavailable: 选中的笔记库已不可用
@@ -1253,8 +1251,8 @@ action:
   saveToNotebaseMissingNotebaseDescription: 旧笔记库不存在或当前账号无法打开。可以创建新的笔记库并保存当前结果，或去 Custom AI Actions 连接已有笔记库。
   saveToNotebaseAccountUnavailableDescription: 当前登录账号和下方已连接账号不同。选择创建并保存会替换之前的连接配置和字段映射；也可以去 Custom AI Actions 连接已有笔记库。
   saveToNotebasePendingLogin: 登录后继续保存
-  saveToNotebasePendingLoginDescription: 登录完成后，Read Frog 会自动创建笔记库并保存当前结果。
-  saveToNotebasePendingConnectedLoginDescription: 登录完成后，Read Frog 会优先保存到已连接的笔记库；如果当前账号无法使用它，会创建新的笔记库并保存当前结果。
+  saveToNotebasePendingLoginDescription: 登录完成后，Yang Zihao Dic 会自动创建笔记库并保存当前结果。
+  saveToNotebasePendingConnectedLoginDescription: 登录完成后，Yang Zihao Dic 会优先保存到已连接的笔记库；如果当前账号无法使用它，会创建新的笔记库并保存当前结果。
   upgrade: 升级
   updatePayment: 更新支付方式
   openCustomActions: 打开 Custom AI Actions
@@ -1293,7 +1291,7 @@ subtitles:
     downloadTranslatedComplete: 翻译字幕已下载
     downloadSource: 下载原字幕
   state:
-    loading: Read Frog 字幕加载中
+    loading: Yang Zihao Dic 字幕加载中
     translating: 翻译中…
     error: 发生错误
   errors:

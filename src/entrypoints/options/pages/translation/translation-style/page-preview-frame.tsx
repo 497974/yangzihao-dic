@@ -124,10 +124,10 @@ export function PagePreviewFrame({ children, className }: PagePreviewFrameProps)
     if (!body) return
 
     const doc = body.ownerDocument
-    let style = doc.getElementById("read-frog-preview-base")
+    let style = doc.getElementById("yangzihao-dic-preview-base")
     if (!style) {
       style = doc.createElement("style")
-      style.id = "read-frog-preview-base"
+      style.id = "yangzihao-dic-preview-base"
       doc.head.prepend(style)
     }
     style.textContent = buildFrameCSS(theme)

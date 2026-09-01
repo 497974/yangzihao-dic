@@ -1,7 +1,6 @@
-name: Read Frog
-extName: "Read Frog - Translate & Learn"
-extDescription: Read Frog is an open source browser extension designed to help you learn languages deeply from any website.
-uninstallSurveyUrl: https://tally.so/r/nPK6Ob
+name: Yang Zihao Dic
+extName: "Yang Zihao Dic - Translate & Learn"
+extDescription: "A fully local, open-source browser extension for deep language learning. Uses your own AI API key; no account, no cloud, no limits."
 account:
   login: Log in
   webApp: Web app
@@ -16,7 +15,7 @@ contextMenu:
   readAloudSelection: Read aloud "%s"
   showOriginal: Show Original
 sidePanel:
-  firefoxUserActionHint: In Firefox, open Read Frog from the browser sidebar.
+  firefoxUserActionHint: In Firefox, open Yang Zihao Dic from the browser sidebar.
   firefoxUserActionHelpText: Learn how to open the Firefox sidebar
   firefoxUserActionHelpUrl: https://support.mozilla.org/en-US/kb/use-sidebar-access-tools-and-vertical-tabs
 popup:
@@ -51,7 +50,7 @@ popup:
   discord:
     tooltip: Join Discord to connect with developers and get early access to new features
   blog:
-    notification: What's new in Read Frog
+    notification: What's new in Yang Zihao Dic
   aiSmartContext: AI Smart Context
   aiSmartContextDescription: Uses webpage context to improve translation quality. Requires LLM translation provider.
   more:
@@ -101,15 +100,15 @@ options:
     roadmap: Roadmap
   helpAndCommunity:
     title: Help & Community
-    pageDescription: Learn how to use Read Frog, get help from the team, or join other users in the community.
+    pageDescription: Learn how to use Yang Zihao Dic, get help from the team, or join other users in the community.
     help:
       title: Help
     tutorial:
       title: Tutorial
-      description: Read the docs and learn how to use Read Frog
+      description: Read the docs and learn how to use Yang Zihao Dic
     email:
       title: Email us
-      description: Reach the team directly at contact@readfrog.app
+      description: This extension runs fully offline. Configure your own AI API key in settings.
     featureRequest:
       title: Feature request
       description: Suggest an idea and vote on what the team builds next
@@ -127,8 +126,8 @@ options:
       qrCodeAlt: WeChat QR code
   apiProviders:
     title: API Providers
-    pageDescription: Connect the AI services Read Frog calls, then choose which one runs each feature.
-    description: Add the providers Read Frog can call. Over 20 are built in, with custom support for Chat Completions-compatible and Open Responses APIs.
+    pageDescription: Connect the AI services Yang Zihao Dic calls, then choose which one runs each feature.
+    description: Add the providers Yang Zihao Dic can call. Over 20 are built in, with custom support for Chat Completions-compatible and Open Responses APIs.
     configTitle: Provider config
     addProvider: Add provider
     builtInProvider: Built-in provider
@@ -234,8 +233,8 @@ options:
         customChatComplete: Custom Chat Complete
         customResponses: Custom Responses
       attribution:
-        builtInAi: Read Frog's hosted standard model. Non-Ultra users can use it only for Custom AI Actions; Ultra members can use it on more features.
-        builtInAiAdvance: Read Frog's hosted advanced model, exclusive to Ultra members. Runs page translation, Custom AI Actions, and every other Built-in AI feature on a shared weekly quota. Uses up the quota faster than the standard model.
+        builtInAi: Yang Zihao Dic's hosted standard model. Non-Ultra users can use it only for Custom AI Actions; Ultra members can use it on more features.
+        builtInAiAdvance: Yang Zihao Dic's hosted advanced model, exclusive to Ultra members. Runs page translation, Custom AI Actions, and every other Built-in AI feature on a shared weekly quota. Uses up the quota faster than the standard model.
       description:
         openai: Provides models like GPT-4o
         azure: Azure-hosted OpenAI models through your deployments
@@ -318,12 +317,12 @@ options:
     duplicate: This pattern is already in the list
   preference:
     title: Preferences
-    pageDescription: Set how Read Frog looks, where it runs, and how your config is synced and backed up.
+    pageDescription: Set how Yang Zihao Dic looks, where it runs, and how your config is synced and backed up.
     appearanceAndLanguage:
       title: Appearance & language
       theme:
         title: Theme
-        description: Choose a theme for Read Frog.
+        description: Choose a theme for Yang Zihao Dic.
         system: System
         light: Light
         dark: Dark
@@ -342,7 +341,7 @@ options:
         description: The language pages are translated into.
     extensionActivation:
       title: Extension activation
-      description: Whether Read Frog runs everywhere except the sites you list, or only on the sites you list
+      description: Whether Yang Zihao Dic runs everywhere except the sites you list, or only on the sites you list
       manageSites: Manage sites
       mode:
         title: Activation mode
@@ -461,8 +460,8 @@ options:
         description: Turn on experimental features that may still be unstable
       analytics:
         title: Help improve user experience
-        tooltip: When enabled, Read Frog sends anonymous product usage signals so we can catch bugs, verify feature reliability, improve performance and UX polish, and prioritize future work.
-        description: Improve Read Frog by helping us locate bugs, refine layouts, and more
+        tooltip: When enabled, Yang Zihao Dic sends anonymous product usage signals so we can catch bugs, verify feature reliability, improve performance and UX polish, and prioritize future work.
+        description: Improve Yang Zihao Dic by helping us locate bugs, refine layouts, and more
   shortcuts:
     title: Shortcuts
     pageDescription: Set the keys that trigger translation while you read.
@@ -515,7 +514,7 @@ options:
     demoImageAlt: Floating button demo
     enable:
       title: Enable floating button
-      description: Display the floating button on web pages for quick access to Read Frog features
+      description: Display the floating button on web pages for quick access to Yang Zihao Dic features
     display:
       title: Display
       side:
@@ -641,7 +640,7 @@ options:
           title: Notebase connection
           description: Save this action's structured results to a remote notebase.
           loginRequiredTitle: Log in to configure Notebase
-          loginRequiredDescription: Sign in on readfrog.app before choosing a notebase or editing mappings.
+          loginRequiredDescription: Your notebook is stored locally in this browser.
           loginRequiredConnectedDescription: This connection was created by the account below. If you log in as the same account, field mappings will be restored. If you log in as another account, the previous mappings will be cleared when you create or connect a Notebase.
           loginAction: Log in
           connectedAccountLabel: Connected account
@@ -653,7 +652,7 @@ options:
           clearConnectionAction: Clear connection
           refreshAction: Refresh
           emptyTitle: No notebases yet
-          emptyDescription: Create a notebase on readfrog.app, then come back here to map fields.
+          emptyDescription: Create a notebook below, then map the fields.
           openNotebaseAction: Open Notebase
           accessDeniedTitle: Cannot access Notebase
           accessDeniedDescription: This account does not have permission to load Notebase data.
@@ -819,7 +818,7 @@ options:
         duplicateFieldKey: Field names must be unique
   contextMenu:
     title: Context Menu
-    pageDescription: Control the Read Frog entries in the browser's right-click menu.
+    pageDescription: Control the Yang Zihao Dic entries in the browser's right-click menu.
     demoImageAlt: Context menu demo
     enable:
       title: Enable context menu translate
@@ -876,7 +875,7 @@ options:
         editor:
           placeholder: |
             /* Example: Custom style with color and background */
-            [data-read-frog-custom-translation-style='custom'] {
+            [data-yangzihao-dic-custom-translation-style='custom'] {
               color: #414535;
               background-color: light-dark(#F2E3BC, #C19875);
               padding: 2px 4px;
@@ -896,7 +895,6 @@ options:
       description: Customizing different types of Prompts allows you to adjust the Prompt type yourself during translation. A Prompt represents the text that the user sends to the LLM.
       managePrompts: Manage prompts
       communityPrompts: Get or share prompts from community
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/821
       addPrompt: Add prompt
       default: Default
       builtIn: Built-in
@@ -1035,9 +1033,9 @@ options:
       noVoicesFound: No voices found
       language:
         title: Language voice
-        description: Pick a language, then the voice that reads it aloud. Reset puts back the voice Read Frog picks for that language.
+        description: Pick a language, then the voice that reads it aloud. Reset puts back the voice Yang Zihao Dic picks for that language.
         reset: Reset
-        previewSample: Hello from Read Frog! This is how I will sound when reading aloud.
+        previewSample: Hello from Yang Zihao Dic! This is how I will sound when reading aloud.
       fallback:
         title: Fallback voice
         description: The voice for any language you have not given one of its own.
@@ -1124,7 +1122,7 @@ options:
               filter: none;
             }
 
-            /* Selectors you can use: .read-frog-subtitles-box, .subtitles-main, .subtitles-translation */
+            /* Selectors you can use: .yangzihao-dic-subtitles-box, .subtitles-main, .subtitles-translation */
           docsLink: How to configure?
           saveButton: Save
           savedButton: Saved
@@ -1179,7 +1177,7 @@ options:
   rateUs:
     title: Rate Us
   configMigration:
-    versionTooNew: The imported config version is newer, please upgrade Read Frog to the latest version
+    versionTooNew: The imported config version is newer, please upgrade Yang Zihao Dic to the latest version
     validationError: Config validation failed
 side:
   sourceLang: Source Language
@@ -1233,7 +1231,7 @@ action:
   saveToNotebaseSaving: Saving...
   saveToNotebaseSuccess: Saved to Notebase
   saveToNotebaseFailed: Failed to save to Notebase
-  saveToNotebaseLoginRequired: Log in on readfrog.app to save to Notebase
+  saveToNotebaseLoginRequired: Could not save to your notebook
   saveToNotebaseAccessDenied: This account cannot access the selected Notebase
   saveToNotebaseLimitExceeded: Upgrade is required to save more Notebase notes
   saveToNotebaseTableUnavailable: The selected Notebase is no longer available
@@ -1248,13 +1246,13 @@ action:
   saveToNotebaseConnectExisting: Connect existing Notebase
   saveToNotebaseGoConfigure: Configure
   saveToNotebaseLoginConnectedTitle: Log in to save?
-  saveToNotebaseLoginConnectedDescription: This Custom Action is connected to the account below. After login, Read Frog will save to the existing Notebase when possible, or create a new Notebase for the logged-in account.
+  saveToNotebaseLoginConnectedDescription: This Custom Action is connected to the account below. After login, Yang Zihao Dic will save to the existing Notebase when possible, or create a new Notebase for the logged-in account.
   saveToNotebaseConnectionUnavailableTitle: Notebase connection unavailable
   saveToNotebaseMissingNotebaseDescription: The old Notebase no longer exists or cannot be opened by this account. Create a new Notebase and save this result, or connect an existing Notebase in Custom AI Actions.
   saveToNotebaseAccountUnavailableDescription: The logged-in account does not match the connected account below. Creating and saving will replace the previous connection and field mappings. You can also connect an existing Notebase in Custom AI Actions.
   saveToNotebasePendingLogin: Log in to finish saving
-  saveToNotebasePendingLoginDescription: After login, Read Frog will create the Notebase and save this result automatically.
-  saveToNotebasePendingConnectedLoginDescription: After login, Read Frog will save to the connected Notebase when possible. If this account cannot use it, Read Frog will create a new Notebase and save this result.
+  saveToNotebasePendingLoginDescription: After login, Yang Zihao Dic will create the Notebase and save this result automatically.
+  saveToNotebasePendingConnectedLoginDescription: After login, Yang Zihao Dic will save to the connected Notebase when possible. If this account cannot use it, Yang Zihao Dic will create a new Notebase and save this result.
   upgrade: Upgrade
   updatePayment: Update payment
   openCustomActions: Open Custom AI Actions
@@ -1293,7 +1291,7 @@ subtitles:
     downloadTranslatedComplete: Translated subtitles downloaded
     downloadSource: Download source subtitles
   state:
-    loading: Read Frog loading captions
+    loading: Yang Zihao Dic loading captions
     translating: Translating…
     error: Error occurred
   errors:

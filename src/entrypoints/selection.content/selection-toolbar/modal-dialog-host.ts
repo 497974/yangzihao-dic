@@ -1,7 +1,7 @@
 import type { SelectionRangeSnapshot } from "../utils"
 import { NOTRANSLATE_CLASS } from "@/utils/constants/dom-labels"
 
-export const MODAL_DIALOG_HOST_SLOT_ATTRIBUTE = "data-read-frog-modal-dialog-host-slot"
+export const MODAL_DIALOG_HOST_SLOT_ATTRIBUTE = "data-yangzihao-dic-modal-dialog-host-slot"
 
 const MAX_OVERLAY_Z_INDEX = "2147483647"
 const CALIBRATION_TOLERANCE = 1
@@ -122,7 +122,7 @@ export function findSelectionModalDialog(ranges: SelectionRangeSnapshot[]) {
 }
 
 export function createModalDialogHostSlot(document: Document) {
-  const slot = document.createElement("read-frog-modal-dialog-host-slot")
+  const slot = document.createElement("yangzihao-dic-modal-dialog-host-slot")
   slot.classList.add(NOTRANSLATE_CLASS)
   slot.setAttribute(MODAL_DIALOG_HOST_SLOT_ATTRIBUTE, "")
 

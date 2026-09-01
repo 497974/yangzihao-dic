@@ -19,7 +19,7 @@ export function RequestAiSubtitlesItem() {
   const shadowWrapper = use(ShadowWrapperContext)
   const source = useAtomValue(subtitlesSourceAtom, { store: subtitlesStore })
   const isVisible = useAtomValue(subtitlesVisibleAtom, { store: subtitlesStore })
-  const buttonId = "read-frog-request-ai-subtitles"
+  const buttonId = "yangzihao-dic-request-ai-subtitles"
 
   const usingAi = source === SUBTITLES_SOURCE.AI && isVisible && !pending
   const label = usingAi

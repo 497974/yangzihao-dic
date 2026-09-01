@@ -13,9 +13,9 @@
 export const PARTNER_BRIDGE_ORIGINS = ["https://www.jalapeno-cloud.ai"] as const
 
 /** Marks a message as coming from a partner page rather than from the extension. */
-export const PARTNER_BRIDGE_REQUEST_SOURCE = "read-frog-partner-page"
+export const PARTNER_BRIDGE_REQUEST_SOURCE = "yangzihao-dic-partner-page"
 
 /** Marks the extension's acknowledgement, so a partner page can tell whether we are installed. */
-export const PARTNER_BRIDGE_RESPONSE_SOURCE = "read-frog-partner-ext"
+export const PARTNER_BRIDGE_RESPONSE_SOURCE = "yangzihao-dic-partner-ext"
 
 export const PARTNER_BRIDGE_OPEN_PROVIDER_CONFIG = "openProviderConfig"

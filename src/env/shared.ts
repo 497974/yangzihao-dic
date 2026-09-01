@@ -1,10 +1,13 @@
 import { z } from "zod"
 
+// 本项目不依赖任何远端服务：笔记库与身份都在扩展内部处理
+// （见 src/utils/local-notebase/intercept.ts）。这些地址只是占位，
+// 实际请求在后台被拦截，永远不会真正发出。
 export const PRODUCTION_EXTENSION_ENV_DEFAULTS = {
-  WXT_API_URL: "https://api.readfrog.app",
-  WXT_WEBSITE_URL: "https://www.readfrog.app",
-  WXT_OFFICIAL_SITE_ORIGINS: "https://readfrog.app,https://www.readfrog.app",
-  WXT_AUTH_COOKIE_DOMAINS: "readfrog.app",
+  WXT_API_URL: "http://localhost",
+  WXT_WEBSITE_URL: "http://localhost",
+  WXT_OFFICIAL_SITE_ORIGINS: "http://localhost",
+  WXT_AUTH_COOKIE_DOMAINS: "localhost",
 } as const
 
 export const LOCAL_EXTENSION_ENV_DEFAULTS = {

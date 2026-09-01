@@ -7,7 +7,7 @@ import { PageLayout } from "../../../../components/page-layout"
 import { promptAtoms } from "../atoms"
 
 /**
- * Every prompt Read Frog can translate subtitles with, drilled into from the Video Subtitles
+ * Every prompt Yang Zihao Dic can translate subtitles with, drilled into from the Video Subtitles
  * page. They stay apart from the page translation prompts, which take different tokens.
  */
 export function SubtitlesCustomPromptsPage() {

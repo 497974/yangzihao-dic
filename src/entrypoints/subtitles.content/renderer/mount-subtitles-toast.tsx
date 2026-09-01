@@ -6,7 +6,7 @@ import { SUBTITLES_THEME } from "@/utils/constants/subtitles"
 import { ShadowHostBuilder } from "@/utils/react-shadow-host/shadow-host-builder"
 import { applyTheme } from "@/utils/theme"
 
-const SUBTITLES_TOAST_HOST_ID = "read-frog-subtitles-toast-host"
+const SUBTITLES_TOAST_HOST_ID = "yangzihao-dic-subtitles-toast-host"
 
 export function mountSubtitlesToast(): () => void {
   const existingHost = document.getElementById(SUBTITLES_TOAST_HOST_ID)

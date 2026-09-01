@@ -217,7 +217,8 @@ export function buildNotebaseCreateInputFromPending(
 }
 
 export function getNotebaseDetailUrl(notebaseId: string) {
-  return new URL(`/notebase/${encodeURIComponent(notebaseId)}`, env.WXT_WEBSITE_URL).toString()
+  // 本地化改动：笔记库在本地服务器上，不在官网。WXT_API_URL 已指向 localhost。
+  return new URL(`/notebase/${encodeURIComponent(notebaseId)}`, env.WXT_API_URL).toString()
 }
 
 export function buildNotebaseConnectionFromPending(

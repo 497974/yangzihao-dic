@@ -1,0 +1,48 @@
+大傻豪词典 (Yang Zihao Dic)
+Copyright (C) 2026 杨子豪
+
+本程序基于开源项目 Read Frog 修改而来：
+  https://github.com/mengxi-ream/read-frog
+  Copyright (C) Read Frog contributors
+  Licensed under GPL-3.0
+
+依据 GPL-3.0 第 5 条，此处声明本版本相对上游的修改内容。
+
+
+== 主要修改 ==
+
+1. 笔记库从云端改为完全本地
+   上游版本的生词本（Notebase）依赖远端 API 与账号体系，免费额度上限 20 条。
+   本版本将其完整实现移入扩展内部，数据存于 chrome.storage.local：
+     src/utils/local-notebase/storage.ts    数据层
+     src/utils/local-notebase/router.ts     按 ORPC 契约实现全部笔记库接口
+     src/utils/local-notebase/intercept.ts  请求拦截 + 本地身份
+   接入点位于 src/entrypoints/background/proxy-fetch.ts。
+   结果：无需服务器、无需账号、无数量上限。
+
+2. 移除全部付费与云端功能
+   删去登录/账号菜单、订阅与定价入口、内置 AI（需订阅）、AI 配额、
+   官网与社区链接。仅保留用户自带 API Key 的 AI 能力。
+
+3. 品牌标识替换
+   扩展名称、描述、图标、DOM 标识符前缀、CSS 类名、页面标题等
+   全部替换为本项目标识。
+
+4. 若干缺陷修复（相对上游笔记库实现）
+   - 事务 id 在写盘前自增，避免重启后回退
+   - 抛出契约定义的类型化错误，使调用方能正确区分错误原因
+   - 拒绝以相同 id 重复创建笔记库（原实现会静默清空既有数据）
+   - 新增写操作串行化，避免并发保存互相覆盖
+
+5. 移除上游的遥测与分析上报
+
+
+== 授权 ==
+
+本程序为自由软件：你可以依据自由软件基金会发布的 GNU 通用公共许可证
+第 3 版条款，重新发布和/或修改本程序。
+
+本程序基于「希望它有用」的目的分发，但不作任何担保；甚至不包含对
+适销性或特定用途适用性的默示担保。详见 GNU 通用公共许可证。
+
+许可证全文见同目录下的 LICENSE 文件。

@@ -9,7 +9,7 @@
  */
 
 const BUILT_IN_DICTIONARY_ACTION_ID = "default-dictionary"
-const BUILT_IN_AI_PROVIDER_ID = "read-frog-free-ai"
+const BUILT_IN_AI_PROVIDER_ID = "yangzihao-dic-free-ai"
 const MIGRATED_CUSTOM_DICTIONARY_ID = "migrated-default-dictionary"
 
 const CURRENT_DICTIONARY_OUTPUT_FIELD_IDS = [

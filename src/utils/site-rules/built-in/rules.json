@@ -1,6 +1,6 @@
 [
   {
-    "id": "readfrog-preserve-text-defaults",
+    "id": "yangzihao-preserve-text-defaults",
     "description": "Preserve common inline math/code tokens as source text",
     "matches": "*",
     "preserveTextSelectors": [
@@ -41,7 +41,7 @@
     "id": "pdf",
     "matches": "https://app.infread.com/pdf/*",
     "includeSelectors": ["#viewerContainer p"],
-    "injectedCss": ".read-frog-translated-content-wrapper {display: contents!important;position:absolute;}\n.read-frog-translated-content-wrapper br {display: none;!important;}\n.read-frog-translated-content-wrapper span {position: relative;!important;}\n.read-frog-translated-content-wrapper[dir='rtl'] {text-align: right;display: inline-block!important;position:unset;}",
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper {display: contents!important;position:absolute;}\n.yangzihao-dic-translated-content-wrapper br {display: none;!important;}\n.yangzihao-dic-translated-content-wrapper span {position: relative;!important;}\n.yangzihao-dic-translated-content-wrapper[dir='rtl'] {text-align: right;display: inline-block!important;position:unset;}",
     "excludeSelectors.remove": ["[contenteditable=\"true\"]"]
   },
   {
@@ -85,7 +85,7 @@
     "forceInlineStyleSelectors": [".chemf", ".mwe-math-element", "[role=math]", ".nowrap"],
     "minCharacters": 4,
     "minWords": 2,
-    "injectedCss": ".read-frog-translated-content-wrapper {content-visibility:auto;}\n.no-article-text-sister-projects li { height:unset; }",
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper {content-visibility:auto;}\n.no-article-text-sister-projects li { height:unset; }",
     "excludeSelectors.add": [".lazy-image-placeholder"],
     "preserveTextSelectors": [".chemf", ".mwe-math-element", "[role=math]", ".nowrap"],
     "injectedCss.add": [".mwe-popups-extract {max-height:unset!important;height:unset!important;}"]
@@ -343,7 +343,7 @@
       ".hn-comment-text",
       ".hn-story-title"
     ],
-    "injectedCss": ".read-frog-translated-content-wrapper {content-visibility:auto;}"
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper {content-visibility:auto;}"
   },
   {
     "id": "quora",
@@ -720,7 +720,7 @@
       ".ytAttributedStringHost",
       ".title"
     ],
-    "injectedCss": ".read-frog-translated-content-wrapper img { width: 16px; height: 16px }\n.shortsLockupViewModelHostMetadataTitle,h4.compact-media-item-headline {max-height:unset !important;line-clamp:unset !important;overflow:unset !important;-webkit-line-clamp:unset !important;}\n.comment-text {max-height:unset;}\n.details,.subhead,.video-card-title,.media-item-headline {max-height:unset!important;-webkit-line-clamp:unset!important;}\ntruncated-text-content {max-height: unset !important;}",
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper img { width: 16px; height: 16px }\n.shortsLockupViewModelHostMetadataTitle,h4.compact-media-item-headline {max-height:unset !important;line-clamp:unset !important;overflow:unset !important;-webkit-line-clamp:unset !important;}\n.comment-text {max-height:unset;}\n.details,.subhead,.video-card-title,.media-item-headline {max-height:unset!important;-webkit-line-clamp:unset!important;}\ntruncated-text-content {max-height: unset !important;}",
     "excludeSelectors.add": [
       ".ytm-badge-and-byline-item-byline",
       ".ytp-caption-window-container",
@@ -773,7 +773,7 @@
     "injectedCss.add": [
       "yt-formatted-string.ytd-watch-metadata {-webkit-line-clamp: unset !important;max-height: unset !important;}"
     ],
-    "injectedCss": ".read-frog-translated-content-wrapper img { width: 16px; height: 16px }\n.metadata-snippet-container {max-height: unset !important;}\n.read-frog-translated-content-wrapper {text-align: left;}\n.read-frog-translated-content-wrapper[dir=rtl] {text-align: right;}\n#commentCanvas .cmt {display:flex;flex-direction: column;}\n#commentCanvas .cmt font br {display: none;}\n#video-title,h1.ytd-watch-metadata,.ytd-video-renderer,.yt-lockup-metadata-view-model-wiz__title {-webkit-line-clamp: unset !important;max-height: unset !important;}\nyt-formatted-string#video-title,.ShortsLockupViewModelHostOutsideMetadataTitle {-webkit-line-clamp: unset !important;max-height: unset !important;}\nytd-expander.ytd-comment-renderer {--ytd-expander-max-lines: 1000;}\n.page-header-view-model-wiz__page-header-title--page-header-title-large {-webkit-line-clamp: unset !important;max-height: unset !important;}\n#title,#video-title,.yt-lockup-metadata-view-model__title,.ytLockupMetadataViewModelTitle,.shortsLockupViewModelHostOutsideMetadataTitle,h1.ytd-watch-metadata,.ytwFeedAdMetadataViewModelHostTextsStyleStandardHeadline {-webkit-line-clamp: unset !important;max-height: unset !important;}",
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper img { width: 16px; height: 16px }\n.metadata-snippet-container {max-height: unset !important;}\n.yangzihao-dic-translated-content-wrapper {text-align: left;}\n.yangzihao-dic-translated-content-wrapper[dir=rtl] {text-align: right;}\n#commentCanvas .cmt {display:flex;flex-direction: column;}\n#commentCanvas .cmt font br {display: none;}\n#video-title,h1.ytd-watch-metadata,.ytd-video-renderer,.yt-lockup-metadata-view-model-wiz__title {-webkit-line-clamp: unset !important;max-height: unset !important;}\nyt-formatted-string#video-title,.ShortsLockupViewModelHostOutsideMetadataTitle {-webkit-line-clamp: unset !important;max-height: unset !important;}\nytd-expander.ytd-comment-renderer {--ytd-expander-max-lines: 1000;}\n.page-header-view-model-wiz__page-header-title--page-header-title-large {-webkit-line-clamp: unset !important;max-height: unset !important;}\n#title,#video-title,.yt-lockup-metadata-view-model__title,.ytLockupMetadataViewModelTitle,.shortsLockupViewModelHostOutsideMetadataTitle,h1.ytd-watch-metadata,.ytwFeedAdMetadataViewModelHostTextsStyleStandardHeadline {-webkit-line-clamp: unset !important;max-height: unset !important;}",
     "excludeSelectors.add": [
       ".ytp-caption-window-container",
       "text",
@@ -1565,7 +1565,7 @@
     "id": "sciencedirect",
     "matches": "www.sciencedirect.com",
     "excludeMatches": ["www.sciencedirect.com/*/pdf/download/*"],
-    "injectedCss": ".read-frog-translated-content-wrapper {content-visibility:auto;}",
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper {content-visibility:auto;}",
     "excludeSelectors.add": [".bibliography", ".author-group"],
     "forceBlockNodeSelectors.add": ["span.display", "span.captions", "span[id^=cap]"],
     "forceBlockStyleSelectors.add": ["span.display", "span.captions", "span[id^=cap]"],
@@ -1891,7 +1891,7 @@
       "#article-info-section",
       ".pdf-content"
     ],
-    "injectedCss": ".read-frog-translated-content-wrapper {content-visibility:auto;}"
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper {content-visibility:auto;}"
   },
   {
     "id": "webofscience",
@@ -2292,7 +2292,7 @@
     "id": "wsj",
     "matches": ["www.wsj.com", "cn.wsj.com"],
     "excludeSelectors": ["header", "footer", "nav", "[aria-label='Markets summary']"],
-    "injectedCss": ".read-frog-translated-content-wrapper br {display:none;}",
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper br {display:none;}",
     "forceBlockNodeSelectors.add": [".series-nav__link-thumbnail"],
     "forceBlockStyleSelectors.add": [".series-nav__link-thumbnail"]
   },
@@ -2453,7 +2453,7 @@
       ".title-copy",
       ".search-result-position"
     ],
-    "injectedCss": "#Scholarscope_HighlightOrigin > p font,#Scholarscope_HighlightContent > p font {display: inline!important;}\n#Scholarscope_HighlightOrigin > p font br,#Scholarscope_HighlightContent > p font br {display: none!important;}\n.title-translate {display:block;}\n.read-frog-translated-content-wrapper {content-visibility:auto;}",
+    "injectedCss": "#Scholarscope_HighlightOrigin > p font,#Scholarscope_HighlightContent > p font {display: inline!important;}\n#Scholarscope_HighlightOrigin > p font br,#Scholarscope_HighlightContent > p font br {display: none!important;}\n.title-translate {display:block;}\n.yangzihao-dic-translated-content-wrapper {content-visibility:auto;}",
     "forceBlockNodeSelectors.add": [".mixed-citation", ".docsum-wrap", "a.docsum-title"],
     "forceBlockStyleSelectors.add": [".mixed-citation", ".docsum-wrap", "a.docsum-title"]
   },
@@ -2737,7 +2737,7 @@
   {
     "id": "barrons",
     "matches": "www.barrons.com",
-    "injectedCss": "font.read-frog-translated-content-wrapper > br {display:none;}",
+    "injectedCss": "font.yangzihao-dic-translated-content-wrapper > br {display:none;}",
     "forceInlineStyleSelectors.add": ["article p span"]
   },
   {
@@ -2843,7 +2843,7 @@
   {
     "id": "orchestraltools",
     "matches": "www.orchestraltools.com",
-    "injectedCss": ".read-frog-translated-content-wrapper *, .read-frog-translated-content-wrapper {font-size: inherit !important;}"
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper *, .yangzihao-dic-translated-content-wrapper {font-size: inherit !important;}"
   },
   {
     "id": "bank",
@@ -3455,7 +3455,7 @@
   {
     "id": "character.ai",
     "matches": "character.ai",
-    "injectedCss": ".read-frog-translated-content-wrapper br {display:none;}\n.swiper,.rah-static,[class*=max-h],.line-clamp-1 { overflow:scroll;-webkit-line-clamp:unset; }",
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper br {display:none;}\n.swiper,.rah-static,[class*=max-h],.line-clamp-1 { overflow:scroll;-webkit-line-clamp:unset; }",
     "forceInlineStyleSelectors.add": [
       ".auto-content",
       ".auto-content *",
@@ -3608,7 +3608,7 @@
     "id": "balthild",
     "matches": "balthild.github.io",
     "description": "暂时单独给他处理公式",
-    "injectedCss": ".read-frog-translated-content-wrapper [aria-hidden=true] {display:none;}"
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper [aria-hidden=true] {display:none;}"
   },
   {
     "id": "csust",
@@ -3867,7 +3867,7 @@
   {
     "id": "descript",
     "matches": "www.descript.com",
-    "injectedCss": ".read-frog-translated-content-wrapper, .read-frog-translated-content-wrapper *{color:unset!important;}",
+    "injectedCss": ".yangzihao-dic-translated-content-wrapper, .yangzihao-dic-translated-content-wrapper *{color:unset!important;}",
     "excludeSelectors.add": ["h1.home-hero"]
   },
   {
@@ -4201,13 +4201,13 @@
   {
     "id": "vercel",
     "matches": "vercel.com",
-    "injectedCss": "[data-docs-heading] .read-frog-translated-content-wrapper,[data-docs-heading] .read-frog-translated-content-wrapper * {visibility:visible!important;opacity:1!important;display:inline!important;margin-left:0!important;}",
+    "injectedCss": "[data-docs-heading] .yangzihao-dic-translated-content-wrapper,[data-docs-heading] .yangzihao-dic-translated-content-wrapper * {visibility:visible!important;opacity:1!important;display:inline!important;margin-left:0!important;}",
     "excludeSelectors.add": ["[class^=fade-in-words]"]
   },
   {
     "id": "ai-sdk",
     "matches": "ai-sdk.dev",
-    "injectedCss": "[data-docs-heading] .read-frog-translated-content-wrapper,[data-docs-heading] .read-frog-translated-content-wrapper * {visibility:visible!important;opacity:1!important;display:inline!important;margin-left:0!important;}"
+    "injectedCss": "[data-docs-heading] .yangzihao-dic-translated-content-wrapper,[data-docs-heading] .yangzihao-dic-translated-content-wrapper * {visibility:visible!important;opacity:1!important;display:inline!important;margin-left:0!important;}"
   },
   {
     "id": "moltbook",
@@ -4359,19 +4359,19 @@
     ]
   },
   {
-    "id": "readfrog-chatgpt",
+    "id": "yangzihao-chatgpt",
     "description": "Skip the ChatGPT prompt editor",
     "matches": "chatgpt.com",
     "excludeSelectors": [".ProseMirror"]
   },
   {
-    "id": "readfrog-arxiv",
+    "id": "yangzihao-arxiv",
     "description": "Skip code listings on arXiv",
     "matches": "arxiv.org",
     "excludeSelectors": [".ltx_listing"]
   },
   {
-    "id": "readfrog-reddit",
+    "id": "yangzihao-reddit",
     "description": "Skip Reddit chrome and force block layout for post bodies",
     "matches": "www.reddit.com",
     "excludeSelectors": [
@@ -4384,8 +4384,8 @@
     "forceBlockStyleSelectors": ["shreddit-post-text-body"]
   },
   {
-    "id": "readfrog-youtube",
-    "description": "Skip YouTube chrome, metadata, and Read Frog subtitle UI",
+    "id": "yangzihao-youtube",
+    "description": "Skip YouTube chrome, metadata, and Yang Zihao Dic subtitle UI",
     "matches": "www.youtube.com",
     "excludeSelectors": [
       "#masthead-container *",
@@ -4404,15 +4404,15 @@
       "#info",
       "#badges *",
       ".ytp-caption-window-container",
-      ".read-frog-subtitles-view",
-      ".read-frog-subtitles-state-message",
-      ".read-frog-subtitles-translate-button"
+      ".yangzihao-dic-subtitles-view",
+      ".yangzihao-dic-subtitles-state-message",
+      ".yangzihao-dic-subtitles-translate-button"
     ],
     "forceBlockNodeSelectors": ["yt-attributed-string > span"],
     "forceBlockStyleSelectors": ["yt-attributed-string > span"]
   },
   {
-    "id": "readfrog-discord",
+    "id": "yangzihao-discord",
     "description": "Skip Discord usernames, timestamps, and channel chrome",
     "matches": "discord.com",
     "excludeSelectors": [
@@ -4426,7 +4426,7 @@
     ]
   },
   {
-    "id": "readfrog-github",
+    "id": "yangzihao-github",
     "description": "Skip GitHub file tree, headers, and diffs (#1174); force block layout for task lists (#867)",
     "matches": "github.com",
     "excludeSelectors": [
@@ -4540,7 +4540,7 @@
     "dontWalkButTranslateTags.remove": ["CODE"]
   },
   {
-    "id": "readfrog-x-chat",
+    "id": "yangzihao-x-chat",
     "description": "Skip the X Chat message footer (send time + delivery receipt). It renders twice inside the bubble — once as an aria-hidden opacity-0 spacer in the text flow, once in the absolutely positioned overlay — so both copies otherwise land in the message's translation unit. Target the footer root only: excluding its `.absolute.bottom-0.inset-e-0` wrapper too would hide that wrapper from unwrapDeepestOnlyHTMLChild, turning the bubble row into an only-child chain and moving the translation wrapper down into the pre-wrap text block",
     "matches": ["chat.x.com"],
     "excludeSelectors": ["div.flex.items-center.ml-auto.shrink-0.gap-1"]

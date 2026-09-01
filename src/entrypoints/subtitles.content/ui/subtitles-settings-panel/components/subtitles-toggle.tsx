@@ -9,7 +9,7 @@ import { SubtitlesSettingsItem } from "./subtitles-settings-item"
 
 export function SubtitlesToggle() {
   const title = `${APP_NAME} ${i18n.t("options.videoSubtitles.title")}`
-  const switchId = "read-frog-subtitles-toggle"
+  const switchId = "yangzihao-dic-subtitles-toggle"
 
   const isVisible = useAtomValue(subtitlesVisibleAtom)
   const { toggleSubtitles } = useSubtitlesUI()

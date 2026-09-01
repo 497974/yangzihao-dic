@@ -61,7 +61,7 @@ const SelectionPopoverRootContext = React.createContext<SelectionPopoverRootCont
 )
 const SelectionPopoverContentContext =
   React.createContext<SelectionPopoverContentContextValue | null>(null)
-const SELECTION_POPOVER_OPEN_EVENT = "read-frog:selection-popover-open"
+const SELECTION_POPOVER_OPEN_EVENT = "yangzihao-dic:selection-popover-open"
 
 function useSelectionPopoverRootContext() {
   const context = React.use(SelectionPopoverRootContext)

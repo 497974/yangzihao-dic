@@ -9,7 +9,7 @@ import type {
   ProviderSponsorConfig,
 } from "@/types/config/provider"
 import type { Theme } from "@/types/config/theme"
-import { APP_NAME } from "@read-frog/definitions"
+import { APP_NAME } from "@/utils/constants/app"
 import { camelCase } from "case-anything"
 import customProviderLogo from "@/assets/providers/custom-provider.svg?url&no-inline"
 import customResponsesLogo from "@/assets/providers/custom-responses.svg?url&no-inline"
@@ -225,11 +225,11 @@ export const PROVIDER_ITEMS: Record<
   jalapenocloud: {
     logo: () => jalapenoCloudLogo,
     name: "Jalapeno Cloud",
-    website: "https://www.jalapeno-cloud.ai/readfrog",
-    apiKeyUrl: "https://www.jalapeno-cloud.ai/readfrog",
+    website: "https://www.jalapeno-cloud.ai",
+    apiKeyUrl: "https://www.jalapeno-cloud.ai",
     sponsor: {
       sponsoring: true,
-      referUrl: "https://www.jalapeno-cloud.ai/readfrog",
+      referUrl: "https://www.jalapeno-cloud.ai",
       // Both default to the generic sponsor wording; Jalapeno names its actual offer instead.
       badgeI18nKey: "options.apiProviders.badges.sponsorJalapenoCloud",
       ctaI18nKey: "options.apiProviders.sponsorCtaJalapenoCloud",
@@ -238,11 +238,11 @@ export const PROVIDER_ITEMS: Record<
   atlascloud: {
     logo: getLobeIconsCDNUrlFn("atlascloud"),
     name: "Atlas Cloud",
-    website: "https://readfrog.s.gy/altas",
-    apiKeyUrl: "https://readfrog.s.gy/altas",
+    website: "https://atlascloud.ai",
+    apiKeyUrl: "https://atlascloud.ai",
     sponsor: {
       sponsoring: true,
-      referUrl: "https://readfrog.s.gy/altas",
+      referUrl: "https://atlascloud.ai",
     },
   },
   "openai-compatible": {

@@ -35,7 +35,6 @@ import { setupSidePanelMessageHandler } from "./side-panel"
 import { setUpSubtitlesTranslationQueue, setUpWebPageTranslationQueue } from "./translation-queues"
 import { translationMessage } from "./translation-signal"
 import { setupTTSPlaybackMessageHandlers } from "./tts-playback"
-import { setupUninstallSurvey } from "./uninstall-survey"
 
 export default defineBackground({
   type: "module",
@@ -156,7 +155,6 @@ export default defineBackground({
     void (async () => {
       await backgroundReady
       void initializeContextMenu()
-      await setupUninstallSurvey()
     })()
 
     // Keep background-resolved strings in the selected language when it changes.
@@ -169,7 +167,6 @@ export default defineBackground({
         if (newConfig.uiLanguage === currentUiLanguage) return
         currentUiLanguage = newConfig.uiLanguage
         await setUiLanguage(newConfig.uiLanguage)
-        await setupUninstallSurvey()
       })()
     })
   },

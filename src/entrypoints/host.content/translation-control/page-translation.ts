@@ -357,7 +357,7 @@ export class PageTranslationManager implements IPageTranslationManager {
 
       // Observe mutations BEFORE the chunked walk: page JS runs between walk
       // slices, and records emitted meanwhile must not be lost. The walk only
-      // writes data-read-frog-* attributes, which this observer's
+      // writes data-yangzihao-dic-* attributes, which this observer's
       // attributeFilter never reports, so this creates no feedback loop.
       //
       // Root the observer at documentElement, NOT body: routers like Turbo
@@ -711,8 +711,8 @@ export class PageTranslationManager implements IPageTranslationManager {
 
     // if container itself has paragraph and the id
     if (
-      container.hasAttribute("data-read-frog-paragraph") &&
-      container.getAttribute("data-read-frog-walked") === walkId
+      container.hasAttribute("data-yangzihao-dic-paragraph") &&
+      container.getAttribute("data-yangzihao-dic-walked") === walkId
     ) {
       this.observeParagraphUnit(container, walkId, config, 0)
       return
@@ -720,7 +720,7 @@ export class PageTranslationManager implements IPageTranslationManager {
 
     const paragraphs = this.collectParagraphElementsDeep(container, walkId)
     const topLevelParagraphs = paragraphs.filter((el) => {
-      const ancestor = el.parentElement?.closest("[data-read-frog-paragraph]")
+      const ancestor = el.parentElement?.closest("[data-yangzihao-dic-paragraph]")
       // keep it if either:
       //  • no paragraph ancestor at all, or
       //  • the ancestor is *not* inside container
@@ -773,7 +773,7 @@ export class PageTranslationManager implements IPageTranslationManager {
     const innerTopLevelParagraphs = this.collectParagraphElementsDeep(element, walkId).filter(
       (paragraph) => {
         if (paragraph === element) return false
-        const ancestor = paragraph.parentElement?.closest("[data-read-frog-paragraph]")
+        const ancestor = paragraph.parentElement?.closest("[data-yangzihao-dic-paragraph]")
         // Keep only paragraphs whose nearest paragraph ancestor is the giant
         // itself (or that have none inside it, e.g. across shadow roots).
         return !ancestor || ancestor === element || !element.contains(ancestor)
@@ -828,7 +828,7 @@ export class PageTranslationManager implements IPageTranslationManager {
 
     const collectFromContainer = (root: HTMLElement | Document | ShadowRoot) => {
       const elements = root.querySelectorAll<HTMLElement>(
-        `[data-read-frog-paragraph][data-read-frog-walked="${CSS.escape(walkId)}"]`,
+        `[data-yangzihao-dic-paragraph][data-yangzihao-dic-walked="${CSS.escape(walkId)}"]`,
       )
       result.push(...[...elements])
     }
@@ -937,7 +937,7 @@ export class PageTranslationManager implements IPageTranslationManager {
    * wrappers stay classified as host mutations so they retranslate once.
    */
   private isSelfInflictedRecord(record: MutationRecord): boolean {
-    // Wrapper classes/styles are set before insertion and data-read-frog-*
+    // Wrapper classes/styles are set before insertion and data-yangzihao-dic-*
     // labels are not observed, so attribute records are never self-caused.
     if (record.type === "attributes") return false
     // In-place swaps/restores write the site's own text nodes (no wrapper

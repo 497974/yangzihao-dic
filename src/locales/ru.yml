@@ -1,7 +1,6 @@
-name: Read Frog
-extName: Read Frog - Переводи и учись
-extDescription: Read Frog — расширение браузера с открытым исходным кодом, которое поможет вам глубоко изучать языки на любом веб-сайте.
-uninstallSurveyUrl: https://tally.so/r/nPK6Ob
+name: Yang Zihao Dic
+extName: "Yang Zihao Dic - Переводи и учись"
+extDescription: "Полностью локальное расширение браузера с открытым исходным кодом. Использует ваш собственный ключ API; без аккаунта, без облака, без ограничений."
 account:
   login: Войти
   webApp: Веб-приложение
@@ -16,7 +15,7 @@ contextMenu:
   readAloudSelection: Прочитать вслух "%s"
   showOriginal: Показать оригинал
 sidePanel:
-  firefoxUserActionHint: В Firefox откройте Read Frog из боковой панели браузера.
+  firefoxUserActionHint: В Firefox откройте Yang Zihao Dic из боковой панели браузера.
   firefoxUserActionHelpText: Как открыть боковую панель Firefox
   firefoxUserActionHelpUrl: https://support.mozilla.org/ru/kb/ispolzovanije-bokovoi-paneli-dostup-instrumenty-i-vertikalnyje-vkladki
 popup:
@@ -51,7 +50,7 @@ popup:
   discord:
     tooltip: Присоединяйтесь к Discord, чтобы связаться с разработчиками и получить ранний доступ к новым функциям
   blog:
-    notification: Что нового в Read Frog
+    notification: Что нового в Yang Zihao Dic
   aiSmartContext: Умный контекст ИИ
   aiSmartContextDescription: Использует контекст веб-страницы для улучшения качества перевода. Требуется LLM-провайдер перевода.
   more:
@@ -101,15 +100,15 @@ options:
     roadmap: Дорожная карта
   helpAndCommunity:
     title: Помощь и сообщество
-    pageDescription: Узнайте, как пользоваться Read Frog, обратитесь за помощью к команде или присоединяйтесь к сообществу.
+    pageDescription: Узнайте, как пользоваться Yang Zihao Dic, обратитесь за помощью к команде или присоединяйтесь к сообществу.
     help:
       title: Помощь
     tutorial:
       title: Руководство
-      description: Прочитайте документацию и узнайте, как пользоваться Read Frog
+      description: Прочитайте документацию и узнайте, как пользоваться Yang Zihao Dic
     email:
       title: Написать нам
-      description: Свяжитесь с командой напрямую по адресу contact@readfrog.app
+      description: Свяжитесь с командой напрямую по адресу local
     featureRequest:
       title: Предложить функцию
       description: Предложите идею и голосуйте за то, что команда сделает дальше
@@ -127,8 +126,8 @@ options:
       qrCodeAlt: QR-код WeChat
   apiProviders:
     title: API-провайдеры
-    pageDescription: Подключите ИИ-сервисы, которые вызывает Read Frog, и выберите провайдера для каждой функции.
-    description: Добавьте провайдеров, которых может вызывать Read Frog. Более 20 встроено; также можно добавить пользовательские API, совместимые с Chat Completions, и API Open Responses.
+    pageDescription: Подключите ИИ-сервисы, которые вызывает Yang Zihao Dic, и выберите провайдера для каждой функции.
+    description: Добавьте провайдеров, которых может вызывать Yang Zihao Dic. Более 20 встроено; также можно добавить пользовательские API, совместимые с Chat Completions, и API Open Responses.
     configTitle: Настройка провайдеров
     addProvider: Добавить провайдера
     builtInProvider: Встроенный провайдер
@@ -233,8 +232,8 @@ options:
         customChatComplete: Пользовательский Chat Complete
         customResponses: Пользовательский Responses
       attribution:
-        builtInAi: Стандартная модель, размещённая Read Frog. Пользователи без Ultra могут использовать её только в пользовательских AI-действиях; пользователям Ultra доступно больше функций.
-        builtInAiAdvance: Продвинутая модель, размещённая Read Frog, — только для подписчиков Ultra. Работает во всех функциях встроенного ИИ — переводе страниц, пользовательских AI-действиях и других — с общей недельной квотой. Расходует квоту быстрее, чем стандартная модель.
+        builtInAi: Стандартная модель, размещённая Yang Zihao Dic. Пользователи без Ultra могут использовать её только в пользовательских AI-действиях; пользователям Ultra доступно больше функций.
+        builtInAiAdvance: Продвинутая модель, размещённая Yang Zihao Dic, — только для подписчиков Ultra. Работает во всех функциях встроенного ИИ — переводе страниц, пользовательских AI-действиях и других — с общей недельной квотой. Расходует квоту быстрее, чем стандартная модель.
       description:
         openai: Предоставляет модели, такие как GPT-4o
         azure: Модели OpenAI в Azure через ваши развертывания
@@ -317,12 +316,12 @@ options:
     duplicate: Этот шаблон уже в списке
   preference:
     title: Предпочтения
-    pageDescription: Задайте внешний вид Read Frog, места его работы, а также синхронизацию и резервное копирование конфигурации.
+    pageDescription: Задайте внешний вид Yang Zihao Dic, места его работы, а также синхронизацию и резервное копирование конфигурации.
     appearanceAndLanguage:
       title: Оформление и язык
       theme:
         title: Тема
-        description: Выберите тему для Read Frog.
+        description: Выберите тему для Yang Zihao Dic.
         system: Системная
         light: Светлая
         dark: Тёмная
@@ -460,8 +459,8 @@ options:
         description: Включить экспериментальные функции, которые могут быть нестабильны
       analytics:
         title: Помочь улучшить пользовательский опыт
-        tooltip: Когда параметр включен, Read Frog отправляет анонимные сигналы об использовании продукта, чтобы мы могли находить ошибки, проверять надежность функций, улучшать производительность и UX-детали, а также понимать, что развивать дальше в первую очередь.
-        description: Улучшайте Read Frog, помогая находить ошибки, дорабатывать интерфейс и не только
+        tooltip: Когда параметр включен, Yang Zihao Dic отправляет анонимные сигналы об использовании продукта, чтобы мы могли находить ошибки, проверять надежность функций, улучшать производительность и UX-детали, а также понимать, что развивать дальше в первую очередь.
+        description: Улучшайте Yang Zihao Dic, помогая находить ошибки, дорабатывать интерфейс и не только
   shortcuts:
     title: Горячие клавиши
     pageDescription: Задайте клавиши, которые запускают перевод во время чтения.
@@ -514,7 +513,7 @@ options:
     demoImageAlt: Демо плавающей кнопки
     enable:
       title: Включить плавающую кнопку
-      description: Отображать плавающую кнопку на веб-страницах для быстрого доступа к функциям Read Frog
+      description: Отображать плавающую кнопку на веб-страницах для быстрого доступа к функциям Yang Zihao Dic
     display:
       title: Отображение
       side:
@@ -640,7 +639,7 @@ options:
           title: Подключение Notebase
           description: Сохранить структурированные результаты этого действия в удалённую Notebase.
           loginRequiredTitle: Войдите, чтобы настроить Notebase
-          loginRequiredDescription: Войдите на readfrog.app, прежде чем выбирать notebase или редактировать сопоставления.
+          loginRequiredDescription: Войдите на local, прежде чем выбирать notebase или редактировать сопоставления.
           loginRequiredConnectedDescription: Это подключение создано аккаунтом ниже. Если войти в тот же аккаунт, сопоставления полей будут восстановлены. Если войти в другой аккаунт, прежние сопоставления будут очищены при создании или подключении Notebase.
           loginAction: Войти
           connectedAccountLabel: Подключённый аккаунт
@@ -652,7 +651,7 @@ options:
           clearConnectionAction: Очистить подключение
           refreshAction: Обновить
           emptyTitle: Notebase пока нет
-          emptyDescription: Создайте notebase на readfrog.app, затем вернитесь сюда и сопоставьте поля.
+          emptyDescription: Создайте notebase на local, затем вернитесь сюда и сопоставьте поля.
           openNotebaseAction: Открыть Notebase
           accessDeniedTitle: Нет доступа к Notebase
           accessDeniedDescription: У этого аккаунта нет разрешения на загрузку данных Notebase.
@@ -703,7 +702,7 @@ options:
         duplicateFieldKey: Имена полей должны быть уникальными
   contextMenu:
     title: Контекстное меню
-    pageDescription: Управляйте пунктами Read Frog в контекстном меню браузера.
+    pageDescription: Управляйте пунктами Yang Zihao Dic в контекстном меню браузера.
     demoImageAlt: Демо контекстного меню
     enable:
       title: Включить перевод в контекстном меню
@@ -760,7 +759,7 @@ options:
         editor:
           placeholder: |
             /* Пример: Пользовательский стиль с цветом и фоном */
-            [data-read-frog-custom-translation-style='custom'] {
+            [data-yangzihao-dic-custom-translation-style='custom'] {
               color: #414535;
               background-color: light-dark(#F2E3BC, #C19875);
               padding: 2px 4px;
@@ -780,7 +779,6 @@ options:
       description: Настройка различных типов промптов позволяет вам самостоятельно изменять тип промпта во время перевода. Промпт — это текст, который пользователь отправляет LLM.
       managePrompts: Управление промптами
       communityPrompts: Получайте или делитесь промптами с сообществом
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/821
       addPrompt: Добавить промпт
       default: По умолчанию
       builtIn: Встроенный
@@ -919,9 +917,9 @@ options:
       noVoicesFound: Голоса не найдены
       language:
         title: Голос для языка
-        description: Выберите язык, а затем голос, которым он будет читаться. Сброс вернёт голос, который Read Frog подбирает для этого языка.
+        description: Выберите язык, а затем голос, которым он будет читаться. Сброс вернёт голос, который Yang Zihao Dic подбирает для этого языка.
         reset: Сброс
-        previewSample: Привет от Read Frog! Так я буду звучать при чтении вслух.
+        previewSample: Привет от Yang Zihao Dic! Так я буду звучать при чтении вслух.
       fallback:
         title: Резервный голос
         description: Голос для языков, которым вы не назначили собственный.
@@ -1008,7 +1006,7 @@ options:
               filter: none;
             }
 
-            /* Доступные селекторы: .read-frog-subtitles-box, .subtitles-main, .subtitles-translation */
+            /* Доступные селекторы: .yangzihao-dic-subtitles-box, .subtitles-main, .subtitles-translation */
           docsLink: Как настроить?
           saveButton: Сохранить
           savedButton: Сохранено
@@ -1063,7 +1061,7 @@ options:
   rateUs:
     title: Оцените нас
   configMigration:
-    versionTooNew: Версия импортированной конфигурации новее, пожалуйста, обновите Read Frog до последней версии
+    versionTooNew: Версия импортированной конфигурации новее, пожалуйста, обновите Yang Zihao Dic до последней версии
     validationError: Ошибка валидации конфигурации
 side:
   sourceLang: Исходный язык
@@ -1117,7 +1115,7 @@ action:
   saveToNotebaseSaving: Сохранение...
   saveToNotebaseSuccess: Сохранено в Notebase
   saveToNotebaseFailed: Не удалось сохранить в Notebase
-  saveToNotebaseLoginRequired: Войдите на readfrog.app, чтобы сохранить в Notebase
+  saveToNotebaseLoginRequired: Войдите на local, чтобы сохранить в Notebase
   saveToNotebaseAccessDenied: Этот аккаунт не может открыть выбранную Notebase
   saveToNotebaseLimitExceeded: Для сохранения большего числа заметок Notebase требуется апгрейд
   saveToNotebaseTableUnavailable: Выбранная Notebase больше недоступна
@@ -1132,13 +1130,13 @@ action:
   saveToNotebaseConnectExisting: Подключить существующую Notebase
   saveToNotebaseGoConfigure: Настроить
   saveToNotebaseLoginConnectedTitle: Войти и сохранить?
-  saveToNotebaseLoginConnectedDescription: Этот Custom Action подключён к аккаунту ниже. После входа Read Frog сохранит в существующую Notebase, если это возможно, или создаст новую Notebase для текущего аккаунта.
+  saveToNotebaseLoginConnectedDescription: Этот Custom Action подключён к аккаунту ниже. После входа Yang Zihao Dic сохранит в существующую Notebase, если это возможно, или создаст новую Notebase для текущего аккаунта.
   saveToNotebaseConnectionUnavailableTitle: Подключение Notebase недоступно
   saveToNotebaseMissingNotebaseDescription: Старая Notebase больше не существует или недоступна этому аккаунту. Создайте новую Notebase и сохраните результат либо подключите существующую Notebase в Custom AI Actions.
   saveToNotebaseAccountUnavailableDescription: Текущий аккаунт не совпадает с подключённым аккаунтом ниже. Создание и сохранение заменит прежнее подключение и сопоставления полей. Также можно подключить существующую Notebase в Custom AI Actions.
   saveToNotebasePendingLogin: Войдите, чтобы завершить сохранение
-  saveToNotebasePendingLoginDescription: После входа Read Frog автоматически создаст Notebase и сохранит этот результат.
-  saveToNotebasePendingConnectedLoginDescription: После входа Read Frog сохранит в подключённую Notebase, если это возможно. Если аккаунт не может её использовать, будет создана новая Notebase.
+  saveToNotebasePendingLoginDescription: После входа Yang Zihao Dic автоматически создаст Notebase и сохранит этот результат.
+  saveToNotebasePendingConnectedLoginDescription: После входа Yang Zihao Dic сохранит в подключённую Notebase, если это возможно. Если аккаунт не может её использовать, будет создана новая Notebase.
   upgrade: Повысить тариф
   updatePayment: Обновить оплату
   openCustomActions: Открыть Custom AI Actions
@@ -1177,7 +1175,7 @@ subtitles:
     downloadTranslatedComplete: Переведённые субтитры скачаны
     downloadSource: Скачать исходные субтитры
   state:
-    loading: Read Frog загрузка субтитров
+    loading: Yang Zihao Dic загрузка субтитров
     translating: Перевод…
     error: Произошла ошибка
   errors:

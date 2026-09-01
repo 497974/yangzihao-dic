@@ -4,6 +4,7 @@ import { browser, storage } from "#imports"
 import { env } from "@/env"
 import { AUTH_CACHE_GROUP_KEY, DEFAULT_PROXY_CACHE_TTL_MS } from "@/utils/constants/proxy-fetch"
 import { logger } from "@/utils/logger"
+import { handleLocalApiRequest, isLocalApiRequest } from "@/utils/local-notebase/intercept"
 import { onMessage } from "@/utils/message"
 import { SessionCacheGroupRegistry } from "../../utils/session-cache/session-cache-group-registry"
 import { clearHostedAiStatusCache } from "./hosted-ai-status"
@@ -108,6 +109,11 @@ export function proxyFetch() {
   // Proxy cross-origin fetches for content scripts and other contexts
   onMessage("backgroundFetch", async (message): Promise<ProxyResponse> => {
     logger.info("[ProxyFetch] Background fetch:", message.data)
+
+    // 笔记库与身份请求一律本地处理，绝不出网。
+    if (isLocalApiRequest(message.data.url)) {
+      return await handleLocalApiRequest(message.data)
+    }
 
     const {
       url,

@@ -3,7 +3,7 @@ import { anchoredToastManager, toastManager } from "@/components/ui/base-ui/toas
 import { sendMessage } from "@/utils/message"
 
 /** Stable, so a double-click refreshes one toast instead of stacking two. */
-const WALL_TOAST_ID = "read-frog-subtitles-wall"
+const WALL_TOAST_ID = "yangzihao-dic-subtitles-wall"
 /**
  * Longer than the shared defaults (5s docked, 3s anchored): this toast is the
  * only place the refusal is explained, and it asks the reader to aim at a

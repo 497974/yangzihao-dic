@@ -35,7 +35,7 @@ export type AnalyticsSurface = (typeof ANALYTICS_SURFACE)[keyof typeof ANALYTICS
 export type AnalyticsOutcome = "success" | "failure"
 
 export const ANALYTICS_PROVIDER = {
-  BUILT_IN_AI: "read-frog-built-in-ai",
+  BUILT_IN_AI: "yangzihao-dic-built-in-ai",
   EDGE_TTS: "edge-tts",
   UNKNOWN: "unknown",
 } as const

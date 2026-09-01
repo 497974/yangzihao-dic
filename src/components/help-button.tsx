@@ -59,7 +59,7 @@ export function HelpButton() {
         localStorage.setItem(STORAGE_KEY, newCorner)
       } else {
         window.open(
-          "https://github.com/mengxi-ream/read-frog/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen",
+          "#/api-providers",
           "_blank",
         )
       }

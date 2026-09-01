@@ -9,7 +9,7 @@ import { SubtitlesSettingsItem } from "./subtitles-settings-item"
 export function DownloadSourceSubtitles() {
   const [isDownloading, setIsDownloading] = useState(false)
   const { downloadSourceSubtitles } = useSubtitlesUI()
-  const buttonId = "read-frog-download-source-subtitles"
+  const buttonId = "yangzihao-dic-download-source-subtitles"
   const title = i18n.t("subtitles.actions.downloadSource")
 
   const downloadSubtitles = async () => {

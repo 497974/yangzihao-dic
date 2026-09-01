@@ -3,7 +3,7 @@ import { ConfigNavItem } from "../../../components/config-nav-item"
 import { ConfigSection } from "../../../components/config-section"
 
 /**
- * Where Read Frog is allowed to run. The mode and the site list it reads only mean anything
+ * Where Yang Zihao Dic is allowed to run. The mode and the site list it reads only mean anything
  * together, and that list grows without limit, so the section points at the page holding both.
  */
 export function ExtensionActivationSection() {

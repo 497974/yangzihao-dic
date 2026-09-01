@@ -70,7 +70,7 @@ export function createLightweightSpinner(ownerDoc: Document): HTMLElement {
     padding: 0 !important;
     vertical-align: middle !important;
     border: 1.5px solid transparent !important;
-    border-top: 1.5px solid var(--read-frog-muted-foreground) !important;
+    border-top: 1.5px solid var(--yangzihao-dic-muted-foreground) !important;
     border-radius: 50% !important;
     box-sizing: content-box !important;
     flex-shrink: 0 !important;
@@ -102,7 +102,7 @@ export function createLightweightSpinner(ownerDoc: Document): HTMLElement {
     // For reduced motion or when Web Animations API isn't available,
     // keep a static muted segment so the loading state stays visible
     // without requiring animation.
-    spinner.style.borderTopColor = "var(--read-frog-muted-foreground)"
+    spinner.style.borderTopColor = "var(--yangzihao-dic-muted-foreground)"
   }
 
   return spinner

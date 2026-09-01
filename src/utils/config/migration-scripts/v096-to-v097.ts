@@ -1,8 +1,8 @@
 /**
  * Migration script from v096 to v097.
  *
- * Renames the advanced built-in provider id from `read-frog-ultra-ai` to
- * `read-frog-advance-ai`. "Ultra" is the name of a billing plan; the provider
+ * Renames the advanced built-in provider id from `yangzihao-dic-ultra-ai` to
+ * `yangzihao-dic-advance-ai`. "Ultra" is the name of a billing plan; the provider
  * runs the hosted `advance` model tier, and the two are independent — which
  * plans may reach which tier is server-side policy. Naming the provider after
  * the plan made that pairing look like a definition.
@@ -22,8 +22,8 @@
  * imports nothing from the evolving application code.
  */
 
-const OLD_PROVIDER_ID = "read-frog-ultra-ai"
-const NEW_PROVIDER_ID = "read-frog-advance-ai"
+const OLD_PROVIDER_ID = "yangzihao-dic-ultra-ai"
+const NEW_PROVIDER_ID = "yangzihao-dic-advance-ai"
 
 function isObject(value: any): value is Record<string, any> {
   return value !== null && typeof value === "object" && !Array.isArray(value)

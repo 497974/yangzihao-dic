@@ -1,7 +1,6 @@
-name: 読書カエル
-extName: 読書カエル - 翻訳して学ぶ
-extDescription: 読書カエルは、あらゆるウェブサイトから言語を深く学ぶために設計されたオープンソースのブラウザ拡張機能です。
-uninstallSurveyUrl: https://tally.so/r/nPK6Ob
+name: Yang Zihao Dic
+extName: "Yang Zihao Dic - 翻訳して学ぶ"
+extDescription: "完全ローカルなオープンソースのブラウザ拡張機能。自分の AI API キーを使用し、アカウント不要・クラウド送信なし・上限なし。"
 account:
   login: ログイン
   webApp: ウェブアプリ
@@ -16,7 +15,7 @@ contextMenu:
   readAloudSelection: 「%s」を読み上げ
   showOriginal: 原文を表示
 sidePanel:
-  firefoxUserActionHint: Firefox では、ブラウザーのサイドバーから Read Frog を開いてください。
+  firefoxUserActionHint: Firefox では、ブラウザーのサイドバーから Yang Zihao Dic を開いてください。
   firefoxUserActionHelpText: Firefox サイドバーの開き方を見る
   firefoxUserActionHelpUrl: https://support.mozilla.org/ja/kb/use-sidebar-access-tools-and-vertical-tabs
 popup:
@@ -51,7 +50,7 @@ popup:
   discord:
     tooltip: Discordに参加して開発者とつながり、新機能を先行体験しましょう
   blog:
-    notification: 読書カエルの最新情報
+    notification: Yang Zihao Dicの最新情報
   aiSmartContext: AI スマートコンテキスト
   aiSmartContextDescription: ウェブページのコンテキストを使用して翻訳品質を向上させます。LLM翻訳プロバイダーが必要です。
   more:
@@ -101,15 +100,15 @@ options:
     roadmap: ロードマップ
   helpAndCommunity:
     title: ヘルプとコミュニティ
-    pageDescription: Read Frog の使い方を学び、チームに相談したり、コミュニティで他のユーザーと交流したりできます。
+    pageDescription: Yang Zihao Dic の使い方を学び、チームに相談したり、コミュニティで他のユーザーと交流したりできます。
     help:
       title: ヘルプ
     tutorial:
       title: 使い方ガイド
-      description: ドキュメントを読んで Read Frog の使い方を学べます
+      description: ドキュメントを読んで Yang Zihao Dic の使い方を学べます
     email:
       title: メールで問い合わせ
-      description: contact@readfrog.app からチームに直接連絡できます
+      description: local からチームに直接連絡できます
     featureRequest:
       title: 機能リクエスト
       description: アイデアを提案し、次に開発する機能に投票できます
@@ -127,8 +126,8 @@ options:
       qrCodeAlt: WeChat QR コード
   apiProviders:
     title: APIプロバイダー
-    pageDescription: Read Frog が呼び出す AI サービスを接続し、各機能で使うものを選びます。
-    description: Read Frog が呼び出せるプロバイダーを追加します。20 以上を内蔵し、Chat Completions 互換 API と Open Responses API をカスタム追加できます。
+    pageDescription: Yang Zihao Dic が呼び出す AI サービスを接続し、各機能で使うものを選びます。
+    description: Yang Zihao Dic が呼び出せるプロバイダーを追加します。20 以上を内蔵し、Chat Completions 互換 API と Open Responses API をカスタム追加できます。
     configTitle: プロバイダー設定
     addProvider: プロバイダーを追加
     builtInProvider: 組み込みプロバイダー
@@ -233,8 +232,8 @@ options:
         customChatComplete: カスタム Chat Complete
         customResponses: カスタム Responses
       attribution:
-        builtInAi: Read Frog がホストする標準モデル。Ultra 以外のユーザーはカスタム AI アクションでのみ利用でき、Ultra ユーザーはより多くの機能で利用できます。
-        builtInAiAdvance: Read Frog がホストする高性能モデルで、Ultra メンバー専用です。ページ翻訳やカスタム AI アクションなど、すべての組み込み AI 機能で利用でき、週間クォータを共有します。標準モデルよりクォータの消費が速くなります。
+        builtInAi: Yang Zihao Dic がホストする標準モデル。Ultra 以外のユーザーはカスタム AI アクションでのみ利用でき、Ultra ユーザーはより多くの機能で利用できます。
+        builtInAiAdvance: Yang Zihao Dic がホストする高性能モデルで、Ultra メンバー専用です。ページ翻訳やカスタム AI アクションなど、すべての組み込み AI 機能で利用でき、週間クォータを共有します。標準モデルよりクォータの消費が速くなります。
       description:
         openai: GPT-4oなどのモデルを提供
         azure: Azure のデプロイ経由で OpenAI モデルを利用
@@ -317,12 +316,12 @@ options:
     duplicate: このパターンは既にリストにあります
   preference:
     title: 環境設定
-    pageDescription: Read Frog の外観、動作する範囲、設定の同期とバックアップ方法を指定します。
+    pageDescription: Yang Zihao Dic の外観、動作する範囲、設定の同期とバックアップ方法を指定します。
     appearanceAndLanguage:
       title: 外観と言語
       theme:
         title: テーマ
-        description: Read Frog のテーマを選択します。
+        description: Yang Zihao Dic のテーマを選択します。
         system: システム
         light: ライト
         dark: ダーク
@@ -460,8 +459,8 @@ options:
         description: まだ不安定な可能性がある実験的機能を有効にします
       analytics:
         title: ユーザー体験の改善に協力する
-        tooltip: 有効にすると、Read Frog は匿名の利用シグナルを送信し、不具合の発見、機能の安定性確認、性能や UX の改善、今後優先すべき機能の判断に役立てます。
-        description: バグの特定や UI レイアウトの改善などを通じて Read Frog をより良くします
+        tooltip: 有効にすると、Yang Zihao Dic は匿名の利用シグナルを送信し、不具合の発見、機能の安定性確認、性能や UX の改善、今後優先すべき機能の判断に役立てます。
+        description: バグの特定や UI レイアウトの改善などを通じて Yang Zihao Dic をより良くします
   shortcuts:
     title: ショートカット
     pageDescription: 読みながら翻訳を実行するキーを設定します。
@@ -514,7 +513,7 @@ options:
     demoImageAlt: フローティングボタンデモ
     enable:
       title: フローティングボタンを有効化
-      description: ウェブページにフローティングボタンを表示し、Read Frog機能に素早くアクセス
+      description: ウェブページにフローティングボタンを表示し、Yang Zihao Dic機能に素早くアクセス
     display:
       title: 表示
       side:
@@ -640,7 +639,7 @@ options:
           title: Notebase 接続
           description: このアクションの構造化された結果をリモート Notebase に保存します。
           loginRequiredTitle: Notebase を設定するにはログインが必要です
-          loginRequiredDescription: notebase を選択したりマッピングを編集したりする前に、readfrog.app にログインしてください。
+          loginRequiredDescription: notebase を選択したりマッピングを編集したりする前に、local にログインしてください。
           loginRequiredConnectedDescription: この接続は下のアカウントで作成されました。同じアカウントでログインするとフィールドマッピングが復元されます。別のアカウントでログインした場合、Notebase を作成または接続すると以前のマッピングは消去されます。
           loginAction: ログイン
           connectedAccountLabel: 接続済みアカウント
@@ -652,7 +651,7 @@ options:
           clearConnectionAction: 接続をクリア
           refreshAction: 更新
           emptyTitle: Notebase がまだありません
-          emptyDescription: readfrog.app で notebase を作成してから、ここに戻ってフィールドをマッピングしてください。
+          emptyDescription: local で notebase を作成してから、ここに戻ってフィールドをマッピングしてください。
           openNotebaseAction: Notebase を開く
           accessDeniedTitle: Notebase にアクセスできません
           accessDeniedDescription: このアカウントには Notebase データを読み込む権限がありません。
@@ -703,7 +702,7 @@ options:
         duplicateFieldKey: フィールド名は一意である必要があります
   contextMenu:
     title: コンテキストメニュー
-    pageDescription: ブラウザーの右クリックメニューに表示される Read Frog の項目を設定します。
+    pageDescription: ブラウザーの右クリックメニューに表示される Yang Zihao Dic の項目を設定します。
     demoImageAlt: コンテキストメニューデモ
     enable:
       title: 右クリック翻訳を有効化
@@ -760,7 +759,7 @@ options:
         editor:
           placeholder: |
             /* 例：カスタムカラーと背景のスタイル */
-            [data-read-frog-custom-translation-style='custom'] {
+            [data-yangzihao-dic-custom-translation-style='custom'] {
               color: #414535;
               background-color: light-dark(#F2E3BC, #C19875);
               padding: 2px 4px;
@@ -780,7 +779,6 @@ options:
       description: 異なるタイプのプロンプトをカスタマイズすることで、翻訳時にプロンプトタイプを自ら調整できます。プロンプトとは、ユーザーがLLMに送信するテキストを指します。
       managePrompts: プロンプトを管理
       communityPrompts: コミュニティからプロンプトを取得・共有
-      communityPromptsUrl: https://github.com/mengxi-ream/read-frog/discussions/821
       addPrompt: プロンプトを追加
       default: デフォルト
       builtIn: 組み込み
@@ -919,9 +917,9 @@ options:
       noVoicesFound: ボイスが見つかりません
       language:
         title: 言語別ボイス
-        description: 言語を選び、その言語を読み上げるボイスを指定します。リセットすると Read Frog がその言語に選ぶボイスに戻ります。
+        description: 言語を選び、その言語を読み上げるボイスを指定します。リセットすると Yang Zihao Dic がその言語に選ぶボイスに戻ります。
         reset: リセット
-        previewSample: Read Frog からこんにちは！朗読するときはこのように聞こえます。
+        previewSample: Yang Zihao Dic からこんにちは！朗読するときはこのように聞こえます。
       fallback:
         title: フォールバックボイス
         description: 個別にボイスを指定していない言語は、このボイスで読み上げます。
@@ -1008,7 +1006,7 @@ options:
               filter: none;
             }
 
-            /* 使用できるセレクター：.read-frog-subtitles-box、.subtitles-main、.subtitles-translation */
+            /* 使用できるセレクター：.yangzihao-dic-subtitles-box、.subtitles-main、.subtitles-translation */
           docsLink: 設定方法は?
           saveButton: 保存
           savedButton: 保存済み
@@ -1063,7 +1061,7 @@ options:
   rateUs:
     title: レビューを書く
   configMigration:
-    versionTooNew: インポートされた設定のバージョンが新しいため、Read Frogを最新バージョンにアップグレードしてください
+    versionTooNew: インポートされた設定のバージョンが新しいため、Yang Zihao Dicを最新バージョンにアップグレードしてください
     validationError: 設定の検証に失敗しました
 side:
   sourceLang: ソース言語
@@ -1117,7 +1115,7 @@ action:
   saveToNotebaseSaving: 保存中...
   saveToNotebaseSuccess: Notebase に保存しました
   saveToNotebaseFailed: Notebase への保存に失敗しました
-  saveToNotebaseLoginRequired: Notebase に保存するには readfrog.app にログインしてください
+  saveToNotebaseLoginRequired: Notebase に保存するには local にログインしてください
   saveToNotebaseAccessDenied: このアカウントでは選択した Notebase にアクセスできません
   saveToNotebaseLimitExceeded: さらに Notebase ノートを保存するにはアップグレードが必要です
   saveToNotebaseTableUnavailable: 選択した Notebase は利用できなくなりました
@@ -1137,8 +1135,8 @@ action:
   saveToNotebaseMissingNotebaseDescription: 以前の Notebase は存在しないか、このアカウントでは開けません。新しい Notebase を作成して保存するか、Custom AI Actions で既存の Notebase に接続してください。
   saveToNotebaseAccountUnavailableDescription: ログイン中のアカウントが下の接続済みアカウントと一致しません。作成して保存すると、以前の接続設定とフィールドマッピングが置き換えられます。Custom AI Actions で既存の Notebase に接続することもできます。
   saveToNotebasePendingLogin: ログイン後に保存を完了
-  saveToNotebasePendingLoginDescription: ログイン後、Read Frog が Notebase を作成し、この結果を自動で保存します。
-  saveToNotebasePendingConnectedLoginDescription: ログイン後、Read Frog は可能であれば接続済み Notebase に保存します。このアカウントで利用できない場合は、新しい Notebase を作成して保存します。
+  saveToNotebasePendingLoginDescription: ログイン後、Yang Zihao Dic が Notebase を作成し、この結果を自動で保存します。
+  saveToNotebasePendingConnectedLoginDescription: ログイン後、Yang Zihao Dic は可能であれば接続済み Notebase に保存します。このアカウントで利用できない場合は、新しい Notebase を作成して保存します。
   upgrade: アップグレード
   updatePayment: 支払いを更新
   openCustomActions: Custom AI Actions を開く
@@ -1177,7 +1175,7 @@ subtitles:
     downloadTranslatedComplete: 翻訳字幕をダウンロードしました
     downloadSource: 元字幕をダウンロード
   state:
-    loading: Read Frog 字幕読み込み中
+    loading: Yang Zihao Dic 字幕読み込み中
     translating: 翻訳中…
     error: エラーが発生しました
   errors:

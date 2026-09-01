@@ -10,7 +10,7 @@ import { PageLayout } from "../../../components/page-layout"
 import { PatternsTable } from "../../../components/patterns-table"
 
 /**
- * Drilled into from the Preference page: the mode Read Frog activates by, and the site list that
+ * Drilled into from the Preference page: the mode Yang Zihao Dic activates by, and the site list that
  * mode reads. The list grows without limit and each row carries a delete button, so it has the
  * room here to run its full length instead of scrolling inside a settings row.
  */

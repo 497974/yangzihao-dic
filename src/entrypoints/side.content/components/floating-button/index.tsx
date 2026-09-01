@@ -3,7 +3,7 @@ import { IconLock, IconLockOpen, IconMessageCircle, IconSettings, IconX } from "
 import { useAtom, useAtomValue } from "jotai"
 import { useEffect, useRef, useState } from "react"
 import { browser } from "#imports"
-import readFrogLogo from "@/assets/icons/read-frog.png?url&no-inline"
+import readFrogLogo from "@/assets/icons/yangzihao-dic.png?url&no-inline"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,9 +16,7 @@ import { ANALYTICS_FEATURE, ANALYTICS_SURFACE } from "@/types/analytics"
 import { createFeatureUsageContext } from "@/utils/analytics"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { APP_NAME } from "@/utils/constants/app"
-import { buildFeaturebaseFeedbackMetadata, buildFeaturebasePortalUrl } from "@/utils/featurebase"
 import { i18n } from "@/utils/i18n"
-import { resolveUiLocale } from "@/utils/i18n/locale-map"
 import { sendMessage } from "@/utils/message"
 import { cn } from "@/utils/styles/utils"
 import { matchDomainPattern } from "@/utils/url"
@@ -140,7 +138,6 @@ export default function FloatingButton() {
   const floatingButtonSide = getFloatingButtonSide(floatingButton.side)
   const isFloatingButtonExpanded = isHitAreaExpanded || isDropdownOpen
   const isMainButtonAttached = isFloatingButtonLocked || isFloatingButtonExpanded
-  const locale = resolveUiLocale(uiLanguage)
 
   useEffect(() => {
     if (!isDraggingButton) return undefined
@@ -216,19 +213,6 @@ export default function FloatingButton() {
     })
   }
 
-  const handleFeedbackClick = () => {
-    const url = buildFeaturebasePortalUrl({
-      destination: "feedback",
-      locale,
-      metadata: buildFeaturebaseFeedbackMetadata({
-        browserName: import.meta.env.BROWSER,
-        extensionVersion: browser.runtime.getManifest().version,
-        pageUrl: window.location.href,
-      }),
-    })
-
-    void sendMessage("openPage", { url, active: true })
-  }
 
   const startActiveDrag = () => {
     const pendingDrag = pendingDragRef.current
@@ -461,15 +445,6 @@ export default function FloatingButton() {
           onClick={() => {
             void sendMessage("openOptionsPage", undefined)
           }}
-        />
-      )}
-      {!isDraggingButton && (
-        <HiddenButton
-          side={floatingButtonSide}
-          expanded={isFloatingButtonExpanded}
-          icon={<IconMessageCircle className="h-5 w-5" />}
-          label={i18n.t("options.floatingButton.tooltips.feedback")}
-          onClick={handleFeedbackClick}
         />
       )}
     </div>

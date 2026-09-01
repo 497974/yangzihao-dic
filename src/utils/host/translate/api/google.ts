@@ -64,12 +64,12 @@ export async function isGoogleTranslateReachable(options?: {
 // white-space CSS (or an input box) makes newlines meaningful — ordinary
 // pages wrap sentences across pretty-printed source lines and RELY on the
 // collapsing.
-const GOOGLE_LINE_BREAK_MARKER = '<br data-read-frog-lb="1">'
+const GOOGLE_LINE_BREAK_MARKER = '<br data-yangzihao-dic-lb="1">'
 const GOOGLE_LINE_BREAK_MARKER_PAIR = GOOGLE_LINE_BREAK_MARKER.repeat(2)
 // Tolerates self-closing serialization and translation-inserted horizontal
 // whitespace around markers (the sentence joiner adds spaces; they are
 // artifacts, not content, so they fold into the restored line boundary).
-const GOOGLE_LINE_BREAK_MARKER_UNIT = String.raw`<br data-read-frog-lb="1"\s*/?>`
+const GOOGLE_LINE_BREAK_MARKER_UNIT = String.raw`<br data-yangzihao-dic-lb="1"\s*/?>`
 const GOOGLE_LINE_BREAK_MARKER_PAIR_PATTERN = String.raw`[^\S\r\n]*(?:${GOOGLE_LINE_BREAK_MARKER_UNIT}[^\S\r\n]*){2}`
 const GOOGLE_LINE_BREAK_MARKER_PAIR_SPLIT_REGEX = new RegExp(GOOGLE_LINE_BREAK_MARKER_PAIR_PATTERN)
 const GOOGLE_LINE_BREAK_MARKER_PAIR_GLOBAL_REGEX = new RegExp(
