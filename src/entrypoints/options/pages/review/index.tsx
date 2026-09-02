@@ -298,22 +298,15 @@ export function ReviewPage() {
                       </button>
                     </div>
 
-                    {/* 答题阶段只给「发音 + 上下文」：
-                        中文释义等于把答案直接翻译出来，音标是原词的音译，
-                        英文原句暴露字母数——这三样都留到答完再显示。
-                        这里只保留中文句意（上下文锚点）和词性（语法线索，不泄露词义）。*/}
-                    <div className="flex flex-col items-center gap-1.5 text-center">
-                      {fields?.[FIELD.partOfSpeech] && (
-                        <div className="text-sm italic text-muted-foreground">
-                          {fields[FIELD.partOfSpeech]}
-                        </div>
-                      )}
-                      {fields?.[FIELD.sentenceTranslation] && (
-                        <div className="max-w-lg text-lg leading-relaxed">
-                          「{fields[FIELD.sentenceTranslation]}」
-                        </div>
-                      )}
-                    </div>
+                    {/* 答题阶段是纯听力：上下文靠听英文原句获得，不给任何中文。
+                        中文释义 = 直接给答案；中文句意 = 变相给答案；
+                        音标 = 原词音译；英文原句 = 暴露字母数。全部留到答完再显示。
+                        只保留词性——它是语法线索，不泄露词义。*/}
+                    {fields?.[FIELD.partOfSpeech] && (
+                      <div className="text-center text-sm italic text-muted-foreground">
+                        {fields[FIELD.partOfSpeech]}
+                      </div>
+                    )}
 
                     {!checked
                       ? (
@@ -370,9 +363,17 @@ export function ReviewPage() {
                               </div>
                             )}
 
+                            {/* 英文原句 + 中文句意都留到这里：答题时靠听，
+                                答完给出文本对照，才能确认自己是真听懂了还是蒙对了 */}
                             {sentence && (
                               <div className="mt-1 max-w-lg text-center text-[15px] leading-relaxed">
                                 {sentence}
+                              </div>
+                            )}
+
+                            {fields?.[FIELD.sentenceTranslation] && (
+                              <div className="max-w-lg text-center text-sm text-muted-foreground">
+                                {fields[FIELD.sentenceTranslation]}
                               </div>
                             )}
 
