@@ -4,12 +4,12 @@
  * 上游把复习放在网页端，本项目改为完全在扩展内完成 —— 不用开网页、不用登录。
  * 调度由本地 FSRS 计算（见 utils/local-notebase/srs-scheduler.ts）。
  *
- * 参考百词斩等背单词 App 验证有效的机制（不是照搬全部功能）：
- *   - 拼写测验：复习（非首次学习）时必须真正打出单词，而不是自己说"我记得"——
- *     多篇测评指出纯识图/自我判断是背单词 App 最大的坑，拼写才是真正逼出记忆的环节。
- *   - 发音朗读：听读结合。
- * 有意跳过的：图片联想记忆（需要图库或按词生图，成本高且要联网，
- * 与本项目的本地化定位冲突）；社交排行榜/打卡群（需要服务器和多用户）。
+ * 拼写测验的设计取舍（参考百词斩等 App 被验证有效的机制，但按听力优先重构）：
+ *   - 不显示英文例句，改为朗读：显示英文等于把字母数和上下文全暴露了。
+ *   - 不显示音标：音标和原词长得太像（/ˈpiːs.waɪz/ 基本就是 piecewise 的音译），
+ *     等于直接给答案。答错之后才显示音标，这时它变成有用的纠音信息。
+ *   - 只保留不泄题的线索：词性、中文释义、中文句意、难度。
+ * 有意跳过的：图片联想（需图库或按词生图，要联网且成本高）；社交排行榜（需服务器）。
  */
 
 import { useAtomValue } from "jotai"
@@ -25,8 +25,12 @@ import { orpcClient } from "@/utils/orpc/client"
 
 type Rating = "again" | "hard" | "good" | "easy"
 
+/** 慢速朗读用的语速（rate 取值范围 -100 ~ 100） */
+const SLOW_RATE = -45
+
 interface ReviewCard {
   id: string
+  notebaseRowId: string
   front: string
   back: string
   state: string
@@ -34,6 +38,16 @@ interface ReviewCard {
   reps: number
   lapses: number
 }
+
+/** 默认卡片模板生成的列名，用于结构化取字段 */
+const FIELD = {
+  phonetic: "音标",
+  partOfSpeech: "词性",
+  definition: "释义",
+  sentence: "句子",
+  sentenceTranslation: "句子翻译",
+  difficulty: "难度",
+} as const
 
 const RATING_META: { key: Rating, label: string, hint: string, cls: string, keyCap: string }[] = [
   { key: "again", label: "忘了", hint: "重新学", cls: "bg-red-500/90 hover:bg-red-500 text-white", keyCap: "1" },
@@ -52,63 +66,26 @@ function isSpellingEligible(c: ReviewCard) {
   return c.state !== "new" && c.reps > 0
 }
 
-function escapeRegExp(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-}
-
-/**
- * 把答案里的目标词挖空成完形填空。默认卡片模板的例句字段本来就包含目标词，
- * 直接显示等于把答案摆在眼前——挖空之后，拼写测验反而比孤立背单词多一层语境线索。
- */
-function maskAnswer(back: string, front: string): string {
-  const word = front.trim()
-  if (!word) return back
-  const pattern = new RegExp(`\\b${escapeRegExp(word)}\\b`, "gi")
-  return back.replace(pattern, "▁".repeat(Math.max(word.length, 3)))
-}
-
 function normalize(s: string) {
   return s.trim().toLowerCase().replace(/\s+/g, " ")
 }
 
-function SpeakButton({ text }: { text: string }) {
+export function ReviewPage() {
+  const qc = useQueryClient()
   const ttsConfig = useAtomValue(configFieldsAtomMap.tts)
   const { play, stop, isFetching, isPlaying } = useTextToSpeech(ANALYTICS_SURFACE.FLASHCARD_REVIEW)
 
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (isFetching || isPlaying) { stop(); return }
-    void play(text, ttsConfig)
-  }, [isFetching, isPlaying, play, stop, text, ttsConfig])
-
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      aria-label="朗读发音"
-      className="rounded-full p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
-    >
-      {isFetching
-        ? <IconLoader2 className="size-4 animate-spin" />
-        : isPlaying
-          ? <IconPlayerStopFilled className="size-4" />
-          : <IconVolume className="size-4" />}
-    </button>
-  )
-}
-
-export function ReviewPage() {
-  const qc = useQueryClient()
   const [revealed, setRevealed] = useState(false)
   const [idx, setIdx] = useState(0)
   const [done, setDone] = useState(0)
+  const [slow, setSlow] = useState(false)
   const shownAtRef = useRef<number>(Date.now())
 
-  // 拼写模式状态
   const [typedAnswer, setTypedAnswer] = useState("")
   const [checked, setChecked] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const autoPlayedRef = useRef<string | null>(null)
 
   const { data: notebases } = useQuery({
     queryKey: ["local-notebases"],
@@ -122,13 +99,42 @@ export function ReviewPage() {
     enabled: !!notebaseId,
   })
 
-  // 只复习到期的；顺序在本轮内固定，避免每次评分后队列重排导致跳卡
+  // 卡片接口只返回渲染好的一整块文本，拆不出单个字段。
+  // 这里直接读生词本原始数据，按列名取值——上游契约的返回格式锁死了，
+  // 往里加字段会被 schema 过滤掉，绕过去反而更简单。
+  const { data: notebase } = useQuery({
+    queryKey: ["local-notebase-detail", notebaseId],
+    queryFn: () => orpcClient.notebase.get({ id: notebaseId! }),
+    enabled: !!notebaseId,
+  })
+
+  const fieldsByRowId = useMemo(() => {
+    const map = new Map<string, Record<string, string>>()
+    if (!notebase) return map
+    const nameById = new Map(notebase.notebaseColumns.map((c) => [c.id, c.name]))
+    for (const row of notebase.notebaseRows) {
+      const fields: Record<string, string> = {}
+      for (const [colId, value] of Object.entries(row.cells ?? {})) {
+        const name = nameById.get(colId)
+        if (name && value != null) fields[name] = String(value)
+      }
+      map.set(row.id, fields)
+    }
+    return map
+  }, [notebase])
+
   const queue = useMemo(() => (cards ?? []).filter(isDue) as ReviewCard[], [cards])
   const current = queue[idx]
   const spellingMode = current ? isSpellingEligible(current) : false
-  const masked = useMemo(
-    () => (current ? maskAnswer(current.back, current.front) : ""),
-    [current],
+  const fields = current ? fieldsByRowId.get(current.notebaseRowId) : undefined
+  const sentence = fields?.[FIELD.sentence]?.trim() || ""
+
+  const speak = useCallback(
+    (text: string) => {
+      if (!text) return Promise.resolve()
+      return play(text, slow ? { ...ttsConfig, rate: SLOW_RATE } : ttsConfig)
+    },
+    [play, slow, ttsConfig],
   )
 
   useEffect(() => {
@@ -138,11 +144,39 @@ export function ReviewPage() {
     setIsCorrect(false)
     setRevealed(false)
     if (spellingMode) {
-      // 下一帧再聚焦，避免和卡片切换的过渡动画抢焦点
       requestAnimationFrame(() => inputRef.current?.focus())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 只在换卡时重置
   }, [current?.id])
+
+  // 进入拼写题自动播放：先整句，再报出要拼的词。
+  // 用 ref 记住播过哪张卡，避免 React 重渲染时重复播放。
+  useEffect(() => {
+    if (!current || !spellingMode) return
+    if (autoPlayedRef.current === current.id) return
+    autoPlayedRef.current = current.id
+
+    let cancelled = false
+    void (async () => {
+      try {
+        if (sentence) await speak(sentence)
+        if (cancelled) return
+        await speak(`Spell the word: ${current.front}`)
+      } catch {
+        // 朗读失败不该打断答题（断网、服务不可用等），静默跳过
+      }
+    })()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 只在换卡时自动播放一次
+  }, [current?.id, spellingMode, sentence])
+
+  // 离开页面时停掉还在播的音频。
+  // stop 没有被 useCallback 包住，每次渲染都是新引用；直接写进依赖会导致
+  // cleanup 在每次重渲染时触发，音频刚播就被掐断。用 ref 存最新引用，
+  // 让这个 effect 只在卸载时跑一次。
+  const stopRef = useRef(stop)
+  stopRef.current = stop
+  useEffect(() => () => stopRef.current(), [])
 
   const { mutate: submit, isPending: isSubmitting } = useMutation({
     mutationFn: async (rating: Rating) => {
@@ -155,6 +189,7 @@ export function ReviewPage() {
       })
     },
     onSuccess: () => {
+      stop()
       setDone((n) => n + 1)
       setIdx((i) => i + 1)
     },
@@ -173,20 +208,18 @@ export function ReviewPage() {
     setIsCorrect(correct)
     setChecked(true)
     setRevealed(true)
-  }, [current, checked, typedAnswer])
+    if (!correct) void speak(current.front)
+  }, [current, checked, typedAnswer, speak])
 
-  // 键盘操作：空格翻面（识记模式）/ 提交答案（拼写模式），1-4 评分。
-  // 复习是高频重复动作，鼠标点太慢；正在打字时不拦截空格和数字。
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const typing = document.activeElement === inputRef.current
-
       if (e.code === "Space" && !typing) {
         e.preventDefault()
         if (!spellingMode && !revealed) setRevealed(true)
         return
       }
-      if (typing) return // 打字时数字键交给输入框本身
+      if (typing) return
       const m = RATING_META.find((x) => x.keyCap === e.key)
       if (m) { e.preventDefault(); handleRate(m.key) }
     }
@@ -196,30 +229,25 @@ export function ReviewPage() {
 
   const restart = () => {
     setIdx(0); setDone(0); setRevealed(false)
+    autoPlayedRef.current = null
     void qc.invalidateQueries({ queryKey: ["review-cards"] })
   }
+
+  const audioBusy = isFetching || isPlaying
 
   return (
     <PageLayout title="闪卡复习" description="按记忆规律安排复习，快忘的词优先出现">
       <div className="mx-auto flex max-w-2xl flex-col gap-6">
-        {isPending && (
-          <div className="py-16 text-center text-muted-foreground">加载中…</div>
-        )}
+        {isPending && <div className="py-16 text-center text-muted-foreground">加载中…</div>}
 
-        {!isPending && queue.length === 0 && (
-          <EmptyState onRefresh={restart} />
-        )}
+        {!isPending && queue.length === 0 && <EmptyState onRefresh={restart} />}
 
         {!isPending && finished && (
           <div className="rounded-xl border border-dashed py-16 text-center">
             <div className="text-4xl">🎉</div>
             <div className="mt-3 text-lg font-medium">今天的复习完成了</div>
-            <div className="mt-1 text-sm text-muted-foreground">
-              本轮复习 {done} 张卡片
-            </div>
-            <Button variant="outline" size="sm" className="mt-5" onClick={restart}>
-              再看一轮
-            </Button>
+            <div className="mt-1 text-sm text-muted-foreground">本轮复习 {done} 张卡片</div>
+            <Button variant="outline" size="sm" className="mt-5" onClick={restart}>再看一轮</Button>
           </div>
         )}
 
@@ -239,14 +267,57 @@ export function ReviewPage() {
 
             {spellingMode
               ? (
-                  <div className="flex min-h-64 flex-col justify-center gap-5 rounded-xl border bg-card p-8">
+                  <div className="flex min-h-72 flex-col justify-center gap-5 rounded-xl border bg-card p-8">
                     <div className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground">
                       <span className="rounded-full bg-muted px-2 py-0.5">拼写测验</span>
-                      <span>看提示，打出这个词</span>
+                      <span>听发音，打出这个词</span>
                     </div>
 
-                    <div className="whitespace-pre-line text-center text-[15px] leading-relaxed">
-                      {masked}
+                    {/* 语音条：整句 / 单词 / 慢速 */}
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                      {sentence && (
+                        <AudioChip
+                          label="听整句"
+                          busy={audioBusy}
+                          onClick={() => void speak(sentence)}
+                        />
+                      )}
+                      <AudioChip
+                        label="听单词"
+                        busy={audioBusy}
+                        onClick={() => void speak(current.front)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setSlow((s) => !s)}
+                        className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                          slow ? "border-primary bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
+                        }`}
+                      >
+                        🐢 慢速{slow ? "开" : "关"}
+                      </button>
+                    </div>
+
+                    {/* 只显示不泄题的线索：词性 / 中文释义 / 中文句意 / 难度 */}
+                    <div className="flex flex-col items-center gap-1.5 text-center">
+                      {fields?.[FIELD.partOfSpeech] && (
+                        <div className="text-sm italic text-muted-foreground">
+                          {fields[FIELD.partOfSpeech]}
+                        </div>
+                      )}
+                      {fields?.[FIELD.definition] && (
+                        <div className="text-lg">{fields[FIELD.definition]}</div>
+                      )}
+                      {fields?.[FIELD.sentenceTranslation] && (
+                        <div className="mt-1 text-sm text-muted-foreground">
+                          「{fields[FIELD.sentenceTranslation]}」
+                        </div>
+                      )}
+                      {fields?.[FIELD.difficulty] && (
+                        <span className="mt-1 rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                          {fields[FIELD.difficulty]}
+                        </span>
+                      )}
                     </div>
 
                     {!checked
@@ -257,36 +328,51 @@ export function ReviewPage() {
                               value={typedAnswer}
                               onChange={(e) => setTypedAnswer(e.target.value)}
                               onKeyDown={(e) => { if (e.key === "Enter") checkSpelling() }}
-                              placeholder="输入单词…"
+                              placeholder="输入你听到的单词…"
                               autoComplete="off"
                               autoCapitalize="off"
                               spellCheck={false}
                               className="w-64 rounded-lg border bg-background px-4 py-2.5
                                          text-center text-lg outline-none focus:ring-2 focus:ring-primary"
                             />
-                            <Button onClick={checkSpelling} disabled={!typedAnswer.trim()}>
-                              提交
-                            </Button>
+                            <Button onClick={checkSpelling} disabled={!typedAnswer.trim()}>提交</Button>
                           </div>
                         )
                       : (
-                          <div className="flex flex-col items-center gap-3">
+                          <div className="flex flex-col items-center gap-3 border-t pt-5">
                             <div
-                              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-lg font-semibold ${
-                                isCorrect
-                                  ? "bg-emerald-500/10 text-emerald-600"
-                                  : "bg-red-500/10 text-red-600"
+                              className={`rounded-lg px-4 py-2 text-lg font-semibold ${
+                                isCorrect ? "bg-emerald-500/10 text-emerald-600" : "bg-red-500/10 text-red-600"
                               }`}
                             >
-                              <span>{isCorrect ? "✓ 拼对了" : "✗ 拼错了"}</span>
-                              <SpeakButton text={current.front} />
+                              {isCorrect ? "✓ 拼对了" : "✗ 拼错了"}
                             </div>
+
                             <div className="text-2xl font-semibold">{current.front}</div>
+
+                            {/* 答完才显示音标——此时它是纠音信息，不再是提示 */}
+                            {fields?.[FIELD.phonetic] && (
+                              <div className="text-sm text-muted-foreground">{fields[FIELD.phonetic]}</div>
+                            )}
+
                             {!isCorrect && (
                               <div className="text-sm text-muted-foreground">
                                 你输入的是「{typedAnswer}」
                               </div>
                             )}
+
+                            {sentence && (
+                              <div className="mt-1 max-w-lg text-center text-[15px] leading-relaxed">
+                                {sentence}
+                              </div>
+                            )}
+
+                            <div className="flex gap-2">
+                              <AudioChip label="再听单词" busy={audioBusy} onClick={() => void speak(current.front)} />
+                              {sentence && (
+                                <AudioChip label="再听整句" busy={audioBusy} onClick={() => void speak(sentence)} />
+                              )}
+                            </div>
                           </div>
                         )}
                   </div>
@@ -299,7 +385,16 @@ export function ReviewPage() {
                   >
                     <div className="flex items-center gap-2 text-3xl font-semibold">
                       <span>{current.front}</span>
-                      <SpeakButton text={current.front} />
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); void speak(current.front) }}
+                        aria-label="朗读发音"
+                        className="rounded-full p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                      >
+                        {audioBusy
+                          ? <IconLoader2 className="size-5 animate-spin" />
+                          : <IconVolume className="size-5" />}
+                      </button>
                     </div>
 
                     {revealed
@@ -345,6 +440,24 @@ export function ReviewPage() {
   )
 }
 
+function AudioChip({
+  label, busy, onClick,
+}: { label: string, busy: boolean, onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm
+                 transition hover:bg-muted disabled:opacity-50"
+    >
+      {busy
+        ? <IconPlayerStopFilled className="size-4 text-primary" />
+        : <IconVolume className="size-4" />}
+      {label}
+    </button>
+  )
+}
+
 function EmptyState({ onRefresh }: { onRefresh: () => void }) {
   return (
     <div className="rounded-xl border border-dashed py-16 text-center">
@@ -353,9 +466,7 @@ function EmptyState({ onRefresh }: { onRefresh: () => void }) {
       <div className="mt-1 text-sm text-muted-foreground">
         划词保存生词后会自动生成卡片；已复习的卡片会按记忆规律在之后的日子里再次出现
       </div>
-      <Button variant="outline" size="sm" className="mt-5" onClick={onRefresh}>
-        刷新
-      </Button>
+      <Button variant="outline" size="sm" className="mt-5" onClick={onRefresh}>刷新</Button>
     </div>
   )
 }
