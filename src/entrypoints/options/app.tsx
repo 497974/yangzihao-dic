@@ -17,6 +17,9 @@ const ApiProvidersPage = lazy(() =>
 const ReviewPage = lazy(() =>
   import("./pages/review").then((module) => ({ default: module.ReviewPage })),
 )
+const StatsPage = lazy(() =>
+  import("./pages/stats").then((module) => ({ default: module.StatsPage })),
+)
 const CustomActionsPage = lazy(() =>
   import("./pages/custom-actions").then((module) => ({ default: module.CustomActionsPage })),
 )
@@ -114,6 +117,7 @@ const ROUTE_COMPONENTS: Record<RoutePath, ComponentType> = {
   "/api-providers": ApiProvidersPage,
   "/custom-actions": CustomActionsPage,
   "/review": ReviewPage,
+  "/stats": StatsPage,
   "/page-translation": TranslationPage,
   "/video-subtitles": VideoSubtitlesPage,
   "/floating-button": FloatingButtonPage,

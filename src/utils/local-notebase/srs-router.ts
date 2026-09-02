@@ -372,54 +372,128 @@ const srsRouter = os.srs.router({
 
 /* ──────────────────────── stats ──────────────────────── */
 
-function dayKey(d: Date) {
-  return d.toISOString().slice(0, 10)
+/**
+ * 之前这三个接口的实现和真实契约（@read-frog/api-contract 的
+ * statsInputSchema / activityStatsOutputSchema 等）对不上——输入少了必填的
+ * to/timezone，输出形状也是瞎猜的 {items:[{date,count}]}，从写完就没被
+ * 真正调用过，一调用就会在 schema 校验这关直接失败。这里按真实契约重写。
+ */
+
+/** 按调用方时区取"日"边界，而不是 UTC 日——否则跨时区用户的"今天"会算错。 */
+function dayKeyInTz(d: Date, timezone: string): string {
+  // en-CA 恰好格式化成 YYYY-MM-DD，省得手拼字符串
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(d)
 }
 
+function inRange(dateKey: string, from: string | undefined, to: string) {
+  return (!from || dateKey >= from) && dateKey <= to
+}
+
+const LONG_TERM_STABILITY_DAYS = 21 // 与 @read-frog/definitions 的 SRS_LONG_TERM_MEMORY_STABILITY_DAYS 一致
+
 const statsRouter = os.stats.router({
-  activity: os.stats.activity.handler(async () => {
-    const db = await readSrsDb()
-    const byDay = new Map<string, number>()
-    for (const r of db.revlogs) {
-      const k = dayKey(new Date(r.reviewedAt))
-      byDay.set(k, (byDay.get(k) ?? 0) + 1)
-    }
-    return {
-      items: [...byDay.entries()]
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([date, count]) => ({ date, count })),
-    }
-  }),
-
-  srsMemoryGrowth: os.stats.srsMemoryGrowth.handler(async () => {
-    const db = await readSrsDb()
-    // 以稳定度 21 天为「长期记忆」门槛，与上游 SRS_LONG_TERM_MEMORY_STABILITY_DAYS 一致
-    const byDay = new Map<string, number>()
-    for (const r of db.revlogs) {
-      if (r.afterStability < 21) continue
-      const k = dayKey(new Date(r.reviewedAt))
-      byDay.set(k, (byDay.get(k) ?? 0) + 1)
-    }
-    return {
-      items: [...byDay.entries()]
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([date, count]) => ({ date, count })),
-    }
-  }),
-
-  notebaseRowGrowth: os.stats.notebaseRowGrowth.handler(async () => {
+  activity: os.stats.activity.handler(async ({ input }) => {
+    const srsDb = await readSrsDb()
     const nbDb = await readDb()
-    const byDay = new Map<string, number>()
+    const { from, to, timezone, notebaseIds } = input
+    const idSet = notebaseIds ? new Set(notebaseIds) : null
+
+    const srsByDay = new Map<string, { answers: number, durationMs: number }>()
+    for (const r of srsDb.revlogs) {
+      if (idSet && !idSet.has(r.notebaseId)) continue
+      const k = dayKeyInTz(new Date(r.reviewedAt), timezone)
+      if (!inRange(k, from, to)) continue
+      const acc = srsByDay.get(k) ?? { answers: 0, durationMs: 0 }
+      acc.answers += 1
+      acc.durationMs += r.durationMs
+      srsByDay.set(k, acc)
+    }
+
+    const learnedCards = Object.values(srsDb.cards)
+      .filter((c) => (!idSet || idSet.has(c.notebaseId)) && c.reps > 0)
+      .length
+
+    const notebaseByDay = new Map<string, number>()
     for (const nb of Object.values(nbDb.notebases)) {
+      if (idSet && !idSet.has(nb.id)) continue
       for (const row of nb.notebaseRows) {
-        const k = dayKey(new Date(row.createdAt))
-        byDay.set(k, (byDay.get(k) ?? 0) + 1)
+        const k = dayKeyInTz(new Date(row.createdAt), timezone)
+        if (!inRange(k, from, to)) continue
+        notebaseByDay.set(k, (notebaseByDay.get(k) ?? 0) + 1)
       }
     }
+
     return {
-      items: [...byDay.entries()]
+      srs: {
+        learnedCards,
+        daily: [...srsByDay.entries()]
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([date, v]) => ({ date, answers: v.answers, durationMs: v.durationMs })),
+      },
+      notebase: {
+        daily: [...notebaseByDay.entries()]
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([date, notes]) => ({ date, notes })),
+      },
+    }
+  }),
+
+  srsMemoryGrowth: os.stats.srsMemoryGrowth.handler(async ({ input }) => {
+    const db = await readSrsDb()
+    const { from, to, timezone, notebaseIds } = input
+    const idSet = notebaseIds ? new Set(notebaseIds) : null
+
+    // 净变化：同一天里，从"未达长期记忆"跨到"达标"记 +1，反向（复习失败掉出长期记忆）记 -1
+    const deltaByDay = new Map<string, number>()
+    let baseTotal = 0
+    for (const r of db.revlogs) {
+      if (idSet && !idSet.has(r.notebaseId)) continue
+      const crossedUp = r.stability < LONG_TERM_STABILITY_DAYS && r.afterStability >= LONG_TERM_STABILITY_DAYS
+      const crossedDown = r.stability >= LONG_TERM_STABILITY_DAYS && r.afterStability < LONG_TERM_STABILITY_DAYS
+      if (!crossedUp && !crossedDown) continue
+
+      const k = dayKeyInTz(new Date(r.reviewedAt), timezone)
+      if (from && k < from) {
+        // from 之前发生的跨越，累进基线而不是计入每日明细
+        baseTotal += crossedUp ? 1 : -1
+        continue
+      }
+      if (k > to) continue
+      deltaByDay.set(k, (deltaByDay.get(k) ?? 0) + (crossedUp ? 1 : -1))
+    }
+
+    return {
+      baseTotal: Math.max(baseTotal, 0),
+      daily: [...deltaByDay.entries()]
         .sort(([a], [b]) => a.localeCompare(b))
-        .map(([date, count]) => ({ date, count })),
+        .map(([date, delta]) => ({ date, delta })),
+    }
+  }),
+
+  notebaseRowGrowth: os.stats.notebaseRowGrowth.handler(async ({ input }) => {
+    const nbDb = await readDb()
+    const { from, to, timezone, notebaseIds } = input
+    const idSet = notebaseIds ? new Set(notebaseIds) : null
+
+    const deltaByDay = new Map<string, number>()
+    let baseTotal = 0
+    for (const nb of Object.values(nbDb.notebases)) {
+      if (idSet && !idSet.has(nb.id)) continue
+      for (const row of nb.notebaseRows) {
+        const k = dayKeyInTz(new Date(row.createdAt), timezone)
+        if (from && k < from) { baseTotal += 1; continue }
+        if (k > to) continue
+        deltaByDay.set(k, (deltaByDay.get(k) ?? 0) + 1)
+      }
+    }
+
+    return {
+      baseTotal,
+      daily: [...deltaByDay.entries()]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, delta]) => ({ date, delta })),
     }
   }),
 })

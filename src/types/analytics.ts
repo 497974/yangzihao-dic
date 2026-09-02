@@ -28,6 +28,7 @@ export const ANALYTICS_SURFACE = {
   VIDEO_SUBTITLES: "video_subtitles",
   VIDEO_SUBTITLES_AUTO: "video_subtitles_auto",
   TTS_SETTINGS: "tts_settings",
+  FLASHCARD_REVIEW: "flashcard_review",
 } as const
 
 export type AnalyticsSurface = (typeof ANALYTICS_SURFACE)[keyof typeof ANALYTICS_SURFACE]

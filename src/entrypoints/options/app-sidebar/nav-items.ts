@@ -5,6 +5,7 @@ export const ROUTE_DEFS = [
   { path: "/api-providers" },
   { path: "/custom-actions" },
   { path: "/review" },
+  { path: "/stats" },
   { path: "/page-translation" },
   { path: "/video-subtitles" },
   { path: "/floating-button" },
