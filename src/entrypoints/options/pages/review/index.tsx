@@ -298,25 +298,20 @@ export function ReviewPage() {
                       </button>
                     </div>
 
-                    {/* 只显示不泄题的线索：词性 / 中文释义 / 中文句意 / 难度 */}
+                    {/* 答题阶段只给「发音 + 上下文」：
+                        中文释义等于把答案直接翻译出来，音标是原词的音译，
+                        英文原句暴露字母数——这三样都留到答完再显示。
+                        这里只保留中文句意（上下文锚点）和词性（语法线索，不泄露词义）。*/}
                     <div className="flex flex-col items-center gap-1.5 text-center">
                       {fields?.[FIELD.partOfSpeech] && (
                         <div className="text-sm italic text-muted-foreground">
                           {fields[FIELD.partOfSpeech]}
                         </div>
                       )}
-                      {fields?.[FIELD.definition] && (
-                        <div className="text-lg">{fields[FIELD.definition]}</div>
-                      )}
                       {fields?.[FIELD.sentenceTranslation] && (
-                        <div className="mt-1 text-sm text-muted-foreground">
+                        <div className="max-w-lg text-lg leading-relaxed">
                           「{fields[FIELD.sentenceTranslation]}」
                         </div>
-                      )}
-                      {fields?.[FIELD.difficulty] && (
-                        <span className="mt-1 rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                          {fields[FIELD.difficulty]}
-                        </span>
                       )}
                     </div>
 
@@ -353,6 +348,20 @@ export function ReviewPage() {
                             {/* 答完才显示音标——此时它是纠音信息，不再是提示 */}
                             {fields?.[FIELD.phonetic] && (
                               <div className="text-sm text-muted-foreground">{fields[FIELD.phonetic]}</div>
+                            )}
+
+                            {/* 释义答题时藏着（等于直接给答案），答完必须显示，
+                                否则整道题做完还是不知道这词什么意思 */}
+                            {fields?.[FIELD.definition] && (
+                              <div className="max-w-lg text-center text-[15px]">
+                                {fields[FIELD.definition]}
+                              </div>
+                            )}
+
+                            {fields?.[FIELD.difficulty] && (
+                              <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                                {fields[FIELD.difficulty]}
+                              </span>
                             )}
 
                             {!isCorrect && (
