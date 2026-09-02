@@ -62,9 +62,24 @@ function isDue(c: ReviewCard) {
   return new Date(c.dueAt).getTime() <= Date.now()
 }
 
-/** 复习过至少一次的卡片才考拼写——第一次见到这个词，直接考拼写没有意义。 */
-function isSpellingEligible(c: ReviewCard) {
-  return c.state !== "new" && c.reps > 0
+/**
+ * 题型：
+ *   recognition —— 首次见到这个词，直接翻卡认识一下，考拼写没有意义
+ *   listening   —— 只给英文语音，不给任何中文（音 → 形 + 听力理解）
+ *   translation —— 只给中文，不给任何语音（义 → 形 + 表达能力）
+ *
+ * 两种测试互为镜像：任一种的应试策略在另一种上都会露馅。
+ * 按「这张卡自己复习过几次」轮换，而不是全局随机——随机不保证覆盖，
+ * 某个词可能连续多次都抽到听力，就永远验证不了你到底懂不懂它的意思。
+ */
+type QuizMode = "recognition" | "listening" | "translation"
+type ModePreference = "auto" | "listening" | "translation"
+
+function resolveQuizMode(c: ReviewCard, pref: ModePreference): QuizMode {
+  if (c.state === "new" || c.reps === 0) return "recognition"
+  if (pref !== "auto") return pref
+  // 第 1、3、5… 次听力，第 2、4、6… 次中译英
+  return c.reps % 2 === 1 ? "listening" : "translation"
 }
 
 function normalize(s: string) {
@@ -81,6 +96,9 @@ export function ReviewPage() {
   const [idx, setIdx] = useState(0)
   const [done, setDone] = useState(0)
   const [slow, setSlow] = useState(false)
+  // 默认自动轮换。留手动覆盖是为了专项训练，但不设成默认——
+  // 让人自己选的话，通常会一直选简单的那种，反而失去互相印证的作用。
+  const [modePref, setModePref] = useState<ModePreference>("auto")
   const shownAtRef = useRef<number>(Date.now())
 
   const [typedAnswer, setTypedAnswer] = useState("")
@@ -127,7 +145,8 @@ export function ReviewPage() {
 
   const queue = useMemo(() => (cards ?? []).filter(isDue) as ReviewCard[], [cards])
   const current = queue[idx]
-  const spellingMode = current ? isSpellingEligible(current) : false
+  const quizMode = current ? resolveQuizMode(current, modePref) : "recognition"
+  const spellingMode = quizMode === "listening" || quizMode === "translation"
   const fields = current ? fieldsByRowId.get(current.notebaseRowId) : undefined
   const sentence = fields?.[FIELD.sentence]?.trim() || ""
 
@@ -178,10 +197,11 @@ export function ReviewPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 只在换卡时重置
   }, [current?.id])
 
-  // 进入拼写题自动播放：先整句，再报出要拼的词。
+  // 进入听力题自动播放：先整句，再报出要拼的词。
+  // 中译英模式绝不能播——一出声就等于直接告诉你答案了。
   // 用 ref 记住播过哪张卡，避免 React 重渲染时重复播放。
   useEffect(() => {
-    if (!current || !spellingMode) return
+    if (!current || quizMode !== "listening") return
     // 生词本是异步加载的。数据没到之前 sentence 还是空字符串，此时若先把这张卡
     // 标记为"已播过"，整句就永远补不上了（依赖变化后会被下面的 ref 判断拦掉），
     // 结果只念了 "Spell the word: xxx"。所以必须等数据到齐再开播。
@@ -201,7 +221,7 @@ export function ReviewPage() {
     })()
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 只在换卡时自动播放一次
-  }, [current?.id, spellingMode, sentence, notebase])
+  }, [current?.id, quizMode, sentence, notebase])
 
   // 离开页面时停掉还在播的音频。
   // stop 没有被 useCallback 包住，每次渲染都是新引用；直接写进依赖会导致
@@ -298,43 +318,88 @@ export function ReviewPage() {
               />
             </div>
 
+            {/* 题型：默认自动按每张卡的复习次数轮换，保证每个词两个方向都被考到。
+                手动挡留给专项训练用。*/}
+            <div className="flex items-center justify-center gap-1 text-xs">
+              {([
+                { key: "auto", label: "自动轮换" },
+                { key: "listening", label: "只练听力" },
+                { key: "translation", label: "只练表达" },
+              ] as const).map((m) => (
+                <button
+                  key={m.key}
+                  type="button"
+                  onClick={() => setModePref(m.key)}
+                  className={`rounded-full px-3 py-1 transition ${
+                    modePref === m.key
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+
             {spellingMode
               ? (
                   <div className="flex min-h-72 flex-col justify-center gap-5 rounded-xl border bg-card p-8">
                     <div className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground">
-                      <span className="rounded-full bg-muted px-2 py-0.5">拼写测验</span>
-                      <span>听发音，打出这个词</span>
+                      <span className="rounded-full bg-muted px-2 py-0.5">
+                        {quizMode === "listening" ? "听音拼写" : "中译英"}
+                      </span>
+                      <span>
+                        {quizMode === "listening" ? "听发音，打出这个词" : "看中文，写出英文单词"}
+                      </span>
                     </div>
 
-                    {/* 语音条：整句 / 单词 / 慢速 */}
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                      {sentence && (
-                        <AudioChip
-                          label="听整句"
-                          busy={audioBusy}
-                          onClick={() => void speak(sentence)}
-                        />
-                      )}
-                      <AudioChip
-                        label="听单词"
-                        busy={audioBusy}
-                        onClick={() => void speak(current.front)}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setSlow((s) => !s)}
-                        className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                          slow ? "border-primary bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
-                        }`}
-                      >
-                        🐢 慢速{slow ? "开" : "关"}
-                      </button>
-                    </div>
-
-                    {/* 答题阶段是纯听力：上下文靠听英文原句获得，不给任何中文。
+                    {/* 听力模式：只给语音，不给任何中文。
                         中文释义 = 直接给答案；中文句意 = 变相给答案；
-                        音标 = 原词音译；英文原句 = 暴露字母数。全部留到答完再显示。
-                        只保留词性——它是语法线索，不泄露词义。*/}
+                        音标 = 原词音译；英文原句 = 暴露字母数。全部留到答完再显示。*/}
+                    {quizMode === "listening" && (
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        {sentence && (
+                          <AudioChip
+                            label="听整句"
+                            busy={audioBusy}
+                            onClick={() => void speak(sentence)}
+                          />
+                        )}
+                        <AudioChip
+                          label="听单词"
+                          busy={audioBusy}
+                          onClick={() => void speak(current.front)}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setSlow((s) => !s)}
+                          className={`rounded-full border px-3 py-1.5 text-sm transition ${
+                            slow ? "border-primary bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
+                          }`}
+                        >
+                          🐢 慢速{slow ? "开" : "关"}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* 中译英模式：只给中文，一个语音按钮都不能有——
+                        听一下就知道答案了，那就完全测不出「想说的话能不能用英文表达」。*/}
+                    {quizMode === "translation" && (
+                      <div className="flex flex-col items-center gap-2 text-center">
+                        {fields?.[FIELD.definition] && (
+                          <div className="max-w-lg text-lg leading-relaxed">
+                            {fields[FIELD.definition]}
+                          </div>
+                        )}
+                        {fields?.[FIELD.sentenceTranslation] && (
+                          <div className="max-w-lg text-sm text-muted-foreground">
+                            「{fields[FIELD.sentenceTranslation]}」
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* 词性两种模式都给：只透露语法角色，不泄露词义 */}
                     {fields?.[FIELD.partOfSpeech] && (
                       <div className="text-center text-sm italic text-muted-foreground">
                         {fields[FIELD.partOfSpeech]}
@@ -349,7 +414,7 @@ export function ReviewPage() {
                               value={typedAnswer}
                               onChange={(e) => setTypedAnswer(e.target.value)}
                               onKeyDown={(e) => { if (e.key === "Enter") checkSpelling() }}
-                              placeholder="输入你听到的单词…"
+                              placeholder={quizMode === "listening" ? "输入你听到的单词…" : "输入对应的英文单词…"}
                               autoComplete="off"
                               autoCapitalize="off"
                               spellCheck={false}
