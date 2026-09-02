@@ -61,40 +61,12 @@ export type ResolvedProviderRef<T extends ProviderConfig = ProviderConfig> =
   | LocalProviderRef<T>
   | SystemProviderRef
 
-const SYSTEM_PROVIDER_DEFS = {
-  [BUILT_IN_AI_PROVIDER_ID]: {
-    id: BUILT_IN_AI_PROVIDER_ID,
-    modelTier: "normal",
-    nameKey: BUILT_IN_AI_PROVIDER_NAME_KEY,
-    fallbackName: BUILT_IN_AI_PROVIDER_FALLBACK_NAME,
-    capabilities: [
-      "pageTranslation",
-      "selectionTranslation",
-      "videoSubtitles",
-      "inputTranslation",
-      "noteSuggestion",
-      "customAction",
-      "languageDetection",
-    ],
-    logo: () => BUILT_IN_AI_PROVIDER_LOGO,
-  },
-  [BUILT_IN_AI_ADVANCE_PROVIDER_ID]: {
-    id: BUILT_IN_AI_ADVANCE_PROVIDER_ID,
-    modelTier: "advance",
-    nameKey: BUILT_IN_AI_ADVANCE_PROVIDER_NAME_KEY,
-    fallbackName: BUILT_IN_AI_ADVANCE_PROVIDER_FALLBACK_NAME,
-    capabilities: [
-      "pageTranslation",
-      "selectionTranslation",
-      "videoSubtitles",
-      "inputTranslation",
-      "noteSuggestion",
-      "customAction",
-      "languageDetection",
-    ],
-    logo: () => BUILT_IN_AI_PROVIDER_LOGO,
-  },
-} as const satisfies Record<string, SystemProviderDef>
+// 本地化改动：上游的「内置 AI」/「高级内置 AI」是需要订阅的托管服务
+// （见 src/entrypoints/background/hosted-ai-status.ts 等，本项目均未实现）。
+// 没有后端支撑，留着只会让用户选中后失败或卡死，所以这里不注册任何系统
+// 供应商 —— 可选的永远只有用户自己配的 API Key。下面用到的 BUILT_IN_AI_*
+// 仍作为类型/常量导出，供 provider-config 的历史配置迁移脚本识别旧数据。
+const SYSTEM_PROVIDER_DEFS = {} as const satisfies Record<string, SystemProviderDef>
 
 function getSystemProviderDefs(): SystemProviderDef[] {
   return Object.values(SYSTEM_PROVIDER_DEFS)

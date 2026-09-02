@@ -2,7 +2,6 @@ import type { Config } from "@/types/config/config"
 import type { FloatingButtonSide } from "@/types/config/floating-button"
 import type { SelectionToolbarCustomAction } from "@/types/config/selection-toolbar"
 import type { PageTranslateRange } from "@/types/config/translate"
-import { BUILT_IN_AI_PROVIDER_ID } from "@/utils/providers/provider-registry"
 import { BUILT_IN_DICTIONARY_ACTION_ID } from "./custom-action"
 import { CUSTOM_ACTION_TEMPLATES } from "./custom-action-templates"
 import {
@@ -64,7 +63,7 @@ export function createDefaultDictionaryAction(): SelectionToolbarCustomAction | 
   const template = CUSTOM_ACTION_TEMPLATES.find((t) => t.id === "dictionary")
   if (!template) return null
 
-  const action = template.createAction(BUILT_IN_AI_PROVIDER_ID)
+  const action = template.createAction("openai-default")
   return {
     ...action,
     id: BUILT_IN_DICTIONARY_ACTION_ID,
@@ -153,7 +152,7 @@ export const DEFAULT_CONFIG: Config = {
     builtInActions: {
       dictionary: {
         enabled: true,
-        providerId: BUILT_IN_AI_PROVIDER_ID,
+        providerId: "openai-default",
       },
     },
     customActions: [],
@@ -249,7 +248,7 @@ export function buildFreshDefaultConfig(): Config {
       builtInActions: {
         dictionary: {
           enabled: true,
-          providerId: BUILT_IN_AI_PROVIDER_ID,
+          providerId: "openai-default",
         },
       },
       customActions: [],

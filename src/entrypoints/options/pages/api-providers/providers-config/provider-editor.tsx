@@ -1,6 +1,5 @@
 import type { APIProviderConfig } from "@/types/config/provider"
 import type { FeatureKey } from "@/utils/constants/feature-providers"
-import type { BuiltInAiProviderId } from "@/utils/constants/provider-ids"
 import { Icon } from "@iconify/react"
 import { useSelector } from "@tanstack/react-store"
 import { useAtomValue, useSetAtom } from "jotai"
@@ -37,10 +36,6 @@ import {
 import { API_PROVIDER_ITEMS } from "@/utils/constants/providers"
 import { getSelectionToolbarActions, patchSelectionToolbarAction } from "@/utils/custom-actions"
 import { i18n } from "@/utils/i18n"
-import {
-  BUILT_IN_AI_PROVIDER_LOGO,
-  getBuiltInAiProviderName,
-} from "@/utils/providers/provider-registry"
 import { providerSupportsTranslationOnlyMode } from "@/utils/providers/translation-only-gate"
 import { cn } from "@/utils/styles/utils"
 import { APIKeyField } from "./provider-config-form/api-key-field"
@@ -163,24 +158,6 @@ function useProviderEditorValue({
       ...(deleteProvider ? { delete: deleteProvider } : {}),
     },
   }
-}
-
-function BuiltInProvider({
-  providerId,
-  children,
-}: {
-  providerId: BuiltInAiProviderId
-  children: React.ReactNode
-}) {
-  const value = useProviderEditorValue({
-    identity: {
-      id: providerId,
-      logo: BUILT_IN_AI_PROVIDER_LOGO,
-      name: getBuiltInAiProviderName(providerId),
-    },
-  })
-
-  return <ProviderEditorContext value={value}>{children}</ProviderEditorContext>
 }
 
 export function useProviderForm(
@@ -611,10 +588,6 @@ export const ProviderEditor = {
   CustomActionAssignments,
   DuplicateButton,
   DeleteButton,
-}
-
-export const BuiltInProviderEditor = {
-  Provider: BuiltInProvider,
 }
 
 export const CustomProviderEditor = {
