@@ -21,6 +21,7 @@ import { PageLayout } from "@/entrypoints/options/components/page-layout"
 import { useTextToSpeech } from "@/hooks/use-text-to-speech"
 import { ANALYTICS_SURFACE } from "@/types/analytics"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
+import { detectLanguage } from "@/utils/content/language"
 import { orpcClient } from "@/utils/orpc/client"
 
 type Rating = "again" | "hard" | "good" | "easy"
@@ -73,6 +74,7 @@ function normalize(s: string) {
 export function ReviewPage() {
   const qc = useQueryClient()
   const ttsConfig = useAtomValue(configFieldsAtomMap.tts)
+  const language = useAtomValue(configFieldsAtomMap.language)
   const { play, stop, isFetching, isPlaying } = useTextToSpeech(ANALYTICS_SURFACE.FLASHCARD_REVIEW)
 
   const [revealed, setRevealed] = useState(false)
@@ -129,12 +131,39 @@ export function ReviewPage() {
   const fields = current ? fieldsByRowId.get(current.notebaseRowId) : undefined
   const sentence = fields?.[FIELD.sentence]?.trim() || ""
 
+  // 锁定音色，不让 TTS 自己按文本猜语言。
+  // hook 内部是 detectLanguage(text, { minLength: 0, enableLLM }) 决定音色的：
+  // 单个单词太短，检测极不可靠（comedian 可能被判成荷兰语/印尼语，于是用外语
+  // 音色念英文，听着就"不标准"）；开了 LLM 检测时同一个词两次结果还可能不同，
+  // 于是"第一次和第二次发音不一样"。这里改为：优先用配置里的学习语言，
+  // 「自动」时退而用整句（长文本，检测可靠）来判定，并对整句和单词复用同一个音色。
+  const [voice, setVoice] = useState<string | undefined>()
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      let lang = language.sourceCode !== "auto" ? language.sourceCode : null
+      if (!lang && sentence) {
+        // 拿整句去检测，而不是单词；关掉 LLM 保证同一文本每次结果一致
+        lang = await detectLanguage(sentence, { minLength: 0, enableLLM: false })
+      }
+      if (cancelled) return
+      setVoice(
+        (lang && ttsConfig.languageVoices[lang]) || ttsConfig.defaultVoice || undefined,
+      )
+    })()
+    return () => { cancelled = true }
+  }, [language.sourceCode, sentence, ttsConfig])
+
   const speak = useCallback(
     (text: string) => {
       if (!text) return Promise.resolve()
-      return play(text, slow ? { ...ttsConfig, rate: SLOW_RATE } : ttsConfig)
+      return play(
+        text,
+        slow ? { ...ttsConfig, rate: SLOW_RATE } : ttsConfig,
+        voice ? { forcedVoice: voice } : undefined,
+      )
     },
-    [play, slow, ttsConfig],
+    [play, slow, ttsConfig, voice],
   )
 
   useEffect(() => {
@@ -153,6 +182,10 @@ export function ReviewPage() {
   // 用 ref 记住播过哪张卡，避免 React 重渲染时重复播放。
   useEffect(() => {
     if (!current || !spellingMode) return
+    // 生词本是异步加载的。数据没到之前 sentence 还是空字符串，此时若先把这张卡
+    // 标记为"已播过"，整句就永远补不上了（依赖变化后会被下面的 ref 判断拦掉），
+    // 结果只念了 "Spell the word: xxx"。所以必须等数据到齐再开播。
+    if (!notebase) return
     if (autoPlayedRef.current === current.id) return
     autoPlayedRef.current = current.id
 
@@ -168,7 +201,7 @@ export function ReviewPage() {
     })()
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- 只在换卡时自动播放一次
-  }, [current?.id, spellingMode, sentence])
+  }, [current?.id, spellingMode, sentence, notebase])
 
   // 离开页面时停掉还在播的音频。
   // stop 没有被 useCallback 包住，每次渲染都是新引用；直接写进依赖会导致
