@@ -17,6 +17,7 @@ import {
   getActiveGuideDictionaryNotebaseTrackingForAction,
 } from "@/utils/guide/dictionary-notebase"
 import { i18n } from "@/utils/i18n"
+import { logger } from "@/utils/logger"
 import { sendMessage } from "@/utils/message"
 import {
   classifyConnectedNotebaseOwnership,
@@ -34,6 +35,8 @@ import {
 } from "@/utils/notebase/errors"
 import { buildNotebaseRowCells, validateNotebaseMappings } from "@/utils/notebase/mapping"
 import {
+  buildNotebaseConnectionFromPending,
+  buildNotebaseCreateInputFromPending,
   createPendingConnectedNotebaseSave,
   createPendingNotebaseSave,
   getNotebaseDetailUrl,
@@ -203,6 +206,41 @@ export function useSaveToNotebase() {
     return getActiveGuideDictionaryNotebaseTrackingForAction(actionId, currentUrl)
   }
 
+  /**
+   * 首次保存时静默建库：按操作的输出字段建好笔记库、把当前结果作为第一条写入，
+   * 再把连接写回配置。之后的保存就走正常的已连接路径。
+   *
+   * 注意 notebase.create 会把第一条记录作为 initialRow 一起创建，
+   * 所以这里不能再单独存一次，否则会重复。
+   */
+  const autoCreateNotebaseAndSave = async (
+    action: SelectionToolbarCustomAction,
+    results: Array<Record<string, unknown>>,
+    connectedAccount: SelectionToolbarCustomActionNotebaseAccount,
+  ): Promise<SaveToNotebaseOutcome> => {
+    const trackingLookup = getGuideDictionaryNotebaseTracking(action.id)
+    const guideDictionaryNotebaseTracking = trackingLookup ? await trackingLookup : null
+    const pending = createPendingNotebaseSave(action, results, Date.now(), {
+      guideDictionaryNotebaseTracking: guideDictionaryNotebaseTracking ?? undefined,
+    })
+
+    await orpcClient.notebase.create(buildNotebaseCreateInputFromPending(pending))
+
+    const nextConnection = buildNotebaseConnectionFromPending(pending, connectedAccount)
+    await setSelectionToolbarConfig(
+      patchSelectionToolbarAction(selectionToolbarConfig, action.id, {
+        notebaseConnection: nextConnection,
+      }),
+    )
+
+    toastManager.add({
+      type: "success",
+      title: i18n.t("action.saveToNotebaseSuccess"),
+      description: pending.actionName,
+    })
+    return "saved"
+  }
+
   const save = async (request: SaveToNotebaseRequest): Promise<SaveToNotebaseOutcome> => {
     const { action, results, actionDraft, analyticsSource, analyticsProvider } = request
     if (results.length === 0) {
@@ -248,6 +286,19 @@ export function useSaveToNotebase() {
       : sanitizeCustomActionNotebaseConnection(action.notebaseConnection, action.outputSchema)
 
     if (!connection) {
+      // 本地化改动：上游在这里弹「创建还是连接现有笔记库」让用户选。
+      // 但本项目是单机单用户，不存在"别人的笔记库"这种情况，那个弹窗对
+      // 新用户只是一道看不懂的坎——第一次存词就被问一个还没有答案的问题。
+      // 这里直接按操作的输出字段建库并保存，全程无感；只有在自动建库失败
+      // 或缺少账号快照时，才退回原来的弹窗，不至于让用户点了没反应。
+      if (!actionDraft && currentAccount) {
+        try {
+          return await autoCreateNotebaseAndSave(action, results, currentAccount)
+        }
+        catch (error) {
+          logger.warn("[SaveToNotebase] 自动创建笔记库失败，退回手动弹窗", error)
+        }
+      }
       return openCreateOrConnectDialog()
     }
 
