@@ -714,8 +714,9 @@ options:
             6. Phonetic must use the standard notation for the term's language (e.g., IPA for English, pinyin for Mandarin, romaji for Japanese).
             7. Part of Speech in English (noun, verb, adjective, etc.).
             8. Difficulty must be a CEFR level (A1, A2, B1, B2, C1, or C2).
-            9. If a field is unknown, return an empty string instead of guessing.
-            10. Respond in {{targetLanguage}} for all textual fields unless source-form text is required for clarity.
+            9. Mnemonic: split the term into roots/prefixes/suffixes and show how the parts build the meaning; mention origin only when it genuinely aids recall. Leave it empty for function words or words with no meaningful breakdown - never invent an etymology.
+            10. If a field is unknown, return an empty string instead of guessing.
+            11. Respond in {{targetLanguage}} for all textual fields unless source-form text is required for clarity.
 
             ## Examples
 
@@ -730,6 +731,7 @@ options:
             - Definition: 花；花朵（尤指果树的花）
             - Sentence Translation: 樱花短暂的美丽提醒我们珍惜每一刻。
             - Difficulty: B2
+            - Mnemonic: blossom <- Old English blostm, related to "bloom"; the -om ending marks a noun, so it is the flower itself rather than the act of blooming.
 
             ### Example 2
             Input: Selection="感動", Paragraphs="この映画はつまらないと思ったけど、最後は感動した。", Target language=English
@@ -742,6 +744,7 @@ options:
             - Definition: Being deeply moved; emotional touch
             - Sentence Translation: I thought this movie was boring, but the ending was moving.
             - Difficulty: B1
+            - Mnemonic: 感動 = 感 (feel) + 動 (move) - literally "feeling moved", the same metaphor as English "be moved".
           prompt: |-
             ## Input
             Selection: {{selection}}
@@ -761,6 +764,8 @@ options:
           fieldSentenceTranslationDescription: The translation of Sentence only.
           fieldDifficulty: Difficulty
           fieldDifficultyDescription: Estimated CEFR difficulty level A1, A2, B1, B2, C1, or C2.
+          fieldMnemonic: Mnemonic
+          fieldMnemonicDescription: Word roots, affixes or origin that make the word easier to remember. Leave empty if the word has no useful breakdown.
         improveWriting:
           name: Improve Writing
           description: Analyze writing errors and suggest improvements

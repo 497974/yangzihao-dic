@@ -714,8 +714,9 @@ options:
             6. 音标必须使用该语言的标准标注（如英语用 IPA，中文用拼音，日语用罗马字）。
             7. 词性使用英文（noun, verb, adjective 等）。
             8. 难度必须是 CEFR 等级（A1, A2, B1, B2, C1, 或 C2）。
-            9. 如果某个字段未知，返回空字符串而非猜测。
-            10. 除非需要保留原文形式，所有文本字段均使用 {{targetLanguage}} 作答。
+            9. 助记：把词条拆成词根／前缀／后缀，说明各部分如何组合出这个意思；词源只在真正有助记忆时才提。功能词、拆不出东西的词一律留空，绝不编造词源。
+            10. 如果某个字段未知，返回空字符串而非猜测。
+            11. 除非需要保留原文形式，所有文本字段均使用 {{targetLanguage}} 作答。
 
             ## 示例
 
@@ -730,6 +731,7 @@ options:
             - 释义：花；花朵（尤指果树的花）
             - 句子翻译：樱花短暂的美丽提醒我们珍惜每一刻。
             - 难度：B2
+            - 助记：blossom ← 古英语 blostm，与 bloom（开花）同源；词尾 -om 构成名词，指「花」这个东西本身，而不是开花这个动作。
 
             ### 示例 2
             输入：Selection="感動", Paragraphs="この映画はつまらないと思ったけど、最後は感動した。", 目标语言=英语
@@ -742,6 +744,7 @@ options:
             - 释义：Being deeply moved; emotional touch
             - 句子翻译：I thought this movie was boring, but the ending was moving.
             - 难度：B1
+            - 助记：感動 = 感（感觉）+ 動（移动）——字面就是「感觉被触动」，和英文 be moved 是同一个比喻。
           prompt: |-
             ## 输入
             选中文本：{{selection}}
@@ -761,6 +764,8 @@ options:
           fieldSentenceTranslationDescription: 只翻译提取出的句子。
           fieldDifficulty: 难度
           fieldDifficultyDescription: 预估 CEFR 难度等级：A1、A2、B1、B2、C1 或 C2。
+          fieldMnemonic: 助记
+          fieldMnemonicDescription: 拆解词根、词缀或词源，帮助记住这个词。没有有价值的拆解时留空。
         improveWriting:
           name: 写作改进
           description: 分析写作错误并提供改进建议

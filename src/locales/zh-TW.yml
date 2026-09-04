@@ -714,8 +714,9 @@ options:
             6. 音標必須使用該詞條語言的標準標記（例如英文使用 IPA、中文使用拼音、日文使用羅馬字）。
             7. 詞性請使用英文（noun、verb、adjective 等）。
             8. 難度必須是 CEFR 等級（A1、A2、B1、B2、C1 或 C2）。
-            9. 如果某個欄位無法判斷，請回傳空字串，不要猜測。
-            10. 除非必須使用來源形式才能保持清楚，所有文字欄位都請使用 {{targetLanguage}} 回答。
+            9. 助記：把詞條拆成詞根／前綴／後綴，說明各部分如何組合出這個意思；詞源只在真正有助記憶時才提。功能詞、拆不出東西的詞一律留空，絕不編造詞源。
+            10. 如果某個欄位無法判斷，請回傳空字串，不要猜測。
+            11. 除非必須使用來源形式才能保持清楚，所有文字欄位都請使用 {{targetLanguage}} 回答。
 
             ## 範例
 
@@ -730,6 +731,7 @@ options:
             - 定義：花；花朵（尤指果樹的花）
             - 句子翻譯：櫻花短暫的美麗提醒我們珍惜每一刻。
             - 難度：B2
+            - 助記：blossom ← 古英語 blostm，與 bloom（開花）同源；詞尾 -om 構成名詞，指「花」這個東西本身，而不是開花這個動作。
 
             ### 範例 2
             輸入：Selection=感動；Paragraphs=この映画はつまらないと思ったけど、最後は感動した。；Target language=English
@@ -742,6 +744,7 @@ options:
             - 定義：Being deeply moved; emotional touch
             - 句子翻譯：I thought this movie was boring, but the ending was moving.
             - 難度：B1
+            - 助記：感動 = 感（感覺）+ 動（移動）——字面就是「感覺被觸動」，和英文 be moved 是同一個比喻。
           prompt: |-
             ## 輸入
             選取文字：{{selection}}
@@ -761,6 +764,8 @@ options:
           fieldSentenceTranslationDescription: 只翻譯提取出的句子。
           fieldDifficulty: 難度
           fieldDifficultyDescription: 預估 CEFR 難度等級 A1、A2、B1、B2、C1 或 C2。
+          fieldMnemonic: 助記
+          fieldMnemonicDescription: 拆解詞根、詞綴或詞源，幫助記住這個詞。沒有有價值的拆解時留空。
         improveWriting:
           name: 改善寫作
           description: 分析寫作錯誤並提出改善建議

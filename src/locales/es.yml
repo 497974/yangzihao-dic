@@ -714,8 +714,9 @@ options:
             6. Fonética debe usar la notación estándar del idioma del término (p. ej., IPA para inglés, pinyin para mandarín, romaji para japonés).
             7. Categoría gramatical en inglés (noun, verb, adjective, etc.).
             8. Dificultad debe ser un nivel CEFR (A1, A2, B1, B2, C1 o C2).
-            9. Si un campo es desconocido, devuelve una cadena vacía en lugar de adivinar.
-            10. Responde en {{targetLanguage}} para todos los campos textuales, salvo que se requiera texto en la forma de origen para mayor claridad.
+            9. Mnemotecnia: divide el termino en raices/prefijos/sufijos y muestra como las partes construyen el significado; menciona el origen solo si ayuda de verdad. Dejalo vacio para palabras funcionales o sin desglose util; nunca inventes una etimologia.
+            10. Si un campo es desconocido, devuelve una cadena vacía en lugar de adivinar.
+            11. Responde en {{targetLanguage}} para todos los campos textuales, salvo que se requiera texto en la forma de origen para mayor claridad.
 
             ## Ejemplos
 
@@ -730,6 +731,7 @@ options:
             - Definición: 花；花朵（尤指果树的花）
             - Traducción de la oración: 樱花短暂的美丽提醒我们珍惜每一刻。
             - Dificultad: B2
+            - Mnemotecnia: blossom <- ingles antiguo blostm, emparentado con bloom (florecer); la terminacion -om forma un sustantivo, o sea la flor en si, no el acto de florecer.
 
             ### Ejemplo 2
             Entrada: Selección="感動", Párrafos="この映画はつまらないと思ったけど、最後は感動した。", Idioma de destino=inglés
@@ -742,6 +744,7 @@ options:
             - Definición: Being deeply moved; emotional touch
             - Traducción de la oración: I thought this movie was boring, but the ending was moving.
             - Dificultad: B1
+            - Mnemotecnia: 感動 = 感 (sentir) + 動 (mover): literalmente "sentirse movido", la misma metafora que be moved en ingles.
           prompt: |-
             ## Entrada
             Selección: {{selection}}
@@ -761,6 +764,8 @@ options:
           fieldSentenceTranslationDescription: La traducción únicamente de la Oración.
           fieldDifficulty: Dificultad
           fieldDifficultyDescription: Nivel de dificultad CEFR estimado A1, A2, B1, B2, C1 o C2.
+          fieldMnemonic: Mnemotecnia
+          fieldMnemonicDescription: Raices, afijos u origen que facilitan recordar la palabra. Dejar vacio si no hay un desglose util.
         improveWriting:
           name: Mejorar escritura
           description: Analiza errores de escritura y sugiere mejoras

@@ -79,6 +79,14 @@ export const CUSTOM_ACTION_TEMPLATES: CustomActionTemplate[] = [
           i18n.t(`${T_PREFIX}.dictionary.fieldDifficultyDescription`),
           "dictionary-difficulty",
         ),
+        // 助记：拆词根词缀讲来源。放在最后，是因为它依赖前面已经确定下来的
+        // 词条原形——模型按字段顺序生成，词条定了再拆才不会拆错。
+        createOutputSchemaField(
+          i18n.t(`${T_PREFIX}.dictionary.fieldMnemonic`),
+          "string",
+          i18n.t(`${T_PREFIX}.dictionary.fieldMnemonicDescription`),
+          "dictionary-mnemonic",
+        ),
       ],
     }),
   },
