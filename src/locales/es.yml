@@ -714,7 +714,7 @@ options:
             6. Fonética debe usar la notación estándar del idioma del término (p. ej., IPA para inglés, pinyin para mandarín, romaji para japonés).
             7. Categoría gramatical en inglés (noun, verb, adjective, etc.).
             8. Dificultad debe ser un nivel CEFR (A1, A2, B1, B2, C1 o C2).
-            9. Mnemotecnia: divide el termino en raices/prefijos/sufijos y muestra como las partes construyen el significado; menciona el origen solo si ayuda de verdad. Dejalo vacio para palabras funcionales o sin desglose util; nunca inventes una etimologia.
+            9. Mnemotecnia: elige el mejor gancho disponible en este orden: (a) raices/prefijos/sufijos, mostrando como las partes construyen el significado; (b) si no se descompone, usa otro gancho real: un cognado o palabra parecida para contrastar, un patron de ortografia o sonido, un origen documentado, o la colocacion en la que siempre aparece; (c) si nada ayuda de verdad, dejalo vacio. Nunca inventes una etimologia ni un juego de palabras forzado.
             10. Si un campo es desconocido, devuelve una cadena vacía en lugar de adivinar.
             11. Responde en {{targetLanguage}} para todos los campos textuales, salvo que se requiera texto en la forma de origen para mayor claridad.
 

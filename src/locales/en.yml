@@ -714,7 +714,7 @@ options:
             6. Phonetic must use the standard notation for the term's language (e.g., IPA for English, pinyin for Mandarin, romaji for Japanese).
             7. Part of Speech in English (noun, verb, adjective, etc.).
             8. Difficulty must be a CEFR level (A1, A2, B1, B2, C1, or C2).
-            9. Mnemonic: split the term into roots/prefixes/suffixes and show how the parts build the meaning; mention origin only when it genuinely aids recall. Leave it empty for function words or words with no meaningful breakdown - never invent an etymology.
+            9. Mnemonic - pick the strongest available hook, in this order: (a) roots/prefixes/suffixes, showing how the parts build the meaning; (b) if it does not decompose, use another real hook - a cognate or look-alike word to contrast, a spelling/sound pattern, a documented origin story, or the collocation it always appears in; (c) if nothing genuine helps, leave it empty. Never invent an etymology or a forced pun.
             10. If a field is unknown, return an empty string instead of guessing.
             11. Respond in {{targetLanguage}} for all textual fields unless source-form text is required for clarity.
 

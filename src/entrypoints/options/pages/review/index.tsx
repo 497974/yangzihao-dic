@@ -57,6 +57,7 @@ const FIELD = {
   sentence: "句子",
   sentenceTranslation: "句子翻译",
   difficulty: "难度",
+  mnemonic: "助记",
 } as const
 
 const RATING_META: { key: Rating; label: string; hint: string; cls: string; keyCap: string }[] = [
@@ -619,6 +620,17 @@ export function ReviewPage() {
                       <span className="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                         {fields[FIELD.difficulty]}
                       </span>
+                    )}
+
+                    {/* 助记：答错时最需要的就是这个——给个能挂住记忆的钩子，
+                        而不是让人把同一个词再死记一遍 */}
+                    {fields?.[FIELD.mnemonic] && (
+                      <div className="max-w-lg rounded-lg border border-primary/25 bg-primary/5 px-4 py-3 text-left text-sm leading-relaxed">
+                        <span className="mr-2 rounded bg-primary/15 px-1.5 py-0.5 text-[11px] font-medium text-primary">
+                          助记
+                        </span>
+                        {fields[FIELD.mnemonic]}
+                      </div>
                     )}
 
                     {!isCorrect && (
