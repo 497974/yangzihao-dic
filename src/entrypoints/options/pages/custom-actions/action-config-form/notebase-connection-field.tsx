@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useSelector } from "@tanstack/react-store"
 import { dequal } from "dequal"
 import { useCallback, useEffect, useMemo } from "react"
+import { browser } from "#imports"
 import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/ui/base-ui/alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/base-ui/avatar"
 import { Button } from "@/components/ui/base-ui/button"
@@ -454,11 +455,10 @@ export const NotebaseConnectionField = withForm({
                       size="sm"
                       render={
                         <a
-                          href={new URL(
-                            `/notebase/${encodeURIComponent(sanitizedConnection.notebaseId)}`,
-                            // 本地化改动：笔记库在本地服务器上
-                            env.WXT_API_URL,
-                          ).toString()}
+                          // 本地化改动：笔记库在扩展内部，不依赖服务器
+                          href={browser.runtime.getURL(
+                            `/options.html#/notebase/${encodeURIComponent(sanitizedConnection.notebaseId)}`,
+                          )}
                           target="_blank"
                           rel="noopener noreferrer"
                         />
@@ -560,7 +560,9 @@ export const NotebaseConnectionField = withForm({
                     type="button"
                     size="sm"
                     variant="outline"
-                    onClick={() => window.open(`${env.WXT_API_URL}/notebase`, "_blank")}
+                    onClick={() =>
+                      window.open(browser.runtime.getURL("/options.html#/notebase"), "_blank")
+                    }
                   >
                     {t("openNotebaseAction")}
                   </Button>

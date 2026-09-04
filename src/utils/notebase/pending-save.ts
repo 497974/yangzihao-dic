@@ -9,8 +9,7 @@ import type {
 } from "@/types/config/selection-toolbar"
 import { NOTEBASE_COLUMN_TYPE_INFO } from "@read-frog/definitions"
 import { z as zod } from "zod"
-import { storage } from "#imports"
-import { env } from "@/env"
+import { browser, storage } from "#imports"
 import { selectionToolbarCustomActionNotebaseConnectionSchema } from "@/types/config/selection-toolbar"
 import { getRandomUUID } from "@/utils/crypto-polyfill"
 import { findSelectionToolbarAction, replaceSelectionToolbarAction } from "@/utils/custom-actions"
@@ -217,8 +216,11 @@ export function buildNotebaseCreateInputFromPending(
 }
 
 export function getNotebaseDetailUrl(notebaseId: string) {
-  // 本地化改动：笔记库在本地服务器上，不在官网。WXT_API_URL 已指向 localhost。
-  return new URL(`/notebase/${encodeURIComponent(notebaseId)}`, env.WXT_API_URL).toString()
+  // 本地化改动：笔记库就在扩展内部（options 页），不依赖任何服务器。
+  // 早先这里指向 WXT_API_URL（本机临时起的服务器），分发给别人时对方机器上
+  // 没有那个服务，点开只会连接失败；而且那个地址读的是另一份数据，
+  // 会出现"明明保存成功了却看不到新词"的假象。
+  return browser.runtime.getURL(`/options.html#/notebase/${encodeURIComponent(notebaseId)}`)
 }
 
 export function buildNotebaseConnectionFromPending(

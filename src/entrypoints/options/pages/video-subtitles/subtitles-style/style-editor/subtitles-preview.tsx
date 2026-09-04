@@ -10,21 +10,33 @@ import { SUBTITLES_BOX_CLASS, SUBTITLES_VIEW_CLASS } from "@/utils/constants/sub
 import { cn } from "@/utils/styles/utils"
 import { ShadowPreviewFrame } from "./shadow-preview-frame"
 
+/** 默认预览样例——没人自定义时用这个，跟以前完全一样 */
+export const DEFAULT_SUBTITLES_PREVIEW_ORIGINAL =
+  "Mr. Kamiya is not fighting against the world, but against things that could make the world take notice."
+export const DEFAULT_SUBTITLES_PREVIEW_TRANSLATION =
+  "神谷先生不是在对抗世界，而是在对抗可能让世界为之侧目的事物。"
+
 interface SubtitlesPreviewProps {
   /**
    * Custom CSS to show the effect of before it is saved. Omitted, the preview falls back to what
    * the config holds, so the style page shows the saved CSS rather than pretending there is none.
    */
   previewCSS?: string
+  /** 自定义预览用的原文/译文——不传就用默认样例（那句"神谷先生"） */
+  originalText?: string
+  translationText?: string
 }
 
-export function SubtitlesPreview({ previewCSS }: SubtitlesPreviewProps) {
+export function SubtitlesPreview({
+  previewCSS,
+  originalText = DEFAULT_SUBTITLES_PREVIEW_ORIGINAL,
+  translationText = DEFAULT_SUBTITLES_PREVIEW_TRANSLATION,
+}: SubtitlesPreviewProps) {
   const { style } = useAtomValue(configFieldsAtomMap.videoSubtitles)
   const { displayMode, translationPosition, container } = style
 
-  const sampleOriginal =
-    "Mr. Kamiya is not fighting against the world, but against things that could make the world take notice."
-  const sampleTranslation = "神谷先生不是在对抗世界，而是在对抗可能让世界为之侧目的事物。"
+  const sampleOriginal = originalText
+  const sampleTranslation = translationText
 
   const translationAbove = translationPosition === "above"
   const showMain = displayMode !== "translationOnly"

@@ -47,3 +47,6 @@ scripts/output/
 
 reference/
 .gstack/
+
+# 本机 Chrome 扩展存储的备份副本 —— 内含用户自己的 API key，绝不能提交
+_storage-backup*/

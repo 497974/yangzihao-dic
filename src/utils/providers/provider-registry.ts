@@ -7,9 +7,12 @@ import type {
   SystemProviderSelectorItem,
 } from "@/utils/providers/provider-display"
 import readFrogLogo from "@/assets/providers/yangzihao-dic-provider.png?url&no-inline"
-import { isLLMProviderConfig, isTranslateProviderConfig } from "@/types/config/provider"
 import {
-  BUILT_IN_AI_PROVIDER_ID,
+  isLLMProviderConfig,
+  isPureTranslateProviderConfig,
+  isTranslateProviderConfig,
+} from "@/types/config/provider"
+import {
   BUILT_IN_AI_PROVIDER_IDS,
   BUILT_IN_AI_ADVANCE_PROVIDER_ID,
   type BuiltInAiProviderId,
@@ -17,16 +20,13 @@ import {
 } from "@/utils/constants/provider-ids"
 import { i18n } from "@/utils/i18n"
 
+// 这两个 id 仍被别处引用（旧配置里可能残留这些 providerId，需要能识别出来），
+// 所以继续转出；但内置 AI 本身已移除，配套的名称常量成了死代码，已删。
 export {
   BUILT_IN_AI_PROVIDER_ID,
   BUILT_IN_AI_ADVANCE_PROVIDER_ID,
 } from "@/utils/constants/provider-ids"
 export const BUILT_IN_AI_PROVIDER_LOGO = readFrogLogo
-
-const BUILT_IN_AI_PROVIDER_NAME_KEY = "options.apiProviders.providers.name.builtInAi"
-const BUILT_IN_AI_PROVIDER_FALLBACK_NAME = "Built-in AI"
-const BUILT_IN_AI_ADVANCE_PROVIDER_NAME_KEY = "options.apiProviders.providers.name.builtInAiAdvance"
-const BUILT_IN_AI_ADVANCE_PROVIDER_FALLBACK_NAME = "Advanced Built-in AI"
 
 export type ProviderCapability = FeatureKey | "customAction" | "languageDetection"
 type SystemProviderNameKey = keyof GeneratedI18nStructure
@@ -232,4 +232,58 @@ export function resolveProviderRefForCapability<C extends ProviderCapability>(
   }
 
   return createSystemProviderRef(systemProvider)
+}
+
+/**
+ * 词典专用的供应商解析——比普通 customAction 松一档。
+ *
+ * customAction 能力被限定成只认大模型（见 LOCAL_PROVIDER_CAPABILITY_PREDICATES），
+ * 这对用户自定义的动作是对的：任意 systemPrompt 驱动的结构化抽取，脱离大模型
+ * 就跑不动。但内置词典的输出字段是固定的（词条/音标/词性/释义/句子/句子翻译/
+ * 难度），当引擎换成 Google/Microsoft 这类纯翻译接口时，能优雅降级——放弃
+ * 词性和难度分析，只留"这个词/这句话翻译成什么"，用一次轻量翻译调用换取
+ * 秒回（对照 use-custom-action-execution.ts 里的快速词典分支）。
+ *
+ * 所以词典的供应商解析要在标准 customAction 判定之外，再额外认一遍纯翻译
+ * 供应商；其他自定义动作一律不享受这条口子。
+ */
+export function resolveDictionaryProviderRef(
+  providersConfig: ProvidersConfig,
+  providerId: string,
+): CustomActionProviderRef | null {
+  const asCustomAction = resolveProviderRefForCapability(
+    "customAction",
+    providersConfig,
+    providerId,
+  )
+  if (asCustomAction) {
+    return asCustomAction
+  }
+
+  const providerConfig = providersConfig.find((provider) => provider.id === providerId)
+  if (providerConfig?.enabled && isPureTranslateProviderConfig(providerConfig)) {
+    // 类型上仍标成 CustomActionProviderRef（config: LLMProviderConfig）——这里其实
+    // 塞进去的是纯翻译配置，字段形状对不上。之所以敢这么断言，是因为消费方
+    // （use-custom-action-execution.ts 的 buildCustomActionExecutionRequest）在
+    // 访问任何 LLM 专属字段（.model/.providerOptions/.temperature）之前，都会先
+    // 用 isLLMProviderConfig 做一次真正的运行时判断——那层判断读的是 .provider
+    // 字符串，跟这里的静态类型无关，所以不会被这个断言糊弄过去、也不会踩空字段崩溃。
+    return {
+      kind: "local",
+      config: providerConfig,
+      id: providerConfig.id,
+      name: providerConfig.name,
+    } as CustomActionProviderRef
+  }
+
+  return null
+}
+
+/** 词典的供应商下拉列表：大模型 + 纯翻译引擎，专供内置词典这一个动作使用。 */
+export function getDictionaryProviders(providersConfig: ProvidersConfig): ProviderSelectorOption[] {
+  const llmProviders = getSelectableProvidersForCapability("customAction", providersConfig)
+  const translateProviders = providersConfig.filter(
+    (provider) => provider.enabled && isPureTranslateProviderConfig(provider),
+  )
+  return [...llmProviders, ...translateProviders]
 }

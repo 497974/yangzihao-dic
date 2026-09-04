@@ -6,7 +6,12 @@ import { i18n } from "@/utils/i18n"
 import { ConfigDetailSection } from "../../../../components/config-detail-section"
 import { ConfigItem } from "../../../../components/config-item"
 import { PageLayout } from "../../../../components/page-layout"
-import { SubtitlesPreview } from "../style-editor/subtitles-preview"
+import { PreviewTextControls } from "../style-editor/preview-text-controls"
+import {
+  DEFAULT_SUBTITLES_PREVIEW_ORIGINAL,
+  DEFAULT_SUBTITLES_PREVIEW_TRANSLATION,
+  SubtitlesPreview,
+} from "../style-editor/subtitles-preview"
 import { CSSEditor } from "./css-editor"
 import { PresetTemplateSelect } from "./preset-template-select"
 
@@ -22,6 +27,8 @@ import { PresetTemplateSelect } from "./preset-template-select"
 export function SubtitlesCustomCssPage() {
   const { style } = useAtomValue(configFieldsAtomMap.videoSubtitles)
   const [draft, setDraft] = useState(style.customCSS ?? "")
+  const [originalText, setOriginalText] = useState(DEFAULT_SUBTITLES_PREVIEW_ORIGINAL)
+  const [translationText, setTranslationText] = useState(DEFAULT_SUBTITLES_PREVIEW_TRANSLATION)
   // Debounced only to keep the shadow root's stylesheet from being rebuilt on every keystroke.
   const previewCSS = useDebouncedValue(draft, 300)
 
@@ -47,7 +54,17 @@ export function SubtitlesCustomCssPage() {
           </span>
         }
       >
-        <SubtitlesPreview previewCSS={previewCSS} />
+        <SubtitlesPreview
+          previewCSS={previewCSS}
+          originalText={originalText}
+          translationText={translationText}
+        />
+        <PreviewTextControls
+          originalText={originalText}
+          onOriginalTextChange={setOriginalText}
+          translationText={translationText}
+          onTranslationTextChange={setTranslationText}
+        />
         <ConfigItem
           title={i18n.t("options.videoSubtitles.style.customCSS.presetTemplate")}
           description={i18n.t("options.videoSubtitles.style.customCSS.presetTemplateDescription")}

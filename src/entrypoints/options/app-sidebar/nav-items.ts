@@ -4,7 +4,11 @@ export const ROUTE_DEFS = [
   { path: "/shortcuts" },
   { path: "/api-providers" },
   { path: "/custom-actions" },
+  { path: "/notebase" },
+  // 保存成功后的「打开笔记库」是带 id 的深链，走同一个页面
+  { path: "/notebase/:notebaseId" },
   { path: "/review" },
+  { path: "/sentence-practice" },
   { path: "/stats" },
   { path: "/page-translation" },
   { path: "/video-subtitles" },

@@ -63,7 +63,10 @@ export function createDefaultDictionaryAction(): SelectionToolbarCustomAction | 
   const template = CUSTOM_ACTION_TEMPLATES.find((t) => t.id === "dictionary")
   if (!template) return null
 
-  const action = template.createAction("openai-default")
+  // 没有 apikey 的用户也要能查词：默认挂 Microsoft Translate（免密钥），走
+  // use-custom-action-execution.ts 的快速词典分支——放弃词性/难度分析换来
+  // 开箱即用。用户接了大模型 apikey 后可以自己在设置里切回 AI 版。
+  const action = template.createAction(MICROSOFT_TRANSLATE_PROVIDER_ID)
   return {
     ...action,
     id: BUILT_IN_DICTIONARY_ACTION_ID,
@@ -152,7 +155,10 @@ export const DEFAULT_CONFIG: Config = {
     builtInActions: {
       dictionary: {
         enabled: true,
-        providerId: "openai-default",
+        // 免密钥：Microsoft Translate 走快速词典分支。noteSuggestion 做不到这点——
+        // 它要凭上下文"生成"笔记建议，没有等价的纯翻译替代，所以那个仍然是
+        // openai-default，没配 key 就用不了，会显示 SetApiKeyWarning。
+        providerId: MICROSOFT_TRANSLATE_PROVIDER_ID,
       },
     },
     customActions: [],
@@ -248,7 +254,7 @@ export function buildFreshDefaultConfig(): Config {
       builtInActions: {
         dictionary: {
           enabled: true,
-          providerId: "openai-default",
+          providerId: MICROSOFT_TRANSLATE_PROVIDER_ID,
         },
       },
       customActions: [],

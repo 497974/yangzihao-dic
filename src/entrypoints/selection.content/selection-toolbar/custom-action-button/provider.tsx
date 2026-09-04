@@ -10,10 +10,12 @@ import { ANALYTICS_FEATURE, ANALYTICS_SURFACE } from "@/types/analytics"
 import { createFeatureUsageContext, trackFeatureUsed } from "@/utils/analytics"
 import { classifyResolvedProvider, UNKNOWN_FEATURE_PROVIDER } from "@/utils/analytics-provider"
 import { configFieldsAtomMap, writeConfigAtom } from "@/utils/atoms/config"
+import { BUILT_IN_DICTIONARY_ACTION_ID } from "@/utils/constants/custom-action"
 import { findSelectionToolbarAction, patchSelectionToolbarAction } from "@/utils/custom-actions"
 import { onMessage } from "@/utils/message"
 import {
   getSelectableProvidersForCapability,
+  resolveDictionaryProviderRef,
   resolveProviderRefForCapability,
 } from "@/utils/providers/provider-registry"
 import { shadowWrapper } from "../.."
@@ -129,8 +131,16 @@ export function SelectionCustomActionProvider({ children }: { children: ReactNod
     () => ({
       language,
       action: activeAction,
+      // 词典允许挂纯翻译供应商（Google/Microsoft Translate），走 resolveDictionaryProviderRef；
+      // 其余自定义动作仍然锁死在大模型上——见该函数的注释。
       provider: activeAction
-        ? resolveProviderRefForCapability("customAction", providersConfig, activeAction.providerId)
+        ? activeAction.id === BUILT_IN_DICTIONARY_ACTION_ID
+          ? resolveDictionaryProviderRef(providersConfig, activeAction.providerId)
+          : resolveProviderRefForCapability(
+              "customAction",
+              providersConfig,
+              activeAction.providerId,
+            )
         : null,
     }),
     [activeAction, language, providersConfig],

@@ -33,12 +33,34 @@ export function FeaturesNav() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
+              render={<Link to="/notebase" />}
+              isActive={pathname.startsWith("/notebase")}
+              tooltip="笔记库"
+            >
+              <Icon icon="tabler:book" />
+              <span>笔记库</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
               render={<Link to="/review" />}
               isActive={pathname === "/review"}
               tooltip="闪卡复习"
             >
               <Icon icon="tabler:cards" />
               <span>闪卡复习</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              render={<Link to="/sentence-practice" />}
+              isActive={pathname === "/sentence-practice"}
+              tooltip="造句练习"
+            >
+              <Icon icon="tabler:pencil-question" />
+              <span>造句练习</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
 

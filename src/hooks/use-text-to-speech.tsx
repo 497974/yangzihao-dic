@@ -6,7 +6,7 @@ import type {
 import type { TTSConfig } from "@/types/config/tts"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useAtomValue } from "jotai"
-import { useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { toastManager } from "@/components/ui/base-ui/toast"
 import { ANALYTICS_FEATURE, ANALYTICS_SURFACE } from "@/types/analytics"
 import { createFeatureUsageContext, trackFeatureUsed } from "@/utils/analytics"
@@ -279,6 +279,48 @@ export function useTextToSpeech(surface: AnalyticsSurface = ANALYTICS_SURFACE.SE
     },
   })
 
+  /**
+   * 悄悄把音频合成好、存进缓存，不播放。
+   *
+   * play() 里 fetchChunkAudio 用的 queryKey 是纯文本内容算出来的（text+voice+
+   * rate+pitch+volume），跟这里用的是同一把 key——只要预取时用的参数和真正播放
+   * 时完全一致，React Query 会直接把这份命中缓存吐回去，不会重新发网络请求。
+   * 用于闪卡复习换题前先把下一张卡的语音焐热，真正切过去时就不用再等合成。
+   */
+  const prefetch = useCallback(
+    async (text: string, ttsConfig: TTSConfig, options?: { forcedVoice?: string }) => {
+      if (!text) return
+      const selectedVoice = await resolveVoiceForText(
+        text,
+        ttsConfig,
+        languageDetection.mode === "llm",
+        options?.forcedVoice,
+      )
+      const chunks = splitTextByUtf8Bytes(text)
+      await Promise.all(
+        chunks.map((chunk) =>
+          queryClient.fetchQuery({
+            queryKey: [
+              "tts-audio",
+              {
+                text: chunk,
+                voice: selectedVoice,
+                rate: ttsConfig.rate,
+                pitch: ttsConfig.pitch,
+                volume: ttsConfig.volume,
+              },
+            ],
+            queryFn: () => synthesizeEdgeTTSAudioChunk(chunk, selectedVoice, ttsConfig),
+            staleTime: Number.POSITIVE_INFINITY,
+            gcTime: 1000 * 60 * 10,
+            meta: { suppressToast: true },
+          }),
+        ),
+      )
+    },
+    [languageDetection.mode, queryClient],
+  )
+
   const play = (text: string, ttsConfig: TTSConfig, options?: { forcedVoice?: string }) => {
     return playMutation.mutateAsync({
       text,
@@ -295,6 +337,7 @@ export function useTextToSpeech(surface: AnalyticsSurface = ANALYTICS_SURFACE.SE
 
   return {
     play,
+    prefetch,
     stop,
     isFetching,
     isPlaying,

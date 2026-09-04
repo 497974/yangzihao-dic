@@ -14,6 +14,14 @@ const ShortcutsPage = lazy(() =>
 const ApiProvidersPage = lazy(() =>
   import("./pages/api-providers").then((module) => ({ default: module.ApiProvidersPage })),
 )
+const NotebasePage = lazy(() =>
+  import("./pages/notebase").then((module) => ({ default: module.NotebasePage })),
+)
+const SentencePracticePage = lazy(() =>
+  import("./pages/sentence-practice").then((module) => ({
+    default: module.SentencePracticePage,
+  })),
+)
 const ReviewPage = lazy(() =>
   import("./pages/review").then((module) => ({ default: module.ReviewPage })),
 )
@@ -116,7 +124,10 @@ const ROUTE_COMPONENTS: Record<RoutePath, ComponentType> = {
   "/shortcuts": ShortcutsPage,
   "/api-providers": ApiProvidersPage,
   "/custom-actions": CustomActionsPage,
+  "/notebase": NotebasePage,
+  "/notebase/:notebaseId": NotebasePage,
   "/review": ReviewPage,
+  "/sentence-practice": SentencePracticePage,
   "/stats": StatsPage,
   "/page-translation": TranslationPage,
   "/video-subtitles": VideoSubtitlesPage,

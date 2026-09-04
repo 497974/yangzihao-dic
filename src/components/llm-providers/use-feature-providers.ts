@@ -12,7 +12,10 @@ import {
 } from "@/utils/constants/feature-providers"
 import { getSelectionToolbarActions, patchSelectionToolbarAction } from "@/utils/custom-actions"
 import { isSystemProviderSelectorItem } from "@/utils/providers/provider-display"
-import { getSelectableProvidersForCapability } from "@/utils/providers/provider-registry"
+import {
+  getDictionaryProviders,
+  getSelectableProvidersForCapability,
+} from "@/utils/providers/provider-registry"
 import { providerSupportsTranslationOnlyMode } from "@/utils/providers/translation-only-gate"
 import { useHostedAiProviderOptions } from "./use-hosted-ai-provider-options"
 
@@ -67,6 +70,13 @@ export interface CustomActionProvidersBinding {
   /** Only the actions the user can actually trigger, so disabled ones stay out of the UI. */
   actions: SelectionToolbarCustomAction[]
   providers: ProviderSelectorOption[]
+  /**
+   * 词典专用的供应商列表——比 `providers` 多一档「普通翻译」（Google/Microsoft
+   * Translate 等），因为内置词典能在缺词性分析的情况下退化成一次纯翻译调用
+   * （见 use-custom-action-execution.ts 的快速词典分支）。其余自定义动作没有
+   * 这条退路，一律沿用 `providers`。
+   */
+  dictionaryProviders: ProviderSelectorOption[]
   getProviderConfig: (action: SelectionToolbarCustomAction) => ProviderConfig | null
   setActionProviderId: (actionId: string, providerId: string) => void
 }
@@ -82,6 +92,10 @@ export function useCustomActionProviders(): CustomActionProvidersBinding {
     [providersConfig],
   )
   const providers = useHostedAiProviderOptions("customAction", baseProviders)
+  const dictionaryProviders = useMemo(
+    () => getDictionaryProviders(providersConfig),
+    [providersConfig],
+  )
 
   const actions = useMemo(
     () =>
@@ -107,5 +121,5 @@ export function useCustomActionProviders(): CustomActionProvidersBinding {
     [providersConfig],
   )
 
-  return { actions, providers, getProviderConfig, setActionProviderId }
+  return { actions, providers, dictionaryProviders, getProviderConfig, setActionProviderId }
 }

@@ -8,6 +8,7 @@ import {
   useCustomActionProviders,
   useFeatureProvider,
 } from "@/components/llm-providers/use-feature-providers"
+import { BUILT_IN_DICTIONARY_ACTION_ID } from "@/utils/constants/custom-action"
 import {
   FEATURE_KEYS,
   getFeatureDescriptionI18nKey,
@@ -98,7 +99,8 @@ function FeatureProviderItem({ featureKey }: { featureKey: FeatureKey }) {
 }
 
 function CustomActionProviderItems() {
-  const { actions, providers, getProviderConfig, setActionProviderId } = useCustomActionProviders()
+  const { actions, providers, dictionaryProviders, getProviderConfig, setActionProviderId } =
+    useCustomActionProviders()
 
   return actions.map((action) => (
     <ConfigItem
@@ -111,7 +113,9 @@ function CustomActionProviderItems() {
       description={toSystemPromptPreview(action)}
     >
       <ProviderSelector
-        providers={providers}
+        // 词典单独多一档「普通翻译」（Google/Microsoft Translate）：不产出词性/
+        // 难度分析，但秒出翻译结果——见 use-custom-action-execution.ts 的降级分支
+        providers={action.id === BUILT_IN_DICTIONARY_ACTION_ID ? dictionaryProviders : providers}
         value={action.providerId}
         onChange={(id) => setActionProviderId(action.id, id)}
         triggerSize="sm"
