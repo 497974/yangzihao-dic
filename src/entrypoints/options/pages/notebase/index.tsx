@@ -10,9 +10,10 @@
  * CSS 变量一律加 `nb-` 前缀并限定在 .nb-root 内，避免和设置页自己的主题变量打架。
  */
 
-import { useQuery } from "@tanstack/react-query"
-import { useMemo, useState } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router"
+import { toastManager } from "@/components/ui/base-ui/toast"
 import { cellToText } from "@/utils/notebase/cell-text"
 import { orpcClient } from "@/utils/orpc/client"
 
@@ -56,6 +57,19 @@ const STYLES = `
 .nb-table tr:hover td{background:var(--nb-accent-soft)}
 .nb-table td:first-child{font-weight:600;white-space:nowrap}
 .nb-empty{padding:70px 20px;text-align:center;color:var(--nb-muted)}
+.nb-tip{margin:0 2px 8px;color:var(--nb-muted);font-size:12.5px}
+.nb-table tr[data-menu-open="true"] td{background:var(--nb-accent-soft)}
+.nb-menu{position:fixed;z-index:50;min-width:190px;padding:5px;
+  border:1px solid var(--nb-border);border-radius:9px;background:var(--nb-panel);
+  box-shadow:0 10px 34px rgba(0,0,0,.16);font-size:14px}
+.nb-menu-item{display:block;width:100%;padding:8px 11px;border:0;border-radius:6px;
+  background:none;color:var(--nb-text);text-align:left;cursor:pointer;font-size:14px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nb-menu-item:hover{background:var(--nb-accent-soft)}
+.nb-menu-item.nb-danger{color:#c0392b}
+.nb-menu-item.nb-danger:hover{background:rgba(192,57,43,.1)}
+@media (prefers-color-scheme:dark){.nb-menu-item.nb-danger{color:#ef7f72}}
+.nb-menu-hint{padding:5px 11px 7px;color:var(--nb-muted);font-size:11.5px;line-height:1.5}
 .nb-dot{display:inline-block;width:8px;height:8px;border-radius:50%;
   background:#4a9d5f;margin-right:6px;vertical-align:middle}
 `
@@ -82,6 +96,16 @@ function download(name: string, text: string, type: string) {
 
 function toCsvCell(value: unknown): string {
   return `"${cellToText(value).replace(/"/g, '""')}"`
+}
+
+/**
+ * 最新存的排最上面。
+ *
+ * position 是入库顺序（新行 push 到末尾），所以倒序就是"最近保存优先"。
+ * 存完一个词切过来就能在第一行看见它，不用滚到底去找。
+ */
+export function sortNewestFirst<T extends { position: number }>(rows: readonly T[]): T[] {
+  return [...rows].sort((a, b) => b.position - a.position)
 }
 
 export function NotebasePage() {
@@ -120,10 +144,7 @@ export function NotebasePage() {
     [notebase],
   )
 
-  const rows = useMemo(
-    () => [...((notebase?.notebaseRows ?? []) as Row[])].sort((a, b) => a.position - b.position),
-    [notebase],
-  )
+  const rows = useMemo(() => sortNewestFirst((notebase?.notebaseRows ?? []) as Row[]), [notebase])
 
   const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase()
@@ -132,6 +153,61 @@ export function NotebasePage() {
       Object.values(row.cells ?? {}).some((v) => cellToText(v).toLowerCase().includes(kw)),
     )
   }, [rows, keyword])
+
+  const queryClient = useQueryClient()
+  /** 右键菜单的位置与目标行；null 表示没打开 */
+  const [menu, setMenu] = useState<{ x: number; y: number; row: Row } | null>(null)
+
+  const closeMenu = useCallback(() => setMenu(null), [])
+
+  // 点别处、滚动、按 Esc 都该收起菜单——菜单是 fixed 定位的，
+  // 页面一滚它就会飘在错误的位置上。
+  useEffect(() => {
+    if (!menu) return undefined
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMenu()
+    }
+    window.addEventListener("click", closeMenu)
+    window.addEventListener("contextmenu", closeMenu)
+    window.addEventListener("scroll", closeMenu, true)
+    window.addEventListener("keydown", onEsc)
+    return () => {
+      window.removeEventListener("click", closeMenu)
+      window.removeEventListener("contextmenu", closeMenu)
+      window.removeEventListener("scroll", closeMenu, true)
+      window.removeEventListener("keydown", onEsc)
+    }
+  }, [menu, closeMenu])
+
+  const { mutate: deleteRow, isPending: isDeleting } = useMutation({
+    mutationFn: (row: Row) => orpcClient.notebaseRow.delete({ notebaseRowId: row.id }),
+    onSuccess: (_data, row) => {
+      void queryClient.invalidateQueries({ queryKey: ["local-notebase-detail", notebaseId] })
+      // 闪卡和统计各读各的缓存。不一起失效的话，删掉的词还会留在复习队列里，
+      // 统计页的"已学单词"也会继续算它。
+      void queryClient.invalidateQueries({ queryKey: ["review-cards"] })
+      void queryClient.invalidateQueries({ queryKey: ["stats-activity"] })
+      toastManager.add({
+        type: "success",
+        title: `已删除「${primaryText(row)}」`,
+        description: "这条生词和它的复习记录都已清掉",
+      })
+    },
+    onError: (error) => {
+      toastManager.add({
+        type: "error",
+        title: "删除失败",
+        description: error instanceof Error ? error.message : String(error),
+      })
+    },
+  })
+
+  /** 取这一行的主字段（第一列）当作它的名字，用于菜单和提示 */
+  function primaryText(row: Row): string {
+    const first = columns[0]
+    const text = first ? cellToText(row.cells?.[first.id]) : ""
+    return text || "这条记录"
+  }
 
   const exportCsv = () => {
     const header = columns.map((c) => toCsvCell(c.name)).join(",")
@@ -197,6 +273,8 @@ export function NotebasePage() {
           </div>
         ) : (
           <>
+            {/* 右键删除不写出来没人会去试；顺带说明排序，免得以为顺序错了 */}
+            <div className="nb-tip">最新保存的排在最上面 · 右键一行可以删除</div>
             <div className="nb-wrap">
               <table className="nb-table">
                 <thead>
@@ -208,7 +286,18 @@ export function NotebasePage() {
                 </thead>
                 <tbody>
                   {filtered.map((r) => (
-                    <tr key={r.id}>
+                    <tr
+                      key={r.id}
+                      data-menu-open={menu?.row.id === r.id ? "true" : undefined}
+                      onContextMenu={(e) => {
+                        e.preventDefault()
+                        // 菜单宽约 190、连提示大约 90 高，靠近右/下边缘时往回收，
+                        // 免得弹到视口外面去够不着
+                        const x = Math.min(e.clientX, window.innerWidth - 210)
+                        const y = Math.min(e.clientY, window.innerHeight - 100)
+                        setMenu({ x, y, row: r })
+                      }}
+                    >
                       {columns.map((c) => (
                         <td key={c.id}>{cellToText(r.cells?.[c.id])}</td>
                       ))}
@@ -235,6 +324,31 @@ export function NotebasePage() {
           </>
         )}
       </main>
+
+      {menu && (
+        <div
+          className="nb-menu"
+          style={{ left: menu.x, top: menu.y }}
+          // 菜单自己身上的点击不该冒泡到 window 上那个"点别处收起"的监听
+          onClick={(e) => e.stopPropagation()}
+          onContextMenu={(e) => e.stopPropagation()}
+          role="menu"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            className="nb-menu-item nb-danger"
+            disabled={isDeleting}
+            onClick={() => {
+              deleteRow(menu.row)
+              closeMenu()
+            }}
+          >
+            删除「{primaryText(menu.row)}」
+          </button>
+          <div className="nb-menu-hint">连它的复习记录一起清掉</div>
+        </div>
+      )}
     </div>
   )
 }

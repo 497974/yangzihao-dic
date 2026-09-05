@@ -10,6 +10,7 @@ import { implement } from "@orpc/server"
 import { contract } from "@read-frog/api-contract"
 import { DEFAULT_SRS_SCHEDULING_PARAMS } from "@read-frog/definitions"
 import { errs } from "./orpc-errors"
+import { mutateSrsDb } from "./srs-storage"
 import { mutateDb, nextTxid, nowIso, readDb } from "./storage"
 
 const LOCAL_USER_ID = "local-user"
@@ -228,8 +229,8 @@ const notebaseRowRouter = os.notebaseRow.router({
     }),
   ),
 
-  delete: os.notebaseRow.delete.handler(async ({ input, errors }) =>
-    mutateDb((db) => {
+  delete: os.notebaseRow.delete.handler(async ({ input, errors }) => {
+    const result = await mutateDb((db) => {
       const { nb, idx } = findRow(db, input.notebaseRowId, errors)
       nb.notebaseRows.splice(idx, 1)
       nb.notebaseRows.forEach((r, i) => {
@@ -237,8 +238,27 @@ const notebaseRowRouter = os.notebaseRow.router({
       })
       nb.updatedAt = nowIso()
       return { txid: nextTxid(db) }
-    }),
-  ),
+    })
+
+    // 连带清掉这条生词的闪卡与复习日志。
+    //
+    // 卡片的正反面是拿 notebaseRowId 回笔记库取单元格现渲染出来的
+    // （见 srs-router 的 renderCard）。行没了但卡片还在的话，取不到单元格就
+    // 渲染成空字符串——复习时会蹦出一张正反面全空的卡，既没法答也删不掉。
+    // 所以删词必须同时收走它的卡片，否则留下的是幽灵卡。
+    await mutateSrsDb((srs) => {
+      const orphanCardIds = new Set(
+        Object.values(srs.cards)
+          .filter((c) => c.notebaseRowId === input.notebaseRowId)
+          .map((c) => c.id),
+      )
+      if (orphanCardIds.size === 0) return
+      for (const id of orphanCardIds) delete srs.cards[id]
+      srs.revlogs = srs.revlogs.filter((log) => !orphanCardIds.has(log.cardId))
+    })
+
+    return result
+  }),
 
   reorder: os.notebaseRow.reorder.handler(async ({ input, errors }) =>
     mutateDb((db) => {
