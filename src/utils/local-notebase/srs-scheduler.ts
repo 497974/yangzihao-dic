@@ -5,6 +5,7 @@
  * 本文件只负责「契约的数据结构 ⇄ FSRS 的数据结构」之间的转换。
  */
 
+import type { FsrsReviewLogSnapshot } from "@read-frog/definitions"
 import type { Card as FsrsCard, Grade, RecordLogItem } from "ts-fsrs"
 import type { LocalCard } from "./srs-storage"
 import { createEmptyCard, fsrs, generatorParameters, Rating, State } from "ts-fsrs"
@@ -93,7 +94,7 @@ export interface ScheduleResult {
     | "lapses"
     | "reps"
   >
-  snapshot: Record<string, unknown>
+  snapshot: FsrsReviewLogSnapshot
 }
 
 /**

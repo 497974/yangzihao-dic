@@ -5,6 +5,7 @@
  * 不依赖任何服务器。
  */
 
+import type { FsrsReviewLogSnapshot } from "@read-frog/definitions"
 import { storage } from "#imports"
 
 export interface LocalCardTemplate {
@@ -48,7 +49,9 @@ export interface LocalRevlog {
   afterStability: number
   reviewedAt: string
   durationMs: number
-  fsrsReviewLogSnapshot: Record<string, unknown>
+  // 契约里这是有确定字段的快照（rating / state / dueAt / …），
+  // 写成 Record<string, unknown> 会让 srs.review 的输出形状对不上契约
+  fsrsReviewLogSnapshot: FsrsReviewLogSnapshot
   createdAt: string
   /** 回滚用：记录复习前的完整卡片状态 */
   beforeCard: Omit<LocalCard, "createdAt" | "updatedAt">

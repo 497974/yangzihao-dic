@@ -282,6 +282,9 @@ export function ReviewPage() {
     return () => {
       cancelled = true
     }
+    // exhaustive-deps 会提示"缺少 nextCard"——这里是刻意只依赖用到的两个字段。
+    // 把整个 nextCard 放进来的话，每次查询重新取数都会换一个对象引用，
+    // effect 就会反复重跑、重复预取同一张卡的语音。
   }, [
     nextCard?.id,
     nextCard?.front,

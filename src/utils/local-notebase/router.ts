@@ -9,6 +9,7 @@ import type { LocalNotebase, LocalNotebaseDb } from "./storage"
 import { implement } from "@orpc/server"
 import { contract } from "@read-frog/api-contract"
 import { DEFAULT_SRS_SCHEDULING_PARAMS } from "@read-frog/definitions"
+import { errs } from "./orpc-errors"
 import { mutateDb, nextTxid, nowIso, readDb } from "./storage"
 
 const LOCAL_USER_ID = "local-user"
@@ -17,20 +18,24 @@ function uuid(): string {
   return crypto.randomUUID()
 }
 
-function requireNotebase(db: LocalNotebaseDb, id: string, errors: any): LocalNotebase {
+function requireNotebase(
+  db: LocalNotebaseDb,
+  id: string,
+  errors: { NOTEBASE_NOT_FOUND: unknown },
+): LocalNotebase {
   const nb = db.notebases[id]
   // 必须抛契约定义的类型化错误，否则调用方的 isORPCNotFoundError 判断失效，
   // 用户只会看到一个泛化的失败提示。
-  if (!nb) throw errors.NOTEBASE_NOT_FOUND()
+  if (!nb) throw errs(errors).NOTEBASE_NOT_FOUND()
   return nb
 }
 
-function findRow(db: LocalNotebaseDb, rowId: string, errors: any) {
+function findRow(db: LocalNotebaseDb, rowId: string, errors: { NOTEBASE_ROW_NOT_FOUND: unknown }) {
   for (const nb of Object.values(db.notebases)) {
     const idx = nb.notebaseRows.findIndex((r) => r.id === rowId)
     if (idx >= 0) return { nb, idx, row: nb.notebaseRows[idx]! }
   }
-  throw errors.NOTEBASE_ROW_NOT_FOUND()
+  throw errs(errors).NOTEBASE_ROW_NOT_FOUND()
 }
 
 function serialize(nb: LocalNotebase) {
@@ -63,8 +68,8 @@ function makeNotebase(id: string, name: string): LocalNotebase {
     srsDesiredRetention: DEFAULT_SRS_SCHEDULING_PARAMS.desiredRetention,
     srsEnableShortTerm: DEFAULT_SRS_SCHEDULING_PARAMS.enableShortTerm,
     srsMaximumInterval: DEFAULT_SRS_SCHEDULING_PARAMS.maximumInterval,
-    srsLearningSteps: DEFAULT_SRS_SCHEDULING_PARAMS.learningSteps as number[],
-    srsRelearningSteps: DEFAULT_SRS_SCHEDULING_PARAMS.relearningSteps as number[],
+    srsLearningSteps: [...DEFAULT_SRS_SCHEDULING_PARAMS.learningSteps],
+    srsRelearningSteps: [...DEFAULT_SRS_SCHEDULING_PARAMS.relearningSteps],
     srsLeechThreshold: DEFAULT_SRS_SCHEDULING_PARAMS.leechThreshold,
     srsEnableFuzz: DEFAULT_SRS_SCHEDULING_PARAMS.enableFuzz,
     srsWeights: null,
@@ -110,7 +115,7 @@ const notebaseRouter = os.notebase.router({
       // 同 id 重复创建会静默覆盖既有笔记库（连同全部行），必须拒绝。
       const existing = db.notebases[id]
       if (existing) {
-        throw errors.CELL_VALIDATION_FAILED({
+        throw errs(errors).CELL_VALIDATION_FAILED({
           message: `Notebase already exists with ${existing.notebaseRows.length} rows; refusing to overwrite.`,
         })
       }
@@ -288,7 +293,7 @@ const notebaseColumnRouter = os.notebaseColumn.router({
       }
       // 遍历完所有笔记库都没找到这一列——契约在这两个过程里只声明了
       // NOTEBASE_COLUMN_NOT_FOUND，用它才是运行时真实存在的构造器
-      throw errors.NOTEBASE_COLUMN_NOT_FOUND()
+      throw errs(errors).NOTEBASE_COLUMN_NOT_FOUND()
     }),
   ),
 
@@ -307,7 +312,7 @@ const notebaseColumnRouter = os.notebaseColumn.router({
       }
       // 遍历完所有笔记库都没找到这一列——契约在这两个过程里只声明了
       // NOTEBASE_COLUMN_NOT_FOUND，用它才是运行时真实存在的构造器
-      throw errors.NOTEBASE_COLUMN_NOT_FOUND()
+      throw errs(errors).NOTEBASE_COLUMN_NOT_FOUND()
     }),
   ),
 

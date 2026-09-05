@@ -9,6 +9,7 @@ import type { LocalCard, LocalCardTemplate } from "./srs-storage"
 import { implement } from "@orpc/server"
 import { contract } from "@read-frog/api-contract"
 import { DEFAULT_SRS_SCHEDULING_PARAMS } from "@read-frog/definitions"
+import { errs } from "./orpc-errors"
 import {
   cardStateToScheduleStatus,
   initialCardMemory,
@@ -158,7 +159,7 @@ const cardRouter = os.card.router({
   get: os.card.get.handler(async ({ input, errors }) => {
     const db = await readSrsDb()
     const c = db.cards[input.id]
-    if (!c) throw errors.CARD_NOT_FOUND()
+    if (!c) throw errs(errors).CARD_NOT_FOUND()
     return renderCard(c)
   }),
 
@@ -181,7 +182,7 @@ const cardTemplateRouter = os.cardTemplate.router({
   get: os.cardTemplate.get.handler(async ({ input, errors }) => {
     const db = await readSrsDb()
     const t = db.templates[input.id]
-    if (!t) throw errors.CARD_TEMPLATE_NOT_FOUND()
+    if (!t) throw errs(errors).CARD_TEMPLATE_NOT_FOUND()
     return serializeTemplate(t)
   }),
 
@@ -205,7 +206,7 @@ const cardTemplateRouter = os.cardTemplate.router({
   update: os.cardTemplate.update.handler(async ({ input, errors }) =>
     mutateSrsDb((db) => {
       const t = db.templates[input.id]
-      if (!t) throw errors.CARD_TEMPLATE_NOT_FOUND()
+      if (!t) throw errs(errors).CARD_TEMPLATE_NOT_FOUND()
       if (input.name !== undefined) t.name = input.name
       if (input.config !== undefined) t.config = input.config
       t.updatedAt = nowIso()
@@ -215,7 +216,7 @@ const cardTemplateRouter = os.cardTemplate.router({
 
   delete: os.cardTemplate.delete.handler(async ({ input, errors }) =>
     mutateSrsDb((db) => {
-      if (!db.templates[input.id]) throw errors.CARD_TEMPLATE_NOT_FOUND()
+      if (!db.templates[input.id]) throw errs(errors).CARD_TEMPLATE_NOT_FOUND()
       delete db.templates[input.id]
       // 模板没了，它的卡片也留不得
       for (const [cid, c] of Object.entries(db.cards)) {
@@ -235,12 +236,8 @@ async function paramsFor(notebaseId: string) {
     desiredRetention: nb?.srsDesiredRetention ?? DEFAULT_SRS_SCHEDULING_PARAMS.desiredRetention,
     maximumInterval: nb?.srsMaximumInterval ?? DEFAULT_SRS_SCHEDULING_PARAMS.maximumInterval,
     enableShortTerm: nb?.srsEnableShortTerm ?? DEFAULT_SRS_SCHEDULING_PARAMS.enableShortTerm,
-    learningSteps: (nb?.srsLearningSteps as unknown as string[]) ?? [
-      ...DEFAULT_SRS_SCHEDULING_PARAMS.learningSteps,
-    ],
-    relearningSteps: (nb?.srsRelearningSteps as unknown as string[]) ?? [
-      ...DEFAULT_SRS_SCHEDULING_PARAMS.relearningSteps,
-    ],
+    learningSteps: nb?.srsLearningSteps ?? [...DEFAULT_SRS_SCHEDULING_PARAMS.learningSteps],
+    relearningSteps: nb?.srsRelearningSteps ?? [...DEFAULT_SRS_SCHEDULING_PARAMS.relearningSteps],
     enableFuzz: nb?.srsEnableFuzz ?? DEFAULT_SRS_SCHEDULING_PARAMS.enableFuzz,
     weights: nb?.srsWeights ?? undefined,
   }
@@ -250,7 +247,7 @@ const srsRouter = os.srs.router({
   review: os.srs.review.handler(async ({ input, errors }) => {
     const pre = await readSrsDb()
     const card0 = pre.cards[input.cardId]
-    if (!card0) throw errors.CARD_NOT_FOUND()
+    if (!card0) throw errs(errors).CARD_NOT_FOUND()
 
     // 幂等重放：同一 id 已记过就直接返回，不重复推进调度
     if (input.id) {
@@ -315,10 +312,10 @@ const srsRouter = os.srs.router({
           break
         }
       }
-      if (idx < 0) throw errors.CARD_NOT_FOUND()
+      if (idx < 0) throw errs(errors).CARD_NOT_FOUND()
       const log = db.revlogs[idx]!
       const card = db.cards[input.cardId]
-      if (!card) throw errors.CARD_NOT_FOUND()
+      if (!card) throw errs(errors).CARD_NOT_FOUND()
 
       Object.assign(card, log.beforeCard, { updatedAt: nowIso() })
       db.revlogs.splice(idx, 1)
@@ -368,7 +365,7 @@ const srsRouter = os.srs.router({
   setCardBuried: os.srs.setCardBuried.handler(async ({ input, errors }) =>
     mutateSrsDb((db) => {
       const c = db.cards[input.cardId]
-      if (!c) throw errors.CARD_NOT_FOUND()
+      if (!c) throw errs(errors).CARD_NOT_FOUND()
       c.buriedAt = input.enabled ? nowIso() : null
       c.scheduleStatus = input.enabled ? "buried" : cardStateToScheduleStatus(c.state)
       c.updatedAt = nowIso()
@@ -379,7 +376,7 @@ const srsRouter = os.srs.router({
   setCardSuspended: os.srs.setCardSuspended.handler(async ({ input, errors }) =>
     mutateSrsDb((db) => {
       const c = db.cards[input.cardId]
-      if (!c) throw errors.CARD_NOT_FOUND()
+      if (!c) throw errs(errors).CARD_NOT_FOUND()
       c.scheduleStatus = input.enabled ? "suspended" : cardStateToScheduleStatus(c.state)
       c.updatedAt = nowIso()
       return { txid: nextSrsTxid(db) }

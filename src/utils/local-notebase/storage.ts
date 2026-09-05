@@ -5,13 +5,17 @@
  * 装上扩展即可使用，无数量上限。
  */
 
+import type { NotebaseView } from "@read-frog/api-contract"
+import type { NotebaseColumnConfig, SrsStep } from "@read-frog/definitions"
 import { storage } from "#imports"
 
 export interface LocalNotebaseColumn {
   id: string
   notebaseId: string
   name: string
-  config: unknown
+  // 列的类型配置是契约里的判别联合（string / number / boolean / date / …），
+  // 之前写成 unknown，导致 notebase.get 与 getSchema 的输出形状对不上契约
+  config: NotebaseColumnConfig
   position: number
   isPrimary: boolean
   width: number | null
@@ -38,8 +42,10 @@ export interface LocalNotebase {
   srsDesiredRetention: number
   srsEnableShortTerm: boolean
   srsMaximumInterval: number
-  srsLearningSteps: number[]
-  srsRelearningSteps: number[]
+  // 契约里这两个是 "1m" / "10m" 这样的步长字符串（SrsStep），不是数字。
+  // 早先误写成 number[]，各处只好用强转把类型糊过去，现在按真实形状声明。
+  srsLearningSteps: SrsStep[]
+  srsRelearningSteps: SrsStep[]
   srsLeechThreshold: number
   srsEnableFuzz: boolean
   srsWeights: number[] | null
@@ -47,7 +53,9 @@ export interface LocalNotebase {
   updatedAt: string
   notebaseColumns: LocalNotebaseColumn[]
   notebaseRows: LocalNotebaseRow[]
-  notebaseViews: unknown[]
+  // 本地实现不提供多视图（看板／画廊），这里恒为空数组；
+  // 但类型要跟契约一致，否则 notebase.get 的输出形状对不上。
+  notebaseViews: NotebaseView[]
 }
 
 export interface LocalNotebaseDb {
