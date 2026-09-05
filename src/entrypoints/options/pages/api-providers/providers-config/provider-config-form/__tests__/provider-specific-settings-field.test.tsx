@@ -93,7 +93,7 @@ describe("providerSpecificSettingsField", () => {
     expect(resourceNameInput).toHaveValue("")
     expect(apiVersionInput).toHaveValue("v1")
 
-    fireEvent.change(resourceNameInput, { target: { value: "read-frog-openai" } })
+    fireEvent.change(resourceNameInput, { target: { value: "yangzihao-dic-openai" } })
     fireEvent.change(apiVersionInput, { target: { value: "2025-04-01-preview" } })
 
     await act(async () => {
@@ -102,7 +102,7 @@ describe("providerSpecificSettingsField", () => {
     })
 
     expect(screen.getByLabelText("persisted-provider-specific-settings")).toHaveTextContent(
-      '{"apiMode":"responses","apiVersion":"2025-04-01-preview","resourceName":"read-frog-openai"}',
+      '{"apiMode":"responses","apiVersion":"2025-04-01-preview","resourceName":"yangzihao-dic-openai"}',
     )
   })
 

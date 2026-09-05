@@ -5,7 +5,7 @@ import { createElement } from "react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { getBuiltInDictionaryAction } from "@/utils/custom-actions"
-import { resolveProviderRefForCapability } from "@/utils/providers/provider-registry"
+import { resolveDictionaryProviderRef } from "@/utils/providers/provider-registry"
 import { CUSTOM_ACTION_CONTEXT_CHAR_LIMIT } from "../../../utils"
 import {
   buildCustomActionExecutionPlan,
@@ -57,11 +57,9 @@ function WebPageContextProbe({
 function createCustomActionRequest() {
   const action = getBuiltInDictionaryAction(DEFAULT_CONFIG.selectionToolbar)
 
-  const provider = resolveProviderRefForCapability(
-    "customAction",
-    DEFAULT_CONFIG.providersConfig,
-    action.providerId,
-  )
+  // 内置词典可以挂纯翻译引擎（默认就是免密钥的 Microsoft Translate），
+  // 严格的 customAction 解析对它返回 null；组件里走的也是这个词典专用解析。
+  const provider = resolveDictionaryProviderRef(DEFAULT_CONFIG.providersConfig, action.providerId)
 
   if (!provider) {
     throw new Error("Default custom action provider must be available")

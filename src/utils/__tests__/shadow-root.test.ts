@@ -11,7 +11,7 @@ import { walkAndLabelElement } from "@/utils/host/dom/traversal"
 import { insertShadowRootUIWrapperInto, OVERLAY_SHADOW_ROOT_CSS } from "../shadow-root"
 
 function createOverlayShadowRoot() {
-  const shadowHost = document.createElement("read-frog-selection")
+  const shadowHost = document.createElement("yangzihao-dic-selection")
   const shadow = shadowHost.attachShadow({ mode: "open" })
   const shadowStyle = document.createElement("style")
   const container = document.createElement("div")

@@ -285,20 +285,20 @@ describe("saveToNotebaseButton notebase availability", () => {
     expect(screen.getByRole("button", { name: i18n.t("action.saveToNotebase") })).toBeEnabled()
   })
 
-  it("opens a create/connect dialog for an unconnected custom action", () => {
+  it("silently creates the notebase and saves instead of asking first", async () => {
+    // 本地化改动：上游在这里弹「创建还是连接现有笔记库」。本项目单机单用户，
+    // 不存在"别人的笔记库"，那个弹窗对新用户只是一道看不懂的坎——
+    // 第一次存词就被问一个还没有答案的问题。改成无感建库直接保存。
     const config = cloneConfig(DEFAULT_CONFIG)
     config.betaExperience.enabled = true
     renderButton(config, createAction())
 
     fireEvent.click(screen.getByRole("button", { name: i18n.t("action.saveToNotebase") }))
 
-    expect(screen.getByText(i18n.t("action.saveToNotebaseCreateTitle"))).toBeInTheDocument()
-    expect(
-      screen.getByRole("button", { name: i18n.t("action.saveToNotebaseCreateAndSaveShort") }),
-    ).toBeInTheDocument()
-    expect(
-      screen.getByRole("button", { name: i18n.t("action.saveToNotebaseConnectExisting") }),
-    ).toBeInTheDocument()
+    await waitFor(() => {
+      expect(orpcClient.notebase.create).toHaveBeenCalledTimes(1)
+    })
+    expect(screen.queryByText(i18n.t("action.saveToNotebaseCreateTitle"))).not.toBeInTheDocument()
   })
 
   it("opens the created notebase after creating and saving", async () => {
@@ -307,9 +307,6 @@ describe("saveToNotebaseButton notebase availability", () => {
     renderButton(config, createAction())
 
     fireEvent.click(screen.getByRole("button", { name: i18n.t("action.saveToNotebase") }))
-    fireEvent.click(
-      screen.getByRole("button", { name: i18n.t("action.saveToNotebaseCreateAndSaveShort") }),
-    )
 
     await waitFor(() => {
       expect(orpcClient.notebase.create).toHaveBeenCalledTimes(1)
@@ -320,82 +317,13 @@ describe("saveToNotebaseButton notebase availability", () => {
       | undefined
     expect(createInput?.id).toBeTruthy()
 
-    await waitFor(() => {
-      expect(sendMessage).toHaveBeenCalledWith("openPage", {
-        url: expect.stringContaining(`/notebase/${encodeURIComponent(createInput!.id)}`),
-        active: true,
-      })
-    })
-  })
-
-  it("shows an upgrade action when creating a Notebase exceeds the note limit", async () => {
-    const config = cloneConfig(DEFAULT_CONFIG)
-    config.betaExperience.enabled = true
-    vi.mocked(orpcClient.notebase.create).mockRejectedValueOnce(
-      new ORPCError("NOTE_LIMIT_EXCEEDED", { status: 403 }),
-    )
-    renderButton(config, createAction())
-
-    fireEvent.click(screen.getByRole("button", { name: i18n.t("action.saveToNotebase") }))
-    fireEvent.click(
-      screen.getByRole("button", { name: i18n.t("action.saveToNotebaseCreateAndSaveShort") }),
-    )
-
+    // 自动建库这条路不跳转——存完继续读，成功只用 toast 提示
     await waitFor(() => {
       expect(toastManagerMock.add).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: "error",
-          title: i18n.t("action.saveToNotebaseLimitExceeded"),
-          actionProps: expect.objectContaining({
-            children: i18n.t("action.upgrade"),
-            onClick: expect.any(Function),
-          }),
-        }),
+        expect.objectContaining({ type: "success" }),
       )
     })
-
-    const toastOptions = toastManagerMock.add.mock.calls[0]?.[0] as
-      | { actionProps?: { onClick?: () => void } }
-      | undefined
-    toastOptions?.actionProps?.onClick?.()
-
-    expect(toastManagerMock.close).toHaveBeenCalledWith("toast-id")
-    expect(sendMessage).toHaveBeenCalledWith("openPage", {
-      url: new URL("/pricing", env.WXT_WEBSITE_URL).toString(),
-      active: true,
-    })
-  })
-
-  it("marks guide Dictionary Notebase complete after direct create-and-save with guide tracking", async () => {
-    const config = cloneConfig(DEFAULT_CONFIG)
-    config.betaExperience.enabled = true
-    guideTrackingMocks.canUseGuideDictionaryNotebaseTracking.mockReturnValue(true)
-    guideTrackingMocks.getActiveGuideDictionaryNotebaseTrackingForAction.mockResolvedValue({
-      id: "tracking-1",
-      actionId: "default-dictionary",
-      sourceUrl: "https://readfrog.app/guide/step-3",
-      startedAt: 1_000,
-      expiresAt: 1_801_000,
-    })
-    const action = createDictionaryAction()
-    renderButton(config, action)
-
-    fireEvent.click(screen.getByRole("button", { name: i18n.t("action.saveToNotebase") }))
-    await waitFor(() => {
-      expect(screen.getByText(i18n.t("action.saveToNotebaseCreateTitle"))).toBeInTheDocument()
-    })
-    fireEvent.click(
-      screen.getByRole("button", { name: i18n.t("action.saveToNotebaseCreateAndSaveShort") }),
-    )
-
-    await waitFor(() => {
-      expect(sendMessage).toHaveBeenCalledWith("completeGuideDictionaryNotebase", {
-        trackingId: "tracking-1",
-        actionId: "default-dictionary",
-        notebaseId: expect.any(String),
-        sourceUrl: "https://readfrog.app/guide/step-3",
-      })
-    })
+    expect(sendMessage).not.toHaveBeenCalledWith("openPage", expect.anything())
   })
 
   it("redirects logged-out users to home while the background save opens the notebase later", async () => {
@@ -670,9 +598,16 @@ describe("saveToNotebaseButton notebase availability", () => {
   it("closes the create/connect dialog when clicking outside", async () => {
     const config = cloneConfig(DEFAULT_CONFIG)
     config.betaExperience.enabled = true
+    // 弹窗现在只是「自动建库失败」时的退路（见 use-save-to-notebase 的注释），
+    // 所以先让建库失败一次，把这条退路逼出来
+    vi.mocked(orpcClient.notebase.create).mockRejectedValueOnce(new Error("create failed"))
     renderButton(config, createAction())
 
     fireEvent.click(screen.getByRole("button", { name: i18n.t("action.saveToNotebase") }))
+
+    await waitFor(() => {
+      expect(screen.getByText(i18n.t("action.saveToNotebaseCreateTitle"))).toBeInTheDocument()
+    })
 
     const overlay = document.querySelector("[data-slot='dialog-overlay']")
     expect(overlay).toBeInTheDocument()

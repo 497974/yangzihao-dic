@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { createStore, Provider } from "jotai"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { storage } from "#imports"
 import { TooltipProvider } from "@/components/ui/base-ui/tooltip"
 import { isLLMProviderConfig } from "@/types/config/provider"
 import { configAtom } from "@/utils/atoms/config"
@@ -32,7 +33,7 @@ const onMessageMock = vi.fn<(...args: any[]) => any>()
 const hotkeyRegisterMock = vi.fn<(...args: any[]) => any>()
 const hotkeyUnregisterMock = vi.fn<(...args: any[]) => any>()
 const originalGetSelection = window.getSelection
-const DEFAULT_DICTIONARY_ACTION = getBuiltInDictionaryAction(DEFAULT_CONFIG.selectionToolbar)
+const DEFAULT_DICTIONARY_ACTION = getBuiltInDictionaryAction(baseConfig().selectionToolbar)
 
 vi.mock("@tanstack/hotkeys", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/hotkeys")>()
@@ -366,6 +367,20 @@ function cloneConfig(config: Config): Config {
   return JSON.parse(JSON.stringify(config)) as Config
 }
 
+/**
+ * 这些用例测的是内置词典走「大模型结构化输出」那条路径。
+ * DEFAULT_CONFIG 里词典默认挂的是免密钥的 Microsoft Translate，那会走
+ * use-custom-action-execution 的快速词典分支（runFastDictionaryLookup，
+ * 一次轻量翻译，不产生结构化流式请求），断言里的 stream mock 永远不会被调用。
+ * 所以这里显式换成大模型。
+ */
+function baseConfig(): Config {
+  const config = cloneConfig(DEFAULT_CONFIG)
+  config.selectionToolbar.builtInActions.dictionary.providerId =
+    DEFAULT_CONFIG.selectionToolbar.noteSuggestion.providerId
+  return config
+}
+
 function createRangeFor(node: Node) {
   const range = document.createRange()
   range.selectNodeContents(node)
@@ -592,12 +607,17 @@ async function openTooltip(trigger: HTMLElement) {
 }
 
 describe("selection toolbar requests", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     hotkeyRegisterMock.mockReturnValue({
       unregister: hotkeyUnregisterMock,
     })
     getOrCreateWebPageContextMock.mockResolvedValue(null)
     getOrGenerateWebPageSummaryMock.mockResolvedValue(undefined)
+    // configAtom.onMount 会异步从 storage 重新读取配置并覆盖 store 里的值
+    // （读不到就退回 DEFAULT_CONFIG）。只 store.set 是留不住的——渲染后那次
+    // 回读会把词典打回默认的 Microsoft Translate，于是走快速词典分支，
+    // 结构化流式请求根本不会发出。所以这里连 storage 一起种上。
+    await storage.setItem("local:config", baseConfig())
   })
 
   afterEach(() => {
@@ -612,7 +632,7 @@ describe("selection toolbar requests", () => {
     getOrCreateWebPageContextMock.mockResolvedValue(null)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text" })
     const view = renderWithProviders(<TranslateButton />, store)
 
@@ -673,7 +693,7 @@ describe("selection toolbar requests", () => {
     getOrCreateWebPageContextMock.mockResolvedValue(null)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text" })
     renderWithProviders(<TranslateButton />, store)
 
@@ -696,7 +716,7 @@ describe("selection toolbar requests", () => {
     getOrCreateWebPageContextMock.mockResolvedValue(null)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text" })
     renderWithProviders(<TranslateButton />, store)
 
@@ -720,7 +740,7 @@ describe("selection toolbar requests", () => {
     getOrCreateWebPageContextMock.mockResolvedValue(null)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text" })
     renderWithProviders(<TranslateButton />, store)
 
@@ -764,7 +784,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, {
       text: "Original page selection",
       range: createRangeFor(paragraph),
@@ -855,7 +875,7 @@ describe("selection toolbar requests", () => {
     )
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text" })
     renderWithProviders(<TranslateButton />, store)
 
@@ -901,7 +921,7 @@ describe("selection toolbar requests", () => {
     })
 
     const store = createStore()
-    const updatedConfig = cloneConfig(DEFAULT_CONFIG)
+    const updatedConfig = baseConfig()
     setSelectionToolbarTranslateProvider(updatedConfig, "openai-default")
     store.set(configAtom, updatedConfig)
     setSelectionState(store, { text: "Selected text" })
@@ -937,7 +957,7 @@ describe("selection toolbar requests", () => {
     getOrCreateWebPageContextMock.mockResolvedValue(null)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text" })
     renderWithProviders(<TranslateButton />, store)
 
@@ -974,7 +994,7 @@ describe("selection toolbar requests", () => {
     getOrCreateWebPageContextMock.mockResolvedValue(null)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text" })
     renderWithProviders(<TranslateButton />, store)
 
@@ -987,7 +1007,7 @@ describe("selection toolbar requests", () => {
 
   it("shows a precheck alert when the translate provider is unavailable", async () => {
     const store = createStore()
-    const updatedConfig = cloneConfig(DEFAULT_CONFIG)
+    const updatedConfig = baseConfig()
     updatedConfig.selectionToolbar.features.translate.providerId = "missing-provider-id"
 
     store.set(configAtom, updatedConfig)
@@ -1008,7 +1028,7 @@ describe("selection toolbar requests", () => {
     getOrCreateWebPageContextMock.mockResolvedValue(null)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text" })
     renderWithProviders(<TranslateButton />, store)
 
@@ -1034,7 +1054,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<TranslateButton />, store)
 
@@ -1094,7 +1114,7 @@ describe("selection toolbar requests", () => {
     }
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, {
       text: "As long as you're alive, there's no bad ending.",
       range: createRangeAcrossNodes(startNode, endNode),
@@ -1139,7 +1159,7 @@ describe("selection toolbar requests", () => {
 
   it("shows a toast when the context menu request cannot recover a selection snapshot", async () => {
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     renderWithProviders(<TranslateButton />, store)
 
     const handler = getRegisteredMessageHandler("openSelectionTranslationFromContextMenu")
@@ -1164,7 +1184,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<TranslateButton />, store)
 
@@ -1202,7 +1222,7 @@ describe("selection toolbar requests", () => {
     paragraph.textContent = "Selected text inside a paragraph."
     document.body.appendChild(paragraph)
 
-    const config = cloneConfig(DEFAULT_CONFIG)
+    const config = baseConfig()
     config.selectionToolbar.enabled = false
 
     const store = createStore()
@@ -1230,7 +1250,7 @@ describe("selection toolbar requests", () => {
 
   it("ignores the selection translation shortcut when no selection is available", async () => {
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     renderWithProviders(<TranslateButton />, store)
 
     const shortcutCallback = await getRegisteredShortcutCallback()
@@ -1244,7 +1264,7 @@ describe("selection toolbar requests", () => {
   })
 
   it("does not register an empty or invalid selection translation shortcut", () => {
-    const emptyShortcutConfig = cloneConfig(DEFAULT_CONFIG)
+    const emptyShortcutConfig = baseConfig()
     emptyShortcutConfig.selectionToolbar.features.translate.shortcut = ""
     const emptyStore = createStore()
     emptyStore.set(configAtom, emptyShortcutConfig)
@@ -1255,7 +1275,7 @@ describe("selection toolbar requests", () => {
     cleanup()
     hotkeyRegisterMock.mockClear()
 
-    const invalidShortcutConfig = cloneConfig(DEFAULT_CONFIG)
+    const invalidShortcutConfig = baseConfig()
     invalidShortcutConfig.selectionToolbar.features.translate.shortcut = "T"
     const invalidStore = createStore()
     invalidStore.set(configAtom, invalidShortcutConfig)
@@ -1273,7 +1293,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<TranslateButton />, store)
 
@@ -1317,7 +1337,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<TranslateButton />, store)
 
@@ -1362,7 +1382,7 @@ describe("selection toolbar requests", () => {
     getOrCreateWebPageContextMock.mockResolvedValue(null)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "First selection" })
     renderWithProviders(<TranslateButton />, store)
 
@@ -1429,7 +1449,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<TranslateButton />, store)
 
@@ -1527,7 +1547,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<TranslateButton />, store)
 
@@ -1591,7 +1611,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<TranslateButton />, store)
 
@@ -1636,7 +1656,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 
@@ -1664,8 +1684,9 @@ describe("selection toolbar requests", () => {
       expect(streamBackgroundStructuredObjectMock).toHaveBeenCalledTimes(1)
     })
     expect(streamBackgroundStructuredObjectMock.mock.calls[0]?.[0]).toMatchObject({
-      providerId: "read-frog-free-ai",
-      modelTier: "normal",
+      // 本项目没有托管内置 AI，词典跑在用户自己配的大模型上，因此没有 modelTier
+      providerId: DEFAULT_CONFIG.selectionToolbar.noteSuggestion.providerId,
+      modelTier: undefined,
       requestId: expect.stringMatching(/^[0-9a-f-]{36}$/i),
     })
 
@@ -1730,7 +1751,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 
@@ -1791,7 +1812,7 @@ describe("selection toolbar requests", () => {
     )
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text" })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 
@@ -1825,7 +1846,7 @@ describe("selection toolbar requests", () => {
     const actionName = DEFAULT_DICTIONARY_ACTION.name
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text" })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 
@@ -1845,7 +1866,7 @@ describe("selection toolbar requests", () => {
 
   it("shows a toast when a custom action context menu request cannot recover a selection snapshot", async () => {
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 
     const action = DEFAULT_DICTIONARY_ACTION
@@ -1890,7 +1911,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 
@@ -1948,7 +1969,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 
@@ -2004,7 +2025,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 
@@ -2057,7 +2078,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 
@@ -2112,7 +2133,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "   ", range: createRangeFor(paragraph) })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 
@@ -2148,7 +2169,7 @@ describe("selection toolbar requests", () => {
     document.body.appendChild(paragraph)
 
     const store = createStore()
-    store.set(configAtom, cloneConfig(DEFAULT_CONFIG))
+    store.set(configAtom, baseConfig())
     setSelectionState(store, { text: "Selected text", range: createRangeFor(paragraph) })
     renderWithProviders(<SelectionToolbarCustomActionButtons />, store)
 

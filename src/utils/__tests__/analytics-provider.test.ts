@@ -54,7 +54,7 @@ describe("feature provider analytics", () => {
       }),
     ).toEqual(BUILT_IN_AI_FEATURE_PROVIDER)
     expect(BUILT_IN_AI_FEATURE_PROVIDER).toEqual({
-      provider: "read-frog-built-in-ai",
+      provider: "yangzihao-dic-built-in-ai",
       backend_kind: "llm",
     })
   })

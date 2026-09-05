@@ -186,7 +186,7 @@ describe("initial scan rooted at documentElement (real traversal)", () => {
     document.body.innerHTML = `
       <div>
         <p id="p1">Hello world</p>
-        <div class="read-frog-translated-content-wrapper notranslate">已翻译</div>
+        <div class="yangzihao-dic-translated-content-wrapper notranslate">已翻译</div>
       </div>
     `
     const readerRoot = document.createElement("sr-read")

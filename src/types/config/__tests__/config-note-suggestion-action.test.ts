@@ -13,6 +13,11 @@ function createConfigWithCustomSaveAction(enabled: boolean) {
     id: "custom-save-action",
     name: "Custom Save Action",
     enabled,
+    // 自定义动作必须挂大模型：任意 systemPrompt 驱动的结构化抽取，纯翻译引擎跑不了。
+    // createDefaultDictionaryAction() 默认挂的是免密钥的 Microsoft Translate——
+    // 那是内置词典专享的降级通道（见 resolveDictionaryProviderRef），
+    // 拿来当普通自定义动作的话，schema 拒绝它是对的。
+    providerId: DEFAULT_CONFIG.selectionToolbar.noteSuggestion.providerId,
   }
 
   return {

@@ -160,11 +160,13 @@ describe("notebase pending save", () => {
     expect(pendingCreateNotebaseSaveSchema.parse(pending)).toEqual(pending)
   })
 
-  it("builds the website detail URL from the pending notebase id", () => {
+  it("builds the in-extension detail URL from the pending notebase id", () => {
     const notebaseId = "11111111-1111-4111-8111-111111111111"
     const url = new URL(getNotebaseDetailUrl(notebaseId))
 
-    expect(url.pathname).toBe(`/notebase/${notebaseId}`)
+    // 本项目的笔记库在扩展内部（options 页的 hash 路由），不再指向官网／本机服务器
+    expect(url.pathname).toBe("/options.html")
+    expect(url.hash).toBe(`#/notebase/${notebaseId}`)
   })
 
   it("writes a notebase connection into the matching action config", () => {

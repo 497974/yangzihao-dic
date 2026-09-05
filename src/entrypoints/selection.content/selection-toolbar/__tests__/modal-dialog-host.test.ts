@@ -182,7 +182,7 @@ describe("modal dialog host placement", () => {
   })
 
   it("retries a residual calibration once on the next animation frame", () => {
-    const host = document.createElement("read-frog-selection")
+    const host = document.createElement("yangzihao-dic-selection")
     document.body.append(host)
     const { dialog } = createActiveDialog()
     const selectedText = document.createTextNode("Selected")
@@ -208,7 +208,7 @@ describe("modal dialog host placement", () => {
   })
 
   it("cancels queued placement work and listeners when disposed", () => {
-    const host = document.createElement("read-frog-selection")
+    const host = document.createElement("yangzihao-dic-selection")
     document.body.append(host)
     const { dialog } = createActiveDialog()
     const selectedText = document.createTextNode("Selected")
@@ -233,7 +233,7 @@ describe("modal dialog host placement", () => {
   })
 
   it("moves the same host into a modal slot and restores its original order", () => {
-    const host = document.createElement("read-frog-selection")
+    const host = document.createElement("yangzihao-dic-selection")
     const marker = document.createElement("div")
     document.body.append(host, marker)
     const { dialog } = createActiveDialog()
@@ -255,7 +255,7 @@ describe("modal dialog host placement", () => {
   })
 
   it("switches between native modal dialogs without changing the original restore target", () => {
-    const host = document.createElement("read-frog-selection")
+    const host = document.createElement("yangzihao-dic-selection")
     document.body.append(host)
     const first = createActiveDialog().dialog
     const second = createActiveDialog().dialog
@@ -277,7 +277,7 @@ describe("modal dialog host placement", () => {
   })
 
   it("keeps the host in the modal until placement or modal lifecycle explicitly changes", async () => {
-    const host = document.createElement("read-frog-selection")
+    const host = document.createElement("yangzihao-dic-selection")
     document.body.append(host)
     const { dialog } = createActiveDialog()
     const selectedText = document.createTextNode("Selected")
@@ -291,7 +291,7 @@ describe("modal dialog host placement", () => {
   })
 
   it("restores a disconnected host when the site removes the modal subtree", async () => {
-    const host = document.createElement("read-frog-selection")
+    const host = document.createElement("yangzihao-dic-selection")
     const marker = document.createElement("div")
     document.body.append(host, marker)
     const { dialog } = createActiveDialog()
@@ -310,7 +310,7 @@ describe("modal dialog host placement", () => {
   })
 
   it("restores when a modal is removed from inside a shadow root", async () => {
-    const host = document.createElement("read-frog-selection")
+    const host = document.createElement("yangzihao-dic-selection")
     const shadowHost = document.createElement("fixture-shadow-host")
     const shadow = shadowHost.attachShadow({ mode: "open" })
     document.body.append(host, shadowHost)
@@ -330,7 +330,7 @@ describe("modal dialog host placement", () => {
   })
 
   it("self-heals when the site removes the active slot", async () => {
-    const host = document.createElement("read-frog-selection")
+    const host = document.createElement("yangzihao-dic-selection")
     document.body.append(host)
     const { dialog } = createActiveDialog()
     const selectedText = document.createTextNode("Selected")
@@ -349,7 +349,7 @@ describe("modal dialog host placement", () => {
   })
 
   it("restores when the dialog closes or loses its native modal state", async () => {
-    const host = document.createElement("read-frog-selection")
+    const host = document.createElement("yangzihao-dic-selection")
     document.body.append(host)
     const { dialog, setActive } = createActiveDialog()
     const selectedText = document.createTextNode("Selected")
@@ -369,7 +369,7 @@ describe("modal dialog host placement", () => {
 
   it("falls back to a replacement body when the original body is removed", async () => {
     const originalBody = document.body
-    const host = document.createElement("read-frog-selection")
+    const host = document.createElement("yangzihao-dic-selection")
     originalBody.append(host)
     const { dialog } = createActiveDialog()
     const selectedText = document.createTextNode("Selected")
@@ -386,7 +386,7 @@ describe("modal dialog host placement", () => {
   })
 
   it("coalesces repeated geometry events into one animation frame", () => {
-    const host = document.createElement("read-frog-selection")
+    const host = document.createElement("yangzihao-dic-selection")
     document.body.append(host)
     const { dialog } = createActiveDialog()
     const selectedText = document.createTextNode("Selected")

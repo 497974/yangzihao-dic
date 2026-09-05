@@ -145,10 +145,10 @@ function mockRect(element: Element, rect: Partial<DOMRect>) {
   })
 }
 
+// 反馈按钮随 Featurebase（云端反馈服务）一起移除了，本项目不外发任何数据
 const TOOLTIP_CONTROL_LABELS = [
   "options.floatingButton.tooltips.togglePageTranslation",
   "options.floatingButton.tooltips.settings",
-  "options.floatingButton.tooltips.feedback",
 ] as const
 
 async function expectTooltipSide(label: string, side: "left" | "right") {
@@ -285,7 +285,7 @@ describe("floatingButton controls", () => {
     async ({ floatingSide, tooltipSide }) => {
       renderFloatingButton({ side: floatingSide })
       fireEvent.mouseEnter(getMainButton())
-      expect(TOOLTIP_CONTROL_LABELS).toHaveLength(3)
+      expect(TOOLTIP_CONTROL_LABELS).toHaveLength(2)
 
       for (const label of TOOLTIP_CONTROL_LABELS) {
         await expectTooltipSide(label, tooltipSide)
@@ -316,44 +316,6 @@ describe("floatingButton controls", () => {
     })
 
     expect(sendMessage).toHaveBeenCalledWith("toggleSidePanel", undefined)
-  })
-
-  it("places feedback after settings and opens a localized Featurebase URL with safe metadata", () => {
-    window.history.replaceState({}, "", "/private/path?token=secret#section")
-    renderFloatingButton()
-
-    const settingsButton = screen.getByRole("button", {
-      name: "options.floatingButton.tooltips.settings",
-    })
-    const feedbackButton = screen.getByRole("button", {
-      name: "options.floatingButton.tooltips.feedback",
-    })
-
-    expect(
-      settingsButton.compareDocumentPosition(feedbackButton) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy()
-
-    fireEvent.click(feedbackButton)
-
-    const openPageCall = vi
-      .mocked(sendMessage)
-      .mock.calls.find(([message]) => message === "openPage")
-    const openPagePayload = openPageCall?.[1] as { active: boolean; url: string } | undefined
-    expect(openPagePayload).toBeDefined()
-    const openedUrl = new URL(openPagePayload!.url)
-
-    expect(openedUrl.origin).toBe("https://feedback.readfrog.app")
-    expect(openedUrl.pathname).toBe("/en")
-    expect(JSON.parse(openedUrl.searchParams.get("metaData")!)).toEqual({
-      browser: "chrome",
-      extension_version: "1.0.0",
-      // The intent is query/hash stripping, not the origin itself.
-      page_url: `${window.location.origin}/private/path`,
-    })
-    expect(openPagePayload).toEqual({
-      url: openedUrl.toString(),
-      active: true,
-    })
   })
 
   it("shows a Firefox sidebar help link when the browser requires an extension user action", async () => {
@@ -482,7 +444,7 @@ describe("floatingButton controls", () => {
     renderFloatingButton()
 
     const mainButton = getMainButton()
-    expect(screen.getAllByRole("button")).toHaveLength(5)
+    expect(screen.getAllByRole("button")).toHaveLength(4)
 
     fireEvent.pointerDown(mainButton, {
       pointerId: 1,

@@ -397,7 +397,7 @@ describe("selectionToolbar - isInputOrTextarea logic", () => {
 
     await clearToolbarState()
 
-    const shadowHost = document.createElement("read-frog-selection")
+    const shadowHost = document.createElement("yangzihao-dic-selection")
     const shadowButton = document.createElement("button")
     shadowButton.type = "button"
     let dispatchComplete = false
@@ -841,7 +841,7 @@ describe("selectionToolbar - positioning logic", () => {
   })
 
   it("moves its shadow host into a selected native modal before showing the toolbar", async () => {
-    const extensionHost = document.createElement("read-frog-selection")
+    const extensionHost = document.createElement("yangzihao-dic-selection")
     const shadowRoot = extensionHost.attachShadow({ mode: "open" })
     const mount = document.createElement("div")
     shadowRoot.append(mount)

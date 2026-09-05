@@ -60,7 +60,7 @@ describe("llm-generate-text", () => {
       ...localPayload,
       providerRef: {
         kind: "system" as const,
-        providerId: "read-frog-advance-ai" as const,
+        providerId: "yangzihao-dic-advance-ai" as const,
         modelTier: "advance" as const,
         modelRevision: "advance-r1",
       },

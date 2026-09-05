@@ -6,7 +6,7 @@ const customAction = {
   name: "Custom Action",
   enabled: true,
   icon: "tabler:sparkles",
-  providerId: "read-frog-free-ai",
+  providerId: "yangzihao-dic-free-ai",
   systemPrompt: "",
   prompt: "{{selection}}",
   outputSchema: [

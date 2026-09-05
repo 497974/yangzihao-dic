@@ -270,11 +270,11 @@ describe("readSelectionSnapshot", () => {
 
   it("passes the Read Frog subtitles shadow root when selection boundaries expose only the host", () => {
     document.body.innerHTML = `
-      <div id="read-frog-subtitles-ui-host"></div>
+      <div id="yangzihao-dic-subtitles-ui-host"></div>
       <main><span id="fallback">against</span></main>
     `
 
-    const subtitlesHost = document.getElementById("read-frog-subtitles-ui-host")
+    const subtitlesHost = document.getElementById("yangzihao-dic-subtitles-ui-host")
     const fallbackNode = document.getElementById("fallback")?.firstChild
     if (!subtitlesHost || !fallbackNode) {
       throw new Error("Selection fixtures not found")

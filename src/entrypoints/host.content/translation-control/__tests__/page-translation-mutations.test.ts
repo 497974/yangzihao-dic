@@ -68,7 +68,8 @@ vi.mock("@/utils/host/dom/filter", () => ({
     mockIsDontWalkIntoAndDontTranslateAsChildElement(element, config),
   isHTMLElement: (node: unknown) => node instanceof HTMLElement,
   isTranslatedWrapperNode: (node: unknown) =>
-    node instanceof HTMLElement && node.classList.contains("read-frog-translated-content-wrapper"),
+    node instanceof HTMLElement &&
+    node.classList.contains("yangzihao-dic-translated-content-wrapper"),
 }))
 
 vi.mock("@/utils/host/dom/find", () => ({
@@ -206,7 +207,7 @@ function walkAndLabelVisibleParagraphs(
     }
   }
 
-  element.setAttribute("data-read-frog-walked", walkId)
+  element.setAttribute("data-yangzihao-dic-walked", walkId)
 
   for (const child of element.children) {
     if (child instanceof HTMLElement) {
@@ -215,7 +216,7 @@ function walkAndLabelVisibleParagraphs(
   }
 
   if (element.tagName === "P" && element.textContent?.trim()) {
-    element.setAttribute("data-read-frog-paragraph", "")
+    element.setAttribute("data-yangzihao-dic-paragraph", "")
   }
 
   // The real walker labels block-level elements too, and the stranded-text
@@ -223,7 +224,7 @@ function walkAndLabelVisibleParagraphs(
   // would collapse into a single request. Without this the guard could never
   // fire under the mock.
   if (MOCK_BLOCK_TAGS.has(element.tagName)) {
-    element.setAttribute("data-read-frog-block-node", "")
+    element.setAttribute("data-yangzihao-dic-block-node", "")
   }
 
   return {
@@ -438,8 +439,8 @@ describe("pageTranslationManager mutation re-walk", () => {
     const tweet = document.getElementById("tweet") as HTMLElement
     const source = document.getElementById("source")!.firstChild as Text
     const wrapper = document.createElement("span")
-    wrapper.className = "read-frog-translated-content-wrapper"
-    wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+    wrapper.className = "yangzihao-dic-translated-content-wrapper"
+    wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
     tweet.append(wrapper)
     const state: BilingualTranslationState = {
       layoutSource: tweet,
@@ -479,8 +480,8 @@ describe("pageTranslationManager mutation re-walk", () => {
     const source = document.getElementById("source")!.firstChild as Text
     const createState = (): BilingualTranslationState => {
       const wrapper = document.createElement("span")
-      wrapper.className = "read-frog-translated-content-wrapper"
-      wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+      wrapper.className = "yangzihao-dic-translated-content-wrapper"
+      wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
       const state: BilingualTranslationState = {
         layoutSource: tweet,
         sourceTextContent: source.data,
@@ -540,8 +541,8 @@ describe("pageTranslationManager mutation re-walk", () => {
     const source = document.getElementById("source")!.firstChild as Text
     const createState = (walkId: string): BilingualTranslationState => {
       const wrapper = document.createElement("span")
-      wrapper.className = "read-frog-translated-content-wrapper"
-      wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+      wrapper.className = "yangzihao-dic-translated-content-wrapper"
+      wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
       const state: BilingualTranslationState = {
         layoutSource: tweet,
         sourceTextContent: source.data,
@@ -634,8 +635,8 @@ describe("pageTranslationManager mutation re-walk", () => {
 
     const tweet = document.getElementById("tweet") as HTMLElement
     const wrapper = document.createElement("span")
-    wrapper.className = "notranslate read-frog-translated-content-wrapper"
-    wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+    wrapper.className = "notranslate yangzihao-dic-translated-content-wrapper"
+    wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
     tweet.append(wrapper)
     const state: BilingualTranslationState = {
       layoutSource: tweet,
@@ -654,10 +655,10 @@ describe("pageTranslationManager mutation re-walk", () => {
     // text inside the wrapper, an error shadow host, and a sibling wrapper.
     wrapper.append("译文文本")
     const errorHost = document.createElement("div")
-    errorHost.className = "read-frog-react-shadow-host"
+    errorHost.className = "yangzihao-dic-react-shadow-host"
     wrapper.append(errorHost)
     const siblingWrapper = document.createElement("span")
-    siblingWrapper.className = "notranslate read-frog-translated-content-wrapper"
+    siblingWrapper.className = "notranslate yangzihao-dic-translated-content-wrapper"
     tweet.append(siblingWrapper)
     await flushDomUpdates()
 
@@ -680,8 +681,8 @@ describe("pageTranslationManager mutation re-walk", () => {
     const tweet = document.getElementById("tweet") as HTMLElement
     const createState = (sourceText: string): BilingualTranslationState => {
       const wrapper = document.createElement("span")
-      wrapper.className = "notranslate read-frog-translated-content-wrapper"
-      wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+      wrapper.className = "notranslate yangzihao-dic-translated-content-wrapper"
+      wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
       wrapper.append(`${sourceText} 的译文`)
       tweet.append(wrapper)
       const state: BilingualTranslationState = {
@@ -721,7 +722,7 @@ describe("pageTranslationManager mutation re-walk", () => {
     await flushDomUpdates()
 
     expect(mockTranslateNodesBilingualMode).toHaveBeenCalledTimes(1)
-    expect(document.querySelectorAll(".read-frog-translated-content-wrapper").length).toBe(1)
+    expect(document.querySelectorAll(".yangzihao-dic-translated-content-wrapper").length).toBe(1)
 
     unregisterBilingualTranslationState(activeState)
     manager.stop()
@@ -738,8 +739,8 @@ describe("pageTranslationManager mutation re-walk", () => {
 
     const tweet = document.getElementById("tweet") as HTMLElement
     const wrapper = document.createElement("span")
-    wrapper.className = "notranslate read-frog-translated-content-wrapper"
-    wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+    wrapper.className = "notranslate yangzihao-dic-translated-content-wrapper"
+    wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
     wrapper.append("译文文本")
     tweet.append(wrapper)
     const state: BilingualTranslationState = {
@@ -778,8 +779,8 @@ describe("pageTranslationManager mutation re-walk", () => {
 
     const tweet = document.getElementById("tweet") as HTMLElement
     const wrapper = document.createElement("span")
-    wrapper.className = "notranslate read-frog-translated-content-wrapper"
-    wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+    wrapper.className = "notranslate yangzihao-dic-translated-content-wrapper"
+    wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
     wrapper.append("中文译文")
     tweet.append(wrapper)
     const state: BilingualTranslationState = {
@@ -821,8 +822,8 @@ describe("pageTranslationManager mutation re-walk", () => {
 
     const tweet = document.getElementById("tweet") as HTMLElement
     const wrapper = document.createElement("span")
-    wrapper.className = "notranslate read-frog-translated-content-wrapper"
-    wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+    wrapper.className = "notranslate yangzihao-dic-translated-content-wrapper"
+    wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
     wrapper.append("中文译文")
     tweet.append(wrapper)
     const state: BilingualTranslationState = {
@@ -863,8 +864,8 @@ describe("pageTranslationManager mutation re-walk", () => {
 
     const tweet = document.getElementById("tweet") as HTMLElement
     const wrapper = document.createElement("span")
-    wrapper.className = "notranslate read-frog-translated-content-wrapper"
-    wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+    wrapper.className = "notranslate yangzihao-dic-translated-content-wrapper"
+    wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
     wrapper.append("中文译文")
     tweet.append(wrapper)
     const state: BilingualTranslationState = {
@@ -913,8 +914,8 @@ describe("pageTranslationManager mutation re-walk", () => {
 
       const tweet = document.getElementById("tweet") as HTMLElement
       const wrapper = document.createElement("span")
-      wrapper.className = "notranslate read-frog-translated-content-wrapper"
-      wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+      wrapper.className = "notranslate yangzihao-dic-translated-content-wrapper"
+      wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
       wrapper.append("译文 0")
       tweet.append(wrapper)
       const translatedTextNode = wrapper.firstChild as Text
@@ -982,8 +983,8 @@ describe("pageTranslationManager mutation re-walk", () => {
       const tweet = document.getElementById("tweet") as HTMLElement
       const source = document.getElementById("source")!.firstChild as Text
       const wrapper = document.createElement("span")
-      wrapper.className = "notranslate read-frog-translated-content-wrapper"
-      wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+      wrapper.className = "notranslate yangzihao-dic-translated-content-wrapper"
+      wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
       tweet.append(wrapper)
       // Snapshot never matches, so every mutation marks the source stale —
       // the pathological ticker page.
@@ -1049,9 +1050,9 @@ describe("pageTranslationManager mutation re-walk", () => {
     const comment = document.getElementById("comment") as HTMLElement
     const tweet = document.getElementById("tweet") as HTMLElement
     const wrapper = document.createElement("span")
-    wrapper.className = "notranslate read-frog-translated-content-wrapper"
+    wrapper.className = "notranslate yangzihao-dic-translated-content-wrapper"
     const errorHost = document.createElement("div")
-    errorHost.className = "read-frog-react-shadow-host"
+    errorHost.className = "yangzihao-dic-react-shadow-host"
     const cleanupSpy = vi.fn<() => void>()
     ;(errorHost as any).__reactShadowContainerCleanup = cleanupSpy
     wrapper.append(errorHost)
@@ -1180,8 +1181,8 @@ describe("pageTranslationManager mutation re-walk", () => {
     const inlinePara = document.createElement("span")
     inlinePara.id = "inlinePara"
     inlinePara.textContent = "an inline fragment"
-    inlinePara.setAttribute("data-read-frog-paragraph", "")
-    inlinePara.setAttribute("data-read-frog-inline-node", "")
+    inlinePara.setAttribute("data-yangzihao-dic-paragraph", "")
+    inlinePara.setAttribute("data-yangzihao-dic-inline-node", "")
     flow.append("bare sentence one", inlinePara, "bare sentence two")
     document.body.append(flow)
     flow.getBoundingClientRect = () => ({ height: 200_000 }) as DOMRect
@@ -1234,7 +1235,7 @@ describe("pageTranslationManager mutation re-walk", () => {
     real.id = "real"
     real.textContent = "Real paragraph"
     document.body.append("Loading…", real)
-    document.body.setAttribute("data-read-frog-paragraph", "")
+    document.body.setAttribute("data-yangzihao-dic-paragraph", "")
     document.body.getBoundingClientRect = () => ({ height: 200_000 }) as DOMRect
 
     const manager = new PageTranslationManager()
@@ -1246,6 +1247,6 @@ describe("pageTranslationManager mutation re-walk", () => {
     expect(observed).toContain(real)
 
     manager.stop()
-    document.body.removeAttribute("data-read-frog-paragraph")
+    document.body.removeAttribute("data-yangzihao-dic-paragraph")
   })
 })

@@ -104,7 +104,9 @@ describe("customActionConfigForm notebase availability", () => {
     const duplicated = store.get(configAtom).selectionToolbar.customActions[0]!
     expect(duplicated).toMatchObject({
       enabled: true,
-      providerId: config.selectionToolbar.builtInActions.dictionary.providerId,
+      // 内置词典可以挂免密钥的纯翻译引擎，普通自定义动作不行（要跑 systemPrompt），
+      // 所以复制出来的动作会退回到一个可用的大模型，而不是照抄词典的供应商
+      providerId: "openai-default",
       notebaseConnection: config.selectionToolbar.builtInActions.dictionary.notebaseConnection,
     })
     expect(duplicated.id).not.toBe("default-dictionary")
@@ -185,7 +187,9 @@ describe("customActionConfigForm notebase availability", () => {
       name: "Summarize",
       icon: "tabler:sparkles",
       enabled: false,
-      providerId: config.selectionToolbar.builtInActions.dictionary.providerId,
+      // 自定义动作必须挂大模型：内置词典默认的纯翻译引擎在这里是非法的，
+      // 整份 config 会校验失败，写不进去
+      providerId: config.selectionToolbar.noteSuggestion.providerId,
       systemPrompt: "You are helpful.",
       prompt: "Summarize the selected text.",
       outputSchema: [

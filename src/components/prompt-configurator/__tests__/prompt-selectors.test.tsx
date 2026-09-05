@@ -149,7 +149,7 @@ describe("translation prompt selectors", () => {
   it("keeps prompt selection available for Built-in AI", () => {
     testState.pageTranslationProviderRef = {
       kind: "system",
-      id: "read-frog-free-ai",
+      id: "yangzihao-dic-free-ai",
       name: "Built-in AI",
       modelTier: "normal",
     }
