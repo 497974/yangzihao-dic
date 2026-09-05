@@ -124,10 +124,6 @@ export function isBuiltInAiProviderId(providerId: string): providerId is BuiltIn
   return BUILT_IN_AI_PROVIDER_IDS.includes(providerId as BuiltInAiProviderId)
 }
 
-export function getBuiltInAiProviderName(providerId: BuiltInAiProviderId): string {
-  return getSystemProviderName(SYSTEM_PROVIDER_DEFS[providerId])
-}
-
 export function getHostedAiModelTier(providerId: BuiltInAiProviderId): HostedAiModelTier {
   return providerId === BUILT_IN_AI_ADVANCE_PROVIDER_ID ? "advance" : "normal"
 }

@@ -6,7 +6,6 @@ import { version } from "../../../package.json"
 import { AISmartContext } from "./components/ai-smart-context"
 import { AlwaysTranslate } from "./components/always-translate"
 import LanguageOptionsSelector from "./components/language-options-selector"
-import { MoreMenu } from "./components/more-menu"
 import Hotkey from "./components/node-translation-hotkey-selector"
 import ProvidersField from "./components/providers-field"
 import { SiteControlToggle } from "./components/site-control-toggle"
@@ -52,7 +51,6 @@ function App() {
           <span className="text-[13px] font-medium">{i18n.t("popup.options")}</span>
         </button>
         <span className="text-sm text-neutral-500 dark:text-neutral-400">{version}</span>
-        <MoreMenu />
       </div>
     </>
   )

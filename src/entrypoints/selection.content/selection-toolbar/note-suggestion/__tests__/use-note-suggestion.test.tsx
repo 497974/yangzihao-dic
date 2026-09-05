@@ -52,7 +52,7 @@ const LOCAL_PROVIDER_REF = {
 
 const SYSTEM_PROVIDER_REF = {
   kind: "system",
-  id: "read-frog-free-ai",
+  id: "yangzihao-dic-free-ai",
   name: "Built-in AI",
   modelTier: "normal",
 } satisfies NoteSuggestionFireInput["provider"]
@@ -211,7 +211,7 @@ describe("useNoteSuggestion", () => {
     await waitFor(() => expect(result.current.suggestion).not.toBeNull())
 
     expect(result.current.suggestion?.analyticsProvider).toEqual({
-      provider: "read-frog-built-in-ai",
+      provider: "yangzihao-dic-built-in-ai",
       backend_kind: "llm",
     })
   })

@@ -5,10 +5,10 @@
  * 数据落在 chrome.storage.local，不经过任何服务器。
  */
 
+import type { LocalNotebase, LocalNotebaseDb } from "./storage"
 import { implement } from "@orpc/server"
 import { contract } from "@read-frog/api-contract"
 import { DEFAULT_SRS_SCHEDULING_PARAMS } from "@read-frog/definitions"
-import type { LocalNotebase, LocalNotebaseDb } from "./storage"
 import { mutateDb, nextTxid, nowIso, readDb } from "./storage"
 
 const LOCAL_USER_ID = "local-user"
@@ -131,12 +131,11 @@ const notebaseRouter = os.notebase.router({
       }))
 
       const initial =
-        input.options?.initialRows ??
-        (input.options?.initialRow ? [input.options.initialRow] : [])
+        input.options?.initialRows ?? (input.options?.initialRow ? [input.options.initialRow] : [])
       nb.notebaseRows = initial.map((r, i) => ({
         id: r.id ?? uuid(),
         notebaseId: id,
-        cells: (r.cells ?? {}) as Record<string, unknown>,
+        cells: r.cells ?? {},
         position: i,
         createdAt: ts,
         updatedAt: ts,
@@ -153,7 +152,8 @@ const notebaseRouter = os.notebase.router({
       if (input.name !== undefined) nb.name = input.name
       if (input.srsNewPerDay !== undefined) nb.srsNewPerDay = input.srsNewPerDay
       if (input.srsReviewsPerDay !== undefined) nb.srsReviewsPerDay = input.srsReviewsPerDay
-      if (input.srsDesiredRetention !== undefined) nb.srsDesiredRetention = input.srsDesiredRetention
+      if (input.srsDesiredRetention !== undefined)
+        nb.srsDesiredRetention = input.srsDesiredRetention
       nb.updatedAt = nowIso()
       return { txid: nextTxid(db) }
     }),
@@ -176,7 +176,7 @@ const notebaseRowRouter = os.notebaseRow.router({
       nb.notebaseRows.push({
         id: input.data.id ?? uuid(),
         notebaseId: nb.id,
-        cells: (input.data.cells ?? {}) as Record<string, unknown>,
+        cells: input.data.cells ?? {},
         position: nb.notebaseRows.length,
         createdAt: ts,
         updatedAt: ts,
@@ -194,7 +194,7 @@ const notebaseRowRouter = os.notebaseRow.router({
         nb.notebaseRows.push({
           id: r.id ?? uuid(),
           notebaseId: nb.id,
-          cells: (r.cells ?? {}) as Record<string, unknown>,
+          cells: r.cells ?? {},
           position: nb.notebaseRows.length,
           createdAt: ts,
           updatedAt: ts,
@@ -208,7 +208,7 @@ const notebaseRowRouter = os.notebaseRow.router({
   update: os.notebaseRow.update.handler(async ({ input, errors }) =>
     mutateDb((db) => {
       const { nb, row } = findRow(db, input.notebaseRowId, errors)
-      if (input.data.cells !== undefined) row.cells = input.data.cells as Record<string, unknown>
+      if (input.data.cells !== undefined) row.cells = input.data.cells
       row.updatedAt = nowIso()
       nb.updatedAt = row.updatedAt
       return {
@@ -239,9 +239,7 @@ const notebaseRowRouter = os.notebaseRow.router({
     mutateDb((db) => {
       const nb = requireNotebase(db, input.notebaseId, errors)
       const byId = new Map(nb.notebaseRows.map((r) => [r.id, r]))
-      const ordered = input.ids
-        .map((id) => byId.get(id))
-        .filter(Boolean) as typeof nb.notebaseRows
+      const ordered = input.ids.map((id) => byId.get(id)).filter(Boolean) as typeof nb.notebaseRows
       for (const r of nb.notebaseRows) if (!input.ids.includes(r.id)) ordered.push(r)
       ordered.forEach((r, i) => {
         r.position = i
@@ -288,7 +286,9 @@ const notebaseColumnRouter = os.notebaseColumn.router({
         nb.updatedAt = col.updatedAt
         return { txid: nextTxid(db) }
       }
-      throw errors.NOTEBASE_NOT_FOUND()
+      // 遍历完所有笔记库都没找到这一列——契约在这两个过程里只声明了
+      // NOTEBASE_COLUMN_NOT_FOUND，用它才是运行时真实存在的构造器
+      throw errors.NOTEBASE_COLUMN_NOT_FOUND()
     }),
   ),
 
@@ -305,7 +305,9 @@ const notebaseColumnRouter = os.notebaseColumn.router({
         nb.updatedAt = nowIso()
         return { txid: nextTxid(db) }
       }
-      throw errors.NOTEBASE_NOT_FOUND()
+      // 遍历完所有笔记库都没找到这一列——契约在这两个过程里只声明了
+      // NOTEBASE_COLUMN_NOT_FOUND，用它才是运行时真实存在的构造器
+      throw errors.NOTEBASE_COLUMN_NOT_FOUND()
     }),
   ),
 
@@ -331,6 +333,8 @@ const notebaseColumnRouter = os.notebaseColumn.router({
 const userRouter = os.user.router({
   ensureTimezone: os.user.ensureTimezone.handler(() => ({
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Shanghai",
+    // 本地实现不落库，只是把浏览器时区报回去，所以从来没有"写入"这一说
+    updated: false,
   })),
   updateTimezone: os.user.updateTimezone.handler(({ input }) => ({
     timezone: input.timezone,

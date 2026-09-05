@@ -294,8 +294,7 @@ export function useSaveToNotebase() {
       if (!actionDraft && currentAccount) {
         try {
           return await autoCreateNotebaseAndSave(action, results, currentAccount)
-        }
-        catch (error) {
+        } catch (error) {
           logger.warn("[SaveToNotebase] 自动创建笔记库失败，退回手动弹窗", error)
         }
       }

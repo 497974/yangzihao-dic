@@ -1,4 +1,3 @@
-import type { CaptureResult, PostHog } from "posthog-js/dist/module.no-external"
 import type { FeatureUsageCache } from "../analytics-feature-cache"
 import type { FeatureUsedEventProperties } from "@/types/analytics"
 import { beforeEach, describe, expect, it, vi } from "vitest"
@@ -12,9 +11,13 @@ type MessageHandler<TData, TResult = void> = (message: {
   data: TData
 }) => TResult | Promise<TResult>
 
-type PostHogCaptureMock = (...args: Parameters<PostHog["capture"]>) => void
-type PostHogInitMock = (...args: Parameters<PostHog["init"]>) => void
-type PostHogRegisterMock = (...args: Parameters<PostHog["register"]>) => void
+// 本分叉已把 posthog SDK 换成空实现（见 ../analytics 顶部注释），
+// 客户端接口随之放宽成 (...args: unknown[]) => void。这里跟着对齐，
+// 不再从 posthog-js 取类型——那个包已经不进产物了。
+type CaptureResult = Record<string, unknown>
+type PostHogCaptureMock = (...args: unknown[]) => void
+type PostHogInitMock = (...args: unknown[]) => void
+type PostHogRegisterMock = (...args: unknown[]) => void
 
 const DEFAULT_FEATURE_PROVIDER = {
   provider: "openai",

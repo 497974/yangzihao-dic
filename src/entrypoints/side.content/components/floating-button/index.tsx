@@ -1,5 +1,5 @@
 import type { FloatingButtonSide } from "@/types/config/floating-button"
-import { IconLock, IconLockOpen, IconMessageCircle, IconSettings, IconX } from "@tabler/icons-react"
+import { IconLock, IconLockOpen, IconSettings, IconX } from "@tabler/icons-react"
 import { useAtom, useAtomValue } from "jotai"
 import { useEffect, useRef, useState } from "react"
 import { browser } from "#imports"
@@ -123,7 +123,6 @@ function getNormalizedFloatingContainerTop(mainButtonTop: number, mainOffsetY: n
 
 export default function FloatingButton() {
   const [floatingButton, setFloatingButton] = useAtom(configFieldsAtomMap.floatingButton)
-  const uiLanguage = useAtomValue(configFieldsAtomMap.uiLanguage)
   const translationState = useAtomValue(enablePageTranslationAtom)
   const [isDraggingButton, setIsDraggingButton] = useAtom(isDraggingButtonAtom)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -212,7 +211,6 @@ export default function FloatingButton() {
       }
     })
   }
-
 
   const startActiveDrag = () => {
     const pendingDrag = pendingDragRef.current
@@ -418,7 +416,7 @@ export default function FloatingButton() {
             className={cn(
               // 照片是方形不透明图，裁成圆形需要 object-cover 避免拉伸，
               // 再加一圈半透明描边和轻微阴影，圆边才不会显得生硬。
-              "h-8 w-8 rounded-full object-cover ring-1 ring-black/10 shadow-sm",
+              "h-8 w-8 rounded-full object-cover shadow-sm ring-1 ring-black/10",
               !isDraggingButton && (floatingButtonSide === "right" ? "ml-1" : "mr-1"),
             )}
           />

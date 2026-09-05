@@ -176,7 +176,7 @@ describe("translation queue helpers", () => {
     expect(
       shouldUseBatchQueue({
         kind: "system",
-        providerId: "read-frog-free-ai",
+        providerId: "yangzihao-dic-free-ai",
         modelTier: "normal",
         modelRevision: "normal-r1",
       }),
@@ -202,7 +202,7 @@ describe("translation queue helpers", () => {
           langConfig: DEFAULT_CONFIG.language,
           providerRef: {
             kind: "system",
-            providerId: "read-frog-free-ai",
+            providerId: "yangzihao-dic-free-ai",
             modelTier: "normal",
             modelRevision: "normal-r1",
           },
@@ -216,7 +216,7 @@ describe("translation queue helpers", () => {
     const firstPayload = runStreamTextInBackgroundMock.mock.calls[0]![0]
     const secondPayload = runStreamTextInBackgroundMock.mock.calls[1]![0]
     expect(firstPayload).toMatchObject({
-      providerId: "read-frog-free-ai",
+      providerId: "yangzihao-dic-free-ai",
       modelTier: "normal",
       instructions: "Translate accurately",
       prompt: "Source text",
@@ -256,7 +256,7 @@ describe("translation queue helpers", () => {
           langConfig: DEFAULT_CONFIG.language,
           providerRef: {
             kind: "system",
-            providerId: "read-frog-free-ai",
+            providerId: "yangzihao-dic-free-ai",
             modelTier: "normal",
             modelRevision: "normal-r1",
           },
@@ -1011,7 +1011,7 @@ describe("translation queue helpers", () => {
         langConfig: DEFAULT_CONFIG.language,
         providerRef: {
           kind: "system" as const,
-          providerId: "read-frog-advance-ai",
+          providerId: "yangzihao-dic-advance-ai",
           modelTier: "advance",
           modelRevision: "advance-r1",
         },
@@ -1039,7 +1039,7 @@ describe("translation queue helpers", () => {
         langConfig: DEFAULT_CONFIG.language,
         providerRef: {
           kind: "system" as const,
-          providerId: "read-frog-free-ai",
+          providerId: "yangzihao-dic-free-ai",
           modelTier: "normal",
           modelRevision: "normal-r1",
         },
@@ -1071,7 +1071,7 @@ describe("translation queue helpers", () => {
       langConfig: DEFAULT_CONFIG.language,
       providerRef: {
         kind: "system" as const,
-        providerId: "read-frog-free-ai",
+        providerId: "yangzihao-dic-free-ai",
         modelTier: "normal",
         modelRevision: "normal-r1",
       },
@@ -1122,7 +1122,7 @@ describe("translation queue helpers", () => {
     )
     const hostedRef = {
       kind: "system" as const,
-      providerId: "read-frog-advance-ai",
+      providerId: "yangzihao-dic-advance-ai",
       modelTier: "advance",
       modelRevision: "advance-r1",
     }

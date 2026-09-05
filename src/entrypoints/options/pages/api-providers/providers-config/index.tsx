@@ -32,14 +32,12 @@ import {
 } from "@/utils/navigation"
 import { isBuiltInAiProviderId } from "@/utils/providers/provider-registry"
 import { ConfigItem } from "../../../components/config-item"
-import { EntityEditor } from "../../../components/entity-editor"
 import { EntityEditorLayout } from "../../../components/entity-editor-layout"
 import { EntityListItem } from "../../../components/entity-list-item"
 import { EntityListRail } from "../../../components/entity-list-rail"
 import AddProviderDialog from "./add-provider-dialog"
 import { highlightedProviderFieldAtom, selectedProviderIdAtom } from "./atoms"
 import { ProviderConfigForm } from "./provider-config-form"
-import { ProviderEditor } from "./provider-editor"
 import { addProvider } from "./utils"
 
 /**
@@ -311,4 +309,3 @@ function FeatureCountBadge({ count, children }: { count: number; children: React
     </div>
   )
 }
-

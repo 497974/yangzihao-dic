@@ -58,10 +58,7 @@ export function HelpButton() {
         setCorner(newCorner)
         localStorage.setItem(STORAGE_KEY, newCorner)
       } else {
-        window.open(
-          "#/api-providers",
-          "_blank",
-        )
+        window.open("#/api-providers", "_blank")
       }
       hasDraggedRef.current = false
       setDragging(false)

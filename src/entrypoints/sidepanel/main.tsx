@@ -27,7 +27,11 @@ function SidePanelShell() {
   return (
     <main className="flex min-h-screen flex-col bg-background px-5 py-6 text-foreground">
       <section className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
-        <img src={readFrogLogo} alt={APP_NAME} className="size-16 rounded-full object-cover ring-1 ring-black/10 shadow-sm" />
+        <img
+          src={readFrogLogo}
+          alt={APP_NAME}
+          className="size-16 rounded-full object-cover shadow-sm ring-1 ring-black/10"
+        />
         <div className="space-y-2">
           <h1 className="text-xl font-semibold tracking-tight">{APP_NAME}</h1>
           <p className="text-sm text-muted-foreground">Side Panel is coming soon.</p>

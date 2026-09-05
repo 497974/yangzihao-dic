@@ -498,7 +498,7 @@ describe("translate-text", () => {
       })
       mockGetOrGenerateWebPageSummary.mockRejectedValue(
         new HostedAiProviderUnavailableError(
-          { kind: "system", id: "read-frog-free-ai", name: "Built-in AI", modelTier: "normal" },
+          { kind: "system", id: "yangzihao-dic-free-ai", name: "Built-in AI", modelTier: "normal" },
           "Weekly credit used up",
         ),
       )

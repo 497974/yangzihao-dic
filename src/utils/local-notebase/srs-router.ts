@@ -5,18 +5,18 @@
  * 上游把这些接口放在云端并与订阅绑定，本项目改为完全本地。
  */
 
+import type { LocalCard, LocalCardTemplate } from "./srs-storage"
 import { implement } from "@orpc/server"
 import { contract } from "@read-frog/api-contract"
 import { DEFAULT_SRS_SCHEDULING_PARAMS } from "@read-frog/definitions"
-import { readDb } from "./storage"
-import type { LocalCard, LocalCardTemplate } from "./srs-storage"
-import { mutateSrsDb, nextSrsTxid, readSrsDb } from "./srs-storage"
 import {
   cardStateToScheduleStatus,
   initialCardMemory,
   renderPattern,
   scheduleReview,
 } from "./srs-scheduler"
+import { mutateSrsDb, nextSrsTxid, readSrsDb } from "./srs-storage"
+import { readDb } from "./storage"
 
 const os = implement(contract)
 
@@ -48,7 +48,7 @@ function serializeTemplate(t: LocalCardTemplate) {
  * 正面 = 主列（词条），背面 = 其余列。
  * 否则用户存完词还要先手动配模板才能复习，多一道坎。
  */
-function defaultTemplateConfig(columns: { id: string, name: string, isPrimary: boolean }[]) {
+function defaultTemplateConfig(columns: { id: string; name: string; isPrimary: boolean }[]) {
   const sorted = [...columns]
   const primary = sorted.find((c) => c.isPrimary) ?? sorted[0]
   const rest = sorted.filter((c) => c.id !== primary?.id)
@@ -67,7 +67,9 @@ async function ensureTemplate(notebaseId: string): Promise<LocalCardTemplate> {
   const nbDb = await readDb()
   const nb = nbDb.notebases[notebaseId]
   const cols = (nb?.notebaseColumns ?? []).map((c) => ({
-    id: c.id, name: c.name, isPrimary: c.isPrimary,
+    id: c.id,
+    name: c.name,
+    isPrimary: c.isPrimary,
   }))
   const ts = nowIso()
   const tpl: LocalCardTemplate = {
@@ -78,7 +80,10 @@ async function ensureTemplate(notebaseId: string): Promise<LocalCardTemplate> {
     createdAt: ts,
     updatedAt: ts,
   }
-  await mutateSrsDb((db) => { db.templates[tpl.id] = tpl; nextSrsTxid(db) })
+  await mutateSrsDb((db) => {
+    db.templates[tpl.id] = tpl
+    nextSrsTxid(db)
+  })
   return tpl
 }
 
@@ -185,9 +190,12 @@ const cardTemplateRouter = os.cardTemplate.router({
       const id = input.id ?? uuid()
       const ts = nowIso()
       const tpl: LocalCardTemplate = {
-        id, notebaseId: input.notebaseId, name: input.name,
-        config: input.config as LocalCardTemplate["config"],
-        createdAt: ts, updatedAt: ts,
+        id,
+        notebaseId: input.notebaseId,
+        name: input.name,
+        config: input.config,
+        createdAt: ts,
+        updatedAt: ts,
       }
       db.templates[id] = tpl
       return { ...serializeTemplate(tpl), txid: nextSrsTxid(db) }
@@ -199,7 +207,7 @@ const cardTemplateRouter = os.cardTemplate.router({
       const t = db.templates[input.id]
       if (!t) throw errors.CARD_TEMPLATE_NOT_FOUND()
       if (input.name !== undefined) t.name = input.name
-      if (input.config !== undefined) t.config = input.config as LocalCardTemplate["config"]
+      if (input.config !== undefined) t.config = input.config
       t.updatedAt = nowIso()
       return { ...serializeTemplate(t), txid: nextSrsTxid(db) }
     }),
@@ -227,10 +235,12 @@ async function paramsFor(notebaseId: string) {
     desiredRetention: nb?.srsDesiredRetention ?? DEFAULT_SRS_SCHEDULING_PARAMS.desiredRetention,
     maximumInterval: nb?.srsMaximumInterval ?? DEFAULT_SRS_SCHEDULING_PARAMS.maximumInterval,
     enableShortTerm: nb?.srsEnableShortTerm ?? DEFAULT_SRS_SCHEDULING_PARAMS.enableShortTerm,
-    learningSteps: (nb?.srsLearningSteps as unknown as string[])
-      ?? [...DEFAULT_SRS_SCHEDULING_PARAMS.learningSteps],
-    relearningSteps: (nb?.srsRelearningSteps as unknown as string[])
-      ?? [...DEFAULT_SRS_SCHEDULING_PARAMS.relearningSteps],
+    learningSteps: (nb?.srsLearningSteps as unknown as string[]) ?? [
+      ...DEFAULT_SRS_SCHEDULING_PARAMS.learningSteps,
+    ],
+    relearningSteps: (nb?.srsRelearningSteps as unknown as string[]) ?? [
+      ...DEFAULT_SRS_SCHEDULING_PARAMS.relearningSteps,
+    ],
     enableFuzz: nb?.srsEnableFuzz ?? DEFAULT_SRS_SCHEDULING_PARAMS.enableFuzz,
     weights: nb?.srsWeights ?? undefined,
   }
@@ -249,7 +259,11 @@ const srsRouter = os.srs.router({
         const cur = pre.cards[input.cardId]!
         return {
           card: serializeCard(cur),
-          revlog: { ...dup, reviewedAt: new Date(dup.reviewedAt), createdAt: new Date(dup.createdAt) },
+          revlog: {
+            ...dup,
+            reviewedAt: new Date(dup.reviewedAt),
+            createdAt: new Date(dup.createdAt),
+          },
           txid: pre.txid,
           created: false,
         }
@@ -296,7 +310,10 @@ const srsRouter = os.srs.router({
       // 找该卡最后一条复习记录，把状态整个还原回去
       let idx = -1
       for (let i = db.revlogs.length - 1; i >= 0; i--) {
-        if (db.revlogs[i]!.cardId === input.cardId) { idx = i; break }
+        if (db.revlogs[i]!.cardId === input.cardId) {
+          idx = i
+          break
+        }
       }
       if (idx < 0) throw errors.CARD_NOT_FOUND()
       const log = db.revlogs[idx]!
@@ -383,7 +400,10 @@ const srsRouter = os.srs.router({
 function dayKeyInTz(d: Date, timezone: string): string {
   // en-CA 恰好格式化成 YYYY-MM-DD，省得手拼字符串
   return new Intl.DateTimeFormat("en-CA", {
-    timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit",
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   }).format(d)
 }
 
@@ -400,7 +420,7 @@ const statsRouter = os.stats.router({
     const { from, to, timezone, notebaseIds } = input
     const idSet = notebaseIds ? new Set(notebaseIds) : null
 
-    const srsByDay = new Map<string, { answers: number, durationMs: number }>()
+    const srsByDay = new Map<string, { answers: number; durationMs: number }>()
     for (const r of srsDb.revlogs) {
       if (idSet && !idSet.has(r.notebaseId)) continue
       const k = dayKeyInTz(new Date(r.reviewedAt), timezone)
@@ -411,9 +431,9 @@ const statsRouter = os.stats.router({
       srsByDay.set(k, acc)
     }
 
-    const learnedCards = Object.values(srsDb.cards)
-      .filter((c) => (!idSet || idSet.has(c.notebaseId)) && c.reps > 0)
-      .length
+    const learnedCards = Object.values(srsDb.cards).filter(
+      (c) => (!idSet || idSet.has(c.notebaseId)) && c.reps > 0,
+    ).length
 
     const notebaseByDay = new Map<string, number>()
     for (const nb of Object.values(nbDb.notebases)) {
@@ -450,8 +470,10 @@ const statsRouter = os.stats.router({
     let baseTotal = 0
     for (const r of db.revlogs) {
       if (idSet && !idSet.has(r.notebaseId)) continue
-      const crossedUp = r.stability < LONG_TERM_STABILITY_DAYS && r.afterStability >= LONG_TERM_STABILITY_DAYS
-      const crossedDown = r.stability >= LONG_TERM_STABILITY_DAYS && r.afterStability < LONG_TERM_STABILITY_DAYS
+      const crossedUp =
+        r.stability < LONG_TERM_STABILITY_DAYS && r.afterStability >= LONG_TERM_STABILITY_DAYS
+      const crossedDown =
+        r.stability >= LONG_TERM_STABILITY_DAYS && r.afterStability < LONG_TERM_STABILITY_DAYS
       if (!crossedUp && !crossedDown) continue
 
       const k = dayKeyInTz(new Date(r.reviewedAt), timezone)
@@ -483,7 +505,10 @@ const statsRouter = os.stats.router({
       if (idSet && !idSet.has(nb.id)) continue
       for (const row of nb.notebaseRows) {
         const k = dayKeyInTz(new Date(row.createdAt), timezone)
-        if (from && k < from) { baseTotal += 1; continue }
+        if (from && k < from) {
+          baseTotal += 1
+          continue
+        }
         if (k > to) continue
         deltaByDay.set(k, (deltaByDay.get(k) ?? 0) + 1)
       }

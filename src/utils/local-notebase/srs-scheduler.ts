@@ -5,15 +5,10 @@
  * 本文件只负责「契约的数据结构 ⇄ FSRS 的数据结构」之间的转换。
  */
 
-import {
-  createEmptyCard,
-  fsrs,
-  generatorParameters,
-  Rating,
-  State,
-} from "ts-fsrs"
 import type { Card as FsrsCard, Grade, RecordLogItem } from "ts-fsrs"
 import type { LocalCard } from "./srs-storage"
+import { createEmptyCard, fsrs, generatorParameters, Rating, State } from "ts-fsrs"
+import { cellToText } from "@/utils/notebase/cell-text"
 
 export type ReviewRating = "again" | "hard" | "good" | "easy"
 
@@ -53,15 +48,17 @@ export interface SchedulingParams {
 }
 
 function buildScheduler(params: SchedulingParams) {
-  return fsrs(generatorParameters({
-    request_retention: params.desiredRetention,
-    maximum_interval: params.maximumInterval,
-    enable_short_term: params.enableShortTerm,
-    enable_fuzz: params.enableFuzz,
-    learning_steps: params.learningSteps as never,
-    relearning_steps: params.relearningSteps as never,
-    ...(params.weights?.length ? { w: params.weights } : {}),
-  }))
+  return fsrs(
+    generatorParameters({
+      request_retention: params.desiredRetention,
+      maximum_interval: params.maximumInterval,
+      enable_short_term: params.enableShortTerm,
+      enable_fuzz: params.enableFuzz,
+      learning_steps: params.learningSteps as never,
+      relearning_steps: params.relearningSteps as never,
+      ...(params.weights?.length ? { w: params.weights } : {}),
+    }),
+  )
 }
 
 /** 本地卡片 → FSRS 卡片 */
@@ -80,14 +77,21 @@ function toFsrsCard(card: LocalCard): FsrsCard {
     state: NAME_TO_FSRS_STATE[card.state],
     last_review: card.lastReviewTime ? new Date(card.lastReviewTime) : undefined,
     learning_steps: card.step,
-  } as FsrsCard
+  }
 }
 
 export interface ScheduleResult {
   card: Pick<
     LocalCard,
-    | "state" | "scheduleStatus" | "dueAt" | "lastReviewTime"
-    | "stability" | "difficulty" | "step" | "lapses" | "reps"
+    | "state"
+    | "scheduleStatus"
+    | "dueAt"
+    | "lastReviewTime"
+    | "stability"
+    | "difficulty"
+    | "step"
+    | "lapses"
+    | "reps"
   >
   snapshot: Record<string, unknown>
 }
@@ -103,11 +107,7 @@ export function scheduleReview(
   reviewedAt: Date,
 ): ScheduleResult {
   const scheduler = buildScheduler(params)
-  const result: RecordLogItem = scheduler.next(
-    toFsrsCard(card),
-    reviewedAt,
-    RATING_TO_FSRS[rating],
-  )
+  const result: RecordLogItem = scheduler.next(toFsrsCard(card), reviewedAt, RATING_TO_FSRS[rating])
 
   const next = result.card
   const state = FSRS_STATE_TO_NAME[next.state] ?? "review"
@@ -161,13 +161,12 @@ export function initialCardMemory(now: Date) {
 export function renderPattern(
   pattern: string,
   cells: Record<string, unknown>,
-  columns: { id: string, name: string }[],
+  columns: { id: string; name: string }[],
 ): string {
   return pattern.replace(/\{\{([^}]+)\}\}/g, (_, rawName: string) => {
     const name = rawName.trim()
     const col = columns.find((c) => c.name === name || c.id === name)
     if (!col) return ""
-    const v = cells[col.id]
-    return v == null ? "" : String(v)
+    return cellToText(cells[col.id])
   })
 }

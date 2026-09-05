@@ -11,12 +11,7 @@ export function APIConfigWarning({ className }: { className?: string }) {
       )}
     >
       {i18n.t("noAPIKeyConfig.warningWithLink.youMust")}{" "}
-      <a
-        href="#/api-providers"
-        target="_blank"
-        rel="noreferrer"
-        className="underline"
-      >
+      <a href="#/api-providers" target="_blank" rel="noreferrer" className="underline">
         {i18n.t("noAPIKeyConfig.warningWithLink.setTheAPIKey")}
       </a>{" "}
       {i18n.t("noAPIKeyConfig.warningWithLink.firstOnThe")}{" "}

@@ -62,7 +62,7 @@ describe("analytics helpers", () => {
         finishedAt: 600,
         action_id: "dictionary",
         action_name: "Dictionary",
-        provider: "read-frog-built-in-ai",
+        provider: "yangzihao-dic-built-in-ai",
         backend_kind: "llm",
       }),
     ).toEqual({
@@ -72,7 +72,7 @@ describe("analytics helpers", () => {
       latency_ms: 500,
       action_id: "dictionary",
       action_name: "Dictionary",
-      provider: "read-frog-built-in-ai",
+      provider: "yangzihao-dic-built-in-ai",
       backend_kind: "llm",
     })
   })

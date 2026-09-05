@@ -21,7 +21,7 @@ const localRef: SerializableProviderRef = {
 
 const hostedRef: SerializableProviderRef = {
   kind: "system",
-  providerId: "read-frog-advance-ai",
+  providerId: "yangzihao-dic-advance-ai",
   modelTier: "advance",
   modelRevision: "advance-r1",
 }

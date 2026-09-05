@@ -78,13 +78,17 @@ describe("isProviderIdDurablyUnusable", () => {
   it("reports a built-in walled off by plan", () => {
     const status = statusWith(tier({ unavailableReason: "ultra_required" }))
 
-    expect(isProviderIdDurablyUnusable("read-frog-free-ai", "pageTranslation", status)).toBe(true)
+    expect(isProviderIdDurablyUnusable("yangzihao-dic-free-ai", "pageTranslation", status)).toBe(
+      true,
+    )
   })
 
   it("keeps a built-in usable while its quota is merely exhausted", () => {
     const status = statusWith(tier({ available: false, unavailableReason: "quota_exhausted" }))
 
-    expect(isProviderIdDurablyUnusable("read-frog-free-ai", "pageTranslation", status)).toBe(false)
+    expect(isProviderIdDurablyUnusable("yangzihao-dic-free-ai", "pageTranslation", status)).toBe(
+      false,
+    )
   })
 })
 
@@ -109,8 +113,8 @@ describe("getUsableProviderIdsForCapability", () => {
 
   it("counts the built-ins when there is no status to judge them by", () => {
     expect(getUsableProviderIdsForCapability("pageTranslation", [], undefined)).toEqual([
-      "read-frog-free-ai",
-      "read-frog-advance-ai",
+      "yangzihao-dic-free-ai",
+      "yangzihao-dic-advance-ai",
     ])
   })
 })
@@ -126,7 +130,7 @@ describe("canProviderRefGenerateText", () => {
     expect(
       canProviderRefGenerateText({
         kind: "system",
-        providerId: "read-frog-free-ai",
+        providerId: "yangzihao-dic-free-ai",
         modelTier: "normal",
         modelRevision: "r1",
       }),

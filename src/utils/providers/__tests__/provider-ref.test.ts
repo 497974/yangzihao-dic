@@ -13,7 +13,7 @@ const { HostedAiProviderUnavailableError, serializeProviderRef } = await import(
 
 const SYSTEM_PROVIDER: SystemProviderRef = {
   kind: "system",
-  id: "read-frog-free-ai",
+  id: "yangzihao-dic-free-ai",
   name: "Built-in AI",
   modelTier: "normal",
 }
@@ -76,7 +76,7 @@ describe("serializeProviderRef status coalescing", () => {
     for (const ref of [page, subtitles, segmentation]) {
       expect(ref).toEqual({
         kind: "system",
-        providerId: "read-frog-free-ai",
+        providerId: "yangzihao-dic-free-ai",
         modelTier: "normal",
         modelRevision: "normal-r7",
       })

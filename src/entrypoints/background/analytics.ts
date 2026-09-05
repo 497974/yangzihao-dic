@@ -289,7 +289,10 @@ export function filterAnalyticsCaptureResult(data: CaptureResult | null): Captur
 
   const filteredData = {
     ...data,
-    properties: sanitizeAnalyticsProperties(data.properties ?? {}, true),
+    properties: sanitizeAnalyticsProperties(
+      (data.properties ?? {}) as AnalyticsCaptureProperties,
+      true,
+    ),
   }
 
   const mutableFilteredData = filteredData as CaptureResult & {

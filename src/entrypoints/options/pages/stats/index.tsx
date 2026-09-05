@@ -16,7 +16,10 @@ const BAR_DAYS = 14
 
 function dayKey(d: Date, timezone: string): string {
   return new Intl.DateTimeFormat("en-CA", {
-    timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit",
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
   }).format(d)
 }
 
@@ -30,12 +33,14 @@ export function StatsPage() {
   const from = useMemo(() => dayKey(daysAgo(WINDOW_DAYS - 1), timezone), [timezone])
 
   const { data, isPending } = useQuery({
-    queryKey: ["stats-activity", from, to],
+    // timezone 也要进 key：from/to 是按它算出来的，跨时区时同样的 from/to
+    // 字符串可能对应不同的日界，不带上它缓存会串
+    queryKey: ["stats-activity", from, to, timezone],
     queryFn: () => orpcClient.stats.activity({ from, to, timezone }),
   })
 
   const dailyMap = useMemo(() => {
-    const m = new Map<string, { answers: number, durationMs: number }>()
+    const m = new Map<string, { answers: number; durationMs: number }>()
     for (const d of data?.srs.daily ?? []) m.set(d.date, d)
     return m
   }, [data])
@@ -64,7 +69,7 @@ export function StatsPage() {
   const learnedCards = data?.srs.learnedCards ?? 0
 
   const bars = useMemo(() => {
-    const out: { date: string, answers: number }[] = []
+    const out: { date: string; answers: number }[] = []
     for (let i = BAR_DAYS - 1; i >= 0; i--) {
       const k = dayKey(daysAgo(i), timezone)
       out.push({ date: k, answers: dailyMap.get(k)?.answers ?? 0 })
@@ -76,63 +81,77 @@ export function StatsPage() {
   return (
     <PageLayout title="学习统计" description="每天学了多少、复习了多少，全部记录在本机">
       <div className="mx-auto flex max-w-2xl flex-col gap-6">
-        {isPending
-          ? <div className="py-16 text-center text-muted-foreground">加载中…</div>
-          : (
-              <>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <StatCard label="今日复习" value={todayAnswers} unit="次" />
-                  <StatCard label="今日用时" value={todayMinutes} unit="分钟" />
-                  <StatCard label="连续学习" value={streak} unit="天" accent={streak > 0} />
-                  <StatCard label="已学单词" value={learnedCards} unit="个" />
+        {isPending ? (
+          <div className="py-16 text-center text-muted-foreground">加载中…</div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <StatCard label="今日复习" value={todayAnswers} unit="次" />
+              <StatCard label="今日用时" value={todayMinutes} unit="分钟" />
+              <StatCard label="连续学习" value={streak} unit="天" accent={streak > 0} />
+              <StatCard label="已学单词" value={learnedCards} unit="个" />
+            </div>
+
+            <section className="rounded-xl border bg-card p-5">
+              <h3 className="mb-4 text-sm font-medium text-muted-foreground">最近 14 天复习量</h3>
+              <div className="flex h-32 items-end gap-1.5">
+                {bars.map((b) => (
+                  <div key={b.date} className="flex flex-1 flex-col items-center gap-1.5">
+                    <div
+                      className={`w-full rounded-t transition-all ${
+                        b.answers > 0 ? "bg-primary" : "bg-muted"
+                      }`}
+                      style={{
+                        height: `${Math.max((b.answers / maxBar) * 100, b.answers > 0 ? 6 : 2)}%`,
+                      }}
+                      title={`${b.date}：${b.answers} 次`}
+                    />
+                    <span className="text-[10px] text-muted-foreground">
+                      {b.date.slice(5).replace("-", "/")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl border bg-card p-5">
+                <div className="text-2xl font-semibold">{totalAnswers}</div>
+                <div className="mt-1 text-sm text-muted-foreground">
+                  近 {WINDOW_DAYS} 天累计复习次数
                 </div>
+              </div>
+              <div className="rounded-xl border bg-card p-5">
+                <div className="text-2xl font-semibold">{totalNewWords}</div>
+                <div className="mt-1 text-sm text-muted-foreground">
+                  近 {WINDOW_DAYS} 天新增生词
+                </div>
+              </div>
+            </section>
 
-                <section className="rounded-xl border bg-card p-5">
-                  <h3 className="mb-4 text-sm font-medium text-muted-foreground">最近 14 天复习量</h3>
-                  <div className="flex h-32 items-end gap-1.5">
-                    {bars.map((b) => (
-                      <div key={b.date} className="flex flex-1 flex-col items-center gap-1.5">
-                        <div
-                          className={`w-full rounded-t transition-all ${
-                            b.answers > 0 ? "bg-primary" : "bg-muted"
-                          }`}
-                          style={{ height: `${Math.max((b.answers / maxBar) * 100, b.answers > 0 ? 6 : 2)}%` }}
-                          title={`${b.date}：${b.answers} 次`}
-                        />
-                        <span className="text-[10px] text-muted-foreground">
-                          {b.date.slice(5).replace("-", "/")}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="grid grid-cols-2 gap-3">
-                  <div className="rounded-xl border bg-card p-5">
-                    <div className="text-2xl font-semibold">{totalAnswers}</div>
-                    <div className="mt-1 text-sm text-muted-foreground">近 {WINDOW_DAYS} 天累计复习次数</div>
-                  </div>
-                  <div className="rounded-xl border bg-card p-5">
-                    <div className="text-2xl font-semibold">{totalNewWords}</div>
-                    <div className="mt-1 text-sm text-muted-foreground">近 {WINDOW_DAYS} 天新增生词</div>
-                  </div>
-                </section>
-
-                {totalAnswers === 0 && (
-                  <div className="rounded-xl border border-dashed py-10 text-center text-sm text-muted-foreground">
-                    还没有复习记录——去「闪卡复习」开始第一轮吧
-                  </div>
-                )}
-              </>
+            {totalAnswers === 0 && (
+              <div className="rounded-xl border border-dashed py-10 text-center text-sm text-muted-foreground">
+                还没有复习记录——去「闪卡复习」开始第一轮吧
+              </div>
             )}
+          </>
+        )}
       </div>
     </PageLayout>
   )
 }
 
 function StatCard({
-  label, value, unit, accent,
-}: { label: string, value: number, unit: string, accent?: boolean }) {
+  label,
+  value,
+  unit,
+  accent,
+}: {
+  label: string
+  value: number
+  unit: string
+  accent?: boolean
+}) {
   return (
     <div className="rounded-xl border bg-card p-4">
       <div className={`text-2xl font-semibold ${accent ? "text-primary" : ""}`}>

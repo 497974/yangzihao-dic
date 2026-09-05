@@ -11,7 +11,7 @@ export interface LocalCardTemplate {
   id: string
   notebaseId: string
   name: string
-  config: { type: "basic", frontPattern: string, backPattern: string }
+  config: { type: "basic"; frontPattern: string; backPattern: string }
   createdAt: string
   updatedAt: string
 }

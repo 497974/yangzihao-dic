@@ -29,7 +29,7 @@ const { HostedAiProviderUnavailableError } = await import("@/utils/providers/pro
 
 const BUILT_IN_PROVIDER = {
   kind: "system" as const,
-  id: "read-frog-free-ai" as const,
+  id: "yangzihao-dic-free-ai" as const,
   name: "Built-in AI",
   modelTier: "normal" as const,
 }
@@ -41,7 +41,7 @@ describe("subtitles provider ref resolution under a hosted denial", () => {
       ...DEFAULT_CONFIG,
       videoSubtitles: {
         ...DEFAULT_CONFIG.videoSubtitles,
-        providerId: "read-frog-free-ai",
+        providerId: "yangzihao-dic-free-ai",
       },
     })
   })

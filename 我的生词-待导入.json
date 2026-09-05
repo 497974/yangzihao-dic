@@ -10,13 +10,8 @@
       "srsDesiredRetention": 0.9,
       "srsEnableShortTerm": true,
       "srsMaximumInterval": 36500,
-      "srsLearningSteps": [
-        "1m",
-        "10m"
-      ],
-      "srsRelearningSteps": [
-        "10m"
-      ],
+      "srsLearningSteps": ["1m", "10m"],
+      "srsRelearningSteps": ["10m"],
       "srsLeechThreshold": 8,
       "srsEnableFuzz": false,
       "srsWeights": null,

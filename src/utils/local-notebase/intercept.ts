@@ -8,9 +8,9 @@
  * 因此本扩展不需要任何服务器，也不需要联网账号。
  */
 
+import type { ProxyRequest, ProxyResponse } from "@/types/proxy-fetch"
 import { RPCHandler } from "@orpc/server/fetch"
 import { AUTH_BASE_PATH, ORPC_PREFIX } from "@read-frog/definitions"
-import type { ProxyResponse } from "@/types/proxy-fetch"
 import { localNotebaseRouter } from "./router"
 import { localSrsRouter } from "./srs-router"
 
@@ -35,7 +35,7 @@ function jsonResponse(data: unknown, status = 200): ProxyResponse {
   return {
     status,
     statusText: status === 200 ? "OK" : "Error",
-    headers: { "content-type": "application/json" },
+    headers: [["content-type", "application/json"]],
     body: JSON.stringify(data),
   }
 }
@@ -53,12 +53,7 @@ export function isLocalApiRequest(url: string): boolean {
   }
 }
 
-export async function handleLocalApiRequest(input: {
-  url: string
-  method?: string
-  headers?: Record<string, string>
-  body?: string
-}): Promise<ProxyResponse> {
+export async function handleLocalApiRequest(input: ProxyRequest): Promise<ProxyResponse> {
   const { pathname } = new URL(input.url)
 
   // ── 身份：永远已登录 ──────────────────────────────────
@@ -93,10 +88,9 @@ export async function handleLocalApiRequest(input: {
     return jsonResponse({ message: "Not found" }, 404)
   }
 
-  const headers: Record<string, string> = {}
-  response.headers.forEach((v, k) => {
-    headers[k] = v
-  })
+  // ProxyResponse.headers 的契约是键值对数组（见 types/proxy-fetch.ts），
+  // 跟 proxy-fetch.ts 里真实网络分支的产出保持同一形状
+  const headers: [string, string][] = [...response.headers.entries()]
 
   return {
     status: response.status,
