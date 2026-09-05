@@ -33,19 +33,19 @@ describe("spinner", () => {
 
     ensurePresetStylesMock.mockImplementation((root: Document | ShadowRoot) => {
       expect(root).toBe(document)
-      expect(wrapper.querySelector(".read-frog-spinner")).toBeNull()
+      expect(wrapper.querySelector(".yangzihao-dic-spinner")).toBeNull()
 
       const style = document.createElement("style")
-      style.id = "read-frog-preset-styles"
+      style.id = "yangzihao-dic-preset-styles"
       document.head.appendChild(style)
     })
 
     const spinner = createSpinnerInside(wrapper)
 
     expect(ensurePresetStylesMock).toHaveBeenCalledOnce()
-    expect(document.head.querySelector("#read-frog-preset-styles")).not.toBeNull()
+    expect(document.head.querySelector("#yangzihao-dic-preset-styles")).not.toBeNull()
     expect(wrapper.lastElementChild).toBe(spinner)
-    expect(spinner.className).toBe("read-frog-spinner")
+    expect(spinner.className).toBe("yangzihao-dic-spinner")
   }, 10_000)
 
   it("ensures preset styles on the containing shadow root before appending the spinner", () => {
@@ -56,25 +56,25 @@ describe("spinner", () => {
 
     ensurePresetStylesMock.mockImplementation((root: Document | ShadowRoot) => {
       expect(root).toBe(shadow)
-      expect(wrapper.querySelector(".read-frog-spinner")).toBeNull()
+      expect(wrapper.querySelector(".yangzihao-dic-spinner")).toBeNull()
 
       const style = document.createElement("style")
-      style.id = "read-frog-preset-styles"
+      style.id = "yangzihao-dic-preset-styles"
       shadow.appendChild(style)
     })
 
     const spinner = createSpinnerInside(wrapper)
 
     expect(ensurePresetStylesMock).toHaveBeenCalledOnce()
-    expect(shadow.querySelector("#read-frog-preset-styles")).not.toBeNull()
+    expect(shadow.querySelector("#yangzihao-dic-preset-styles")).not.toBeNull()
     expect(wrapper.lastElementChild).toBe(spinner)
-    expect(spinner.className).toBe("read-frog-spinner")
+    expect(spinner.className).toBe("yangzihao-dic-spinner")
   }, 10_000)
 
   it("uses a thin gray spinner arc without a background ring", () => {
     const spinner = createLightweightSpinner(document)
 
-    expect(spinner.style.borderTopColor).toBe("var(--read-frog-muted-foreground)")
+    expect(spinner.style.borderTopColor).toBe("var(--yangzihao-dic-muted-foreground)")
     expect(spinner.style.borderRightColor).toBe("transparent")
     expect(spinner.style.borderBottomColor).toBe("transparent")
     expect(spinner.style.borderLeftColor).toBe("transparent")
@@ -107,7 +107,7 @@ describe("spinner", () => {
     const spinner = createLightweightSpinner(document)
 
     expect(animateMock).not.toHaveBeenCalled()
-    expect(spinner.style.borderTopColor).toBe("var(--read-frog-muted-foreground)")
+    expect(spinner.style.borderTopColor).toBe("var(--yangzihao-dic-muted-foreground)")
   })
 })
 
@@ -176,7 +176,7 @@ describe("spinner animation registry (#1881)", () => {
     // Above the cap: static muted ring, no new animation.
     const overCap = makeSpinner()
     expect(animateMock).toHaveBeenCalledTimes(MAX_ANIMATED_SPINNERS)
-    expect(overCap.style.borderTopColor).toBe("var(--read-frog-muted-foreground)")
+    expect(overCap.style.borderTopColor).toBe("var(--yangzihao-dic-muted-foreground)")
 
     // Cancelling one frees a slot for the next spinner.
     cancelSpinnerAnimation(createdSpinners[0]!)

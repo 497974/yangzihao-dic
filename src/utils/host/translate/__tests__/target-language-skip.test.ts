@@ -95,7 +95,7 @@ describe.each(["bilingual", "translationOnly"] as const)("%s translation", (mode
     expect(mocks.translateTextForPage).not.toHaveBeenCalled()
     // The old behavior inserted a wrapper+spinner and then removed it; now the
     // DOM must never contain one at all.
-    expect(document.querySelectorAll(".read-frog-translated-content-wrapper").length).toBe(0)
+    expect(document.querySelectorAll(".yangzihao-dic-translated-content-wrapper").length).toBe(0)
   })
 
   it("still requests a translation for a different-language paragraph", async () => {

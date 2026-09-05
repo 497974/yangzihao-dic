@@ -803,7 +803,7 @@ describe("translate", () => {
             const wrapper = document.createElement("span")
             wrapper.className = `notranslate ${CONTENT_WRAPPER_CLASS}`
             wrapper.setAttribute(VIRTUAL_PARAGRAPH_ATTRIBUTE, `orphan:${index}`)
-            wrapper.setAttribute("data-read-frog-translation-mode", "bilingual")
+            wrapper.setAttribute("data-yangzihao-dic-translation-mode", "bilingual")
             wrapper.textContent = `Old translation ${index + 1}`
             return wrapper
           })

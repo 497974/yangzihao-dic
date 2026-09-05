@@ -122,6 +122,9 @@ describe("dEFAULT_CONFIG", () => {
     const { buildFreshDefaultConfig, createDefaultDictionaryAction, DEFAULT_CONFIG } =
       await import("../config")
     const { configSchema } = await import("@/types/config/config")
+    // 本分叉的内置词典默认走免密钥的 Microsoft Translate（上游默认是需要订阅的
+    // 内置 AI，本项目已移除）。从常量取值而不是写死字符串，默认值再变也不会漂移。
+    const { MICROSOFT_TRANSLATE_PROVIDER_ID } = await import("../providers")
 
     const config = buildFreshDefaultConfig()
 
@@ -131,7 +134,7 @@ describe("dEFAULT_CONFIG", () => {
     )
     expect(config.selectionToolbar.builtInActions.dictionary).toEqual({
       enabled: true,
-      providerId: "read-frog-free-ai",
+      providerId: MICROSOFT_TRANSLATE_PROVIDER_ID,
     })
     expect(config.selectionToolbar.customActions).toEqual([])
     expect(createDefaultDictionaryAction()).toEqual(

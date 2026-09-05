@@ -60,19 +60,19 @@ describe("v095 to v096 migration", () => {
   it("falls back to the built-in AI provider when the translate provider is not an LLM", () => {
     const result = migrate(configWithTranslateProvider("microsoft-translate-default"))
 
-    expect(result.selectionToolbar.noteSuggestion.providerId).toBe("read-frog-ultra-ai")
+    expect(result.selectionToolbar.noteSuggestion.providerId).toBe("yangzihao-dic-ultra-ai")
   })
 
   it("falls back to the built-in AI provider when the translate LLM provider is disabled", () => {
     const result = migrate(configWithTranslateProvider("deepseek-disabled"))
 
-    expect(result.selectionToolbar.noteSuggestion.providerId).toBe("read-frog-ultra-ai")
+    expect(result.selectionToolbar.noteSuggestion.providerId).toBe("yangzihao-dic-ultra-ai")
   })
 
   it("falls back to the built-in AI provider when the translate provider id is unknown", () => {
     const result = migrate(configWithTranslateProvider("missing-provider"))
 
-    expect(result.selectionToolbar.noteSuggestion.providerId).toBe("read-frog-ultra-ai")
+    expect(result.selectionToolbar.noteSuggestion.providerId).toBe("yangzihao-dic-ultra-ai")
   })
 
   it("leaves the rest of the config untouched and does not mutate the input", () => {
@@ -105,7 +105,7 @@ describe("v095 to v096 migration", () => {
         noteSuggestion: {
           enabled: true,
           actionId: "default-dictionary",
-          providerId: "read-frog-ultra-ai",
+          providerId: "yangzihao-dic-ultra-ai",
         },
       },
     }

@@ -8,10 +8,10 @@ import { deepQueryTopLevelSelector } from "../find"
 import { walkAndLabelElement, walkAndLabelElementChunked } from "../traversal"
 
 const WALK_ATTRIBUTES = [
-  "data-read-frog-walked",
-  "data-read-frog-paragraph",
-  "data-read-frog-block-node",
-  "data-read-frog-inline-node",
+  "data-yangzihao-dic-walked",
+  "data-yangzihao-dic-paragraph",
+  "data-yangzihao-dic-block-node",
+  "data-yangzihao-dic-inline-node",
 ] as const
 
 function config(): Config {
@@ -76,7 +76,7 @@ function snapshotLabels(root: HTMLElement, walkId: string): string[] {
       const value = element.getAttribute(attribute)
       if (value === null) return `${attribute}=∅`
       // Normalize walk ids so runs with different ids compare equal.
-      return attribute === "data-read-frog-walked"
+      return attribute === "data-yangzihao-dic-walked"
         ? `${attribute}=${value === walkId ? "SET" : "OTHER"}`
         : `${attribute}=${value}`
     }).join(" ")
@@ -111,13 +111,17 @@ describe("walkAndLabelElementChunked parity", () => {
       snapshotLabels(syncHost, "sync-walk"),
     )
     for (const host of [syncHost, chunkedHost]) {
-      expect(host.querySelector(".style-block-only")).toHaveAttribute("data-read-frog-inline-node")
-      expect(host.querySelector(".style-block-only")).not.toHaveAttribute(
-        "data-read-frog-block-node",
+      expect(host.querySelector(".style-block-only")).toHaveAttribute(
+        "data-yangzihao-dic-inline-node",
       )
-      expect(host.querySelector(".style-inline-only")).toHaveAttribute("data-read-frog-block-node")
+      expect(host.querySelector(".style-block-only")).not.toHaveAttribute(
+        "data-yangzihao-dic-block-node",
+      )
+      expect(host.querySelector(".style-inline-only")).toHaveAttribute(
+        "data-yangzihao-dic-block-node",
+      )
       expect(host.querySelector(".style-inline-only")).not.toHaveAttribute(
-        "data-read-frog-inline-node",
+        "data-yangzihao-dic-inline-node",
       )
     }
 
@@ -163,16 +167,16 @@ describe("walkAndLabelElementChunked parity", () => {
 
     expect(result).toBeNull()
 
-    const walked = host.querySelectorAll('[data-read-frog-walked="aborted-walk"]').length
+    const walked = host.querySelectorAll('[data-yangzihao-dic-walked="aborted-walk"]').length
     const total = host.querySelectorAll("*").length
     // A prefix was labeled, the rest was never touched, and no element got a
     // paragraph/block/inline label without the walked marker.
     expect(walked).toBeGreaterThan(0)
     expect(walked).toBeLessThan(total)
     for (const labeled of host.querySelectorAll(
-      "[data-read-frog-paragraph], [data-read-frog-block-node], [data-read-frog-inline-node]",
+      "[data-yangzihao-dic-paragraph], [data-yangzihao-dic-block-node], [data-yangzihao-dic-inline-node]",
     )) {
-      expect(labeled.getAttribute("data-read-frog-walked")).toBe("aborted-walk")
+      expect(labeled.getAttribute("data-yangzihao-dic-walked")).toBe("aborted-walk")
     }
 
     host.remove()
@@ -191,7 +195,7 @@ describe("walkAndLabelElementChunked parity", () => {
 
     expect(result).toEqual({ forceBlock: false, isInlineNode: false })
     expect(reported).toEqual([host])
-    expect(host.hasAttribute("data-read-frog-walked")).toBe(false)
+    expect(host.hasAttribute("data-yangzihao-dic-walked")).toBe(false)
 
     host.remove()
   })

@@ -23,13 +23,13 @@ vi.mock("../translation-state", () => ({
 function buildParagraphTree(childCount: number): HTMLElement {
   const container = document.createElement("div")
   container.setAttribute(WALKED_ATTRIBUTE, "walk-1")
-  container.setAttribute("data-read-frog-paragraph", "")
-  container.setAttribute("data-read-frog-block-node", "")
+  container.setAttribute("data-yangzihao-dic-paragraph", "")
+  container.setAttribute("data-yangzihao-dic-block-node", "")
   for (let i = 0; i < childCount; i++) {
     const p = document.createElement("p")
     p.setAttribute(WALKED_ATTRIBUTE, "walk-1")
-    p.setAttribute("data-read-frog-paragraph", "")
-    p.setAttribute("data-read-frog-block-node", "")
+    p.setAttribute("data-yangzihao-dic-paragraph", "")
+    p.setAttribute("data-yangzihao-dic-block-node", "")
     p.textContent = `paragraph ${i}`
     container.append(p)
   }

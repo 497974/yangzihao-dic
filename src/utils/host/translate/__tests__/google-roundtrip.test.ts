@@ -14,7 +14,7 @@ import { executeTranslate } from "../execute-translate"
 // must therefore return the original text byte-for-byte only when the request
 // was escaped and, for multi-line text, marker-joined with indentation and
 // bullet prefixes captured client-side.
-const LINE_BREAK_MARKER = '<br data-read-frog-lb="1">'
+const LINE_BREAK_MARKER = '<br data-yangzihao-dic-lb="1">'
 
 function simulateTranslateHtmlEndpoint(requestText: string): string {
   return requestText

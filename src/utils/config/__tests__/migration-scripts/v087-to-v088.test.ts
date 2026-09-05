@@ -237,7 +237,7 @@ describe("v087-to-v088 migration", () => {
 
     expect(migrated.selectionToolbar.builtInActions.dictionary).toEqual({
       enabled: false,
-      providerId: "read-frog-free-ai",
+      providerId: "yangzihao-dic-free-ai",
     })
   })
 
@@ -340,8 +340,10 @@ describe("v087-to-v088 migration", () => {
       config({ ...currentDictionary, providerId: "missing-provider", systemPrompt: "modified" }),
     )
 
-    expect(migrated.selectionToolbar.builtInActions.dictionary.providerId).toBe("read-frog-free-ai")
-    expect(migrated.selectionToolbar.customActions[0].providerId).toBe("read-frog-free-ai")
+    expect(migrated.selectionToolbar.builtInActions.dictionary.providerId).toBe(
+      "yangzihao-dic-free-ai",
+    )
+    expect(migrated.selectionToolbar.customActions[0].providerId).toBe("yangzihao-dic-free-ai")
   })
 
   it("uses a collision-safe deterministic custom id and is idempotent", () => {

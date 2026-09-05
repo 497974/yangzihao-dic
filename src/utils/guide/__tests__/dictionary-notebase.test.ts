@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { storage } from "#imports"
+import { env } from "@/env"
 import {
   getActiveGuideDictionaryNotebaseTrackingForAction,
   getGuideDictionaryNotebaseState,
@@ -11,7 +12,11 @@ import {
   startGuideDictionaryNotebaseTracking,
 } from "../dictionary-notebase"
 
-const GUIDE_URL = "https://readfrog.app/guide/step-3"
+// 引导页是否"官方"由 env.WXT_OFFICIAL_SITE_ORIGINS 决定。上游写死的是
+// readfrog.app；本项目不依赖任何远端站点，那个常量已改成占位地址。
+// 从同一处取值，测的才是路径识别逻辑本身，而不是某个品牌域名。
+const OFFICIAL_ORIGIN = env.WXT_OFFICIAL_SITE_ORIGINS[0]!
+const GUIDE_URL = `${OFFICIAL_ORIGIN}/guide/step-3`
 
 function localKey(key: string) {
   return `local:${key}`
@@ -41,25 +46,23 @@ describe("Dictionary Notebase guide tracking", () => {
 
   it("recognizes official guide step 3 routes by pathname suffix", () => {
     expect(isGuideDictionaryNotebaseGuideUrl(GUIDE_URL)).toBe(true)
-    expect(isGuideDictionaryNotebaseGuideUrl("https://readfrog.app/guide/step-3/")).toBe(true)
-    expect(isGuideDictionaryNotebaseGuideUrl("https://readfrog.app/en/guide/step-3")).toBe(true)
-    expect(isGuideDictionaryNotebaseGuideUrl("https://readfrog.app/zh-TW/guide/step-3")).toBe(true)
+    expect(isGuideDictionaryNotebaseGuideUrl(`${OFFICIAL_ORIGIN}/guide/step-3/`)).toBe(true)
+    expect(isGuideDictionaryNotebaseGuideUrl(`${OFFICIAL_ORIGIN}/en/guide/step-3`)).toBe(true)
+    expect(isGuideDictionaryNotebaseGuideUrl(`${OFFICIAL_ORIGIN}/zh-TW/guide/step-3`)).toBe(true)
     expect(
       isGuideDictionaryNotebaseGuideUrl(
-        "https://readfrog.app/fr-CA/guide/step-3/?from=guide#dictionary",
+        `${OFFICIAL_ORIGIN}/fr-CA/guide/step-3/?from=guide#dictionary`,
       ),
     ).toBe(true)
-    expect(isGuideDictionaryNotebaseGuideUrl("https://readfrog.app/docs/guide/step-3")).toBe(true)
-    expect(isGuideDictionaryNotebaseGuideUrl("https://readfrog.app/guide/step-30")).toBe(false)
-    expect(isGuideDictionaryNotebaseGuideUrl("https://readfrog.app/guide/step-3/details")).toBe(
-      false,
-    )
+    expect(isGuideDictionaryNotebaseGuideUrl(`${OFFICIAL_ORIGIN}/docs/guide/step-3`)).toBe(true)
+    expect(isGuideDictionaryNotebaseGuideUrl(`${OFFICIAL_ORIGIN}/guide/step-30`)).toBe(false)
+    expect(isGuideDictionaryNotebaseGuideUrl(`${OFFICIAL_ORIGIN}/guide/step-3/details`)).toBe(false)
     expect(isGuideDictionaryNotebaseGuideUrl("https://example.com/guide/step-3")).toBe(false)
   })
 
   it("starts a short-lived tracking session only from guide step 3", async () => {
     await expect(
-      startGuideDictionaryNotebaseTracking("https://readfrog.app/docs", 1_000),
+      startGuideDictionaryNotebaseTracking(`${OFFICIAL_ORIGIN}/docs`, 1_000),
     ).resolves.toEqual({ completed: false })
     expect(storageSetItemMock).not.toHaveBeenCalled()
 
@@ -96,7 +99,7 @@ describe("Dictionary Notebase guide tracking", () => {
     await expect(
       getActiveGuideDictionaryNotebaseTrackingForAction(
         GUIDE_DICTIONARY_NOTEBASE_ACTION_ID,
-        "https://readfrog.app/docs",
+        `${OFFICIAL_ORIGIN}/docs`,
         2_000,
       ),
     ).resolves.toBeNull()

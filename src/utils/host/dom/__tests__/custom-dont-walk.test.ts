@@ -193,7 +193,7 @@ describe("isSiteRuleExcludedElement", () => {
 
     const config = configWithSiteRules({
       userRules: [],
-      disabledBuiltInRules: ["readfrog-chatgpt", "chatOpenai"],
+      disabledBuiltInRules: ["yangzihao-chatgpt", "chatOpenai"],
     })
 
     const proseMirror = document.createElement("div")

@@ -110,13 +110,6 @@ describe("getUsableProviderIdsForCapability", () => {
     // is non-empty (the built-ins are always in it) but nothing in it can run.
     expect(getUsableProviderIdsForCapability("pageTranslation", [], walledOff)).toEqual([])
   })
-
-  it("counts the built-ins when there is no status to judge them by", () => {
-    expect(getUsableProviderIdsForCapability("pageTranslation", [], undefined)).toEqual([
-      "yangzihao-dic-free-ai",
-      "yangzihao-dic-advance-ai",
-    ])
-  })
 })
 
 describe("canProviderRefGenerateText", () => {

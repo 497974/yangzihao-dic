@@ -42,7 +42,7 @@ describe("getEffectiveSiteRule", () => {
 
   it("resolves built-in rules and honors disabledBuiltInRules", () => {
     const enabled = getEffectiveSiteRule(configWithUserRules([]), "https://github.com/foo")
-    expect(enabled.matchedRuleIds).toContain("readfrog-github")
+    expect(enabled.matchedRuleIds).toContain("yangzihao-github")
     expect(enabled.excludeSelector).toContain("table.diff-table")
     expect(enabled.forceBlockNodeSelector).toContain("task-lists")
     expect(enabled.forceBlockStyleSelector).toContain("task-lists")
@@ -51,9 +51,9 @@ describe("getEffectiveSiteRule", () => {
     expect(enabled.forceInlineStyleSelector).toContain("g-emoji")
 
     const config = configWithUserRules([])
-    config.siteRules.disabledBuiltInRules = ["readfrog-github"]
+    config.siteRules.disabledBuiltInRules = ["yangzihao-github"]
     const disabled = getEffectiveSiteRule(config, "https://github.com/foo")
-    expect(disabled.matchedRuleIds).not.toContain("readfrog-github")
+    expect(disabled.matchedRuleIds).not.toContain("yangzihao-github")
   })
 
   it("returns the same materialized tag set across memoized calls", () => {

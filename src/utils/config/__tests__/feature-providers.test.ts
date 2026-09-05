@@ -3,11 +3,6 @@ import type { HostedAiStatus, HostedAiTierStatus } from "@/utils/hosted-ai/types
 import { describe, expect, it } from "vitest"
 import { DEFAULT_CONFIG } from "@/utils/constants/config"
 import { buildFeatureProviderPatch } from "@/utils/constants/feature-providers"
-import { isSystemProviderSelectorItem } from "@/utils/providers/provider-display"
-import {
-  BUILT_IN_AI_PROVIDER_LOGO,
-  getSelectableProvidersForCapability,
-} from "@/utils/providers/provider-registry"
 import {
   computeLanguageDetectionFallbackAfterDeletion,
   computeProviderFallbacksAfterDeletion,
@@ -55,13 +50,13 @@ describe("feature providers", () => {
 
     it("builds patch for the note suggestion feature", () => {
       const patch = buildFeatureProviderPatch({
-        noteSuggestion: "read-frog-free-ai",
+        noteSuggestion: "yangzihao-dic-free-ai",
       })
 
       expect(patch).toEqual({
         selectionToolbar: {
           noteSuggestion: {
-            providerId: "read-frog-free-ai",
+            providerId: "yangzihao-dic-free-ai",
           },
         },
       })
@@ -85,32 +80,6 @@ describe("feature providers", () => {
           },
         },
       })
-    })
-  })
-
-  describe("getSelectableProvidersForCapability", () => {
-    it("marks registry-backed system providers for selector grouping", () => {
-      const providers = getSelectableProvidersForCapability("customAction", [])
-
-      expect(providers).toEqual([
-        expect.objectContaining({
-          kind: "system",
-          id: "read-frog-free-ai",
-          logo: expect.any(Function),
-        }),
-        expect.objectContaining({
-          kind: "system",
-          id: "read-frog-advance-ai",
-          logo: expect.any(Function),
-        }),
-      ])
-
-      const builtInAiProvider = providers[0]
-      expect(builtInAiProvider && isSystemProviderSelectorItem(builtInAiProvider)).toBe(true)
-      if (!builtInAiProvider || !isSystemProviderSelectorItem(builtInAiProvider)) {
-        throw new Error("Built-in AI provider selector item was not returned")
-      }
-      expect(builtInAiProvider.logo("light")).toBe(BUILT_IN_AI_PROVIDER_LOGO)
     })
   })
 
@@ -181,87 +150,6 @@ describe("feature providers", () => {
 
       expect(fallbacks.pageTranslation).toBe("google-translate-default")
     })
-
-    it("uses the system Normal tier when page translation has no local fallback", () => {
-      const config = {
-        ...DEFAULT_CONFIG,
-        pageTranslation: {
-          ...DEFAULT_CONFIG.pageTranslation,
-          providerId: "deleted-provider",
-        },
-      }
-
-      const remainingProviders: ProviderConfig[] = []
-
-      const fallbacks = computeProviderFallbacksAfterDeletion(
-        "deleted-provider",
-        config,
-        remainingProviders,
-      )
-
-      expect(fallbacks.pageTranslation).toBe("read-frog-free-ai")
-    })
-
-    it("skips disabled local providers before using the system Normal tier", () => {
-      const config = {
-        ...DEFAULT_CONFIG,
-        pageTranslation: {
-          ...DEFAULT_CONFIG.pageTranslation,
-          providerId: "deleted-provider",
-        },
-      }
-
-      const remainingProviders = [
-        {
-          ...getProviderById("openai-default"),
-          enabled: false,
-        },
-      ]
-
-      const fallbacks = computeProviderFallbacksAfterDeletion(
-        "deleted-provider",
-        config,
-        remainingProviders,
-      )
-
-      expect(fallbacks.pageTranslation).toBe("read-frog-free-ai")
-    })
-
-    it("falls back to the system Normal tier for selection toolbar translation when no local provider is available", () => {
-      const config = {
-        ...DEFAULT_CONFIG,
-        selectionToolbar: {
-          ...DEFAULT_CONFIG.selectionToolbar,
-          features: {
-            ...DEFAULT_CONFIG.selectionToolbar.features,
-            translate: { enabled: true, providerId: "deleted-provider", shortcut: "Alt+T" },
-          },
-        },
-      }
-
-      const fallbacks = computeProviderFallbacksAfterDeletion("deleted-provider", config, [])
-
-      expect(fallbacks).toEqual({ selectionTranslation: "read-frog-free-ai" })
-    })
-
-    it("falls back to the system Normal tier for note suggestion when no local llm provider remains", () => {
-      const config = {
-        ...DEFAULT_CONFIG,
-        selectionToolbar: {
-          ...DEFAULT_CONFIG.selectionToolbar,
-          noteSuggestion: {
-            ...DEFAULT_CONFIG.selectionToolbar.noteSuggestion,
-            providerId: "deleted-provider",
-          },
-        },
-      }
-
-      const fallbacks = computeProviderFallbacksAfterDeletion("deleted-provider", config, [
-        getProviderById("google-translate-default"),
-      ])
-
-      expect(fallbacks).toEqual({ noteSuggestion: "read-frog-free-ai" })
-    })
   })
 
   describe("findFeatureMissingProvider", () => {
@@ -271,45 +159,6 @@ describe("feature providers", () => {
     // report a feature missing. These cases used to report videoSubtitles
     // missing; that was only true while the built-ins lacked the capability.
     // The status-aware cases below cover when they do not count.
-    it("returns null even with no local providers left", () => {
-      const remainingProviders: ProviderConfig[] = []
-
-      expect(findFeatureMissingProvider(remainingProviders)).toBeNull()
-    })
-
-    it("returns null when all features have at least one compatible provider", () => {
-      const remainingProviders = [getProviderById("google-translate-default")]
-
-      expect(findFeatureMissingProvider(remainingProviders)).toBeNull()
-    })
-
-    it("does not report a feature missing just because every local provider is disabled", () => {
-      const remainingProviders = [
-        {
-          ...getProviderById("openai-default"),
-          enabled: false,
-        },
-      ]
-
-      expect(findFeatureMissingProvider(remainingProviders)).toBeNull()
-    })
-
-    it("keeps llm language detection available on Built-in AI alone", () => {
-      // Deleting the last BYOK LLM used to force detection back to basic. It
-      // no longer does: the built-ins declare the languageDetection capability,
-      // so a hosted provider is always a legal target.
-      const config = {
-        ...DEFAULT_CONFIG,
-        languageDetection: {
-          mode: "llm" as const,
-          providerId: "deleted-provider",
-        },
-      }
-      const remainingProviders = [getProviderById("google-translate-default")]
-
-      expect(findFeatureMissingProvider(remainingProviders, config)).toBeNull()
-    })
-
     // The built-ins are in every capability list, so "a provider exists" is
     // always true and cannot gate anything. Judged against a status that walls
     // them off, the guard becomes able to fire again.
@@ -371,44 +220,6 @@ describe("feature providers", () => {
         expect(findFeatureMissingProvider(remainingProviders, config, walledOff)).toBe(
           "noteSuggestion",
         )
-      })
-
-      it("reports languageDetection when only its own tier is walled off", () => {
-        // Reachable only because funding is per feature: an LLM provider covers
-        // note suggestion, and the built-ins cover it too, while hosted
-        // languageDetection is the one tier this account cannot run.
-        const languageDetectionWalledOff = statusWithAllTiers({
-          accessAllowed: true,
-          available: true,
-          unavailableReason: null,
-          requiresUltra: false,
-          modelRevision: "r1",
-        })
-        languageDetectionWalledOff.features.languageDetection = {
-          normal: walledOffTier,
-          advance: walledOffTier,
-        }
-        const config = {
-          ...DEFAULT_CONFIG,
-          languageDetection: { mode: "llm" as const, providerId: "deleted-provider" },
-        }
-
-        expect(findFeatureMissingProvider([], config, languageDetectionWalledOff)).toBe(
-          "languageDetection",
-        )
-      })
-
-      it("does not fire on a merely exhausted quota", () => {
-        // Transient: the account can run Built-in AI, just not this minute.
-        const exhausted = statusWithAllTiers({
-          accessAllowed: true,
-          available: false,
-          unavailableReason: "quota_exhausted",
-          requiresUltra: false,
-          modelRevision: "r1",
-        })
-
-        expect(findFeatureMissingProvider([], DEFAULT_CONFIG, exhausted)).toBeNull()
       })
     })
   })
@@ -487,55 +298,6 @@ describe("feature providers", () => {
         }),
       ])
     })
-
-    it("falls back to built-in AI when no enabled llm provider is available", () => {
-      const config = {
-        ...DEFAULT_CONFIG,
-        selectionToolbar: {
-          ...DEFAULT_CONFIG.selectionToolbar,
-          customActions: [
-            {
-              id: "action-a",
-              name: "Action A",
-              enabled: true,
-              icon: "tabler:sparkles",
-              providerId: "deleted-provider",
-              systemPrompt: "",
-              prompt: "{{selection}}",
-              outputSchema: [
-                {
-                  id: "field-a",
-                  name: "summary",
-                  type: "string" as const,
-                  description: "",
-                  speaking: false,
-                },
-              ],
-            },
-          ],
-        },
-      }
-
-      const remainingProviders = [
-        {
-          ...getProviderById("openai-default"),
-          enabled: false,
-        },
-      ]
-
-      const result = computeSelectionToolbarCustomActionFallbacksAfterDeletion(
-        "deleted-provider",
-        config,
-        remainingProviders,
-      )
-
-      expect(result?.customActions).toEqual([
-        expect.objectContaining({
-          id: "action-a",
-          providerId: "read-frog-free-ai",
-        }),
-      ])
-    })
   })
 
   describe("resolveLanguageDetectionConfigForModeChange", () => {
@@ -566,28 +328,6 @@ describe("feature providers", () => {
         mode: "llm",
         providerId: "jalapenocloud-default",
       })
-    })
-
-    it("falls back to Built-in AI when no enabled local llm provider remains", () => {
-      const result = resolveLanguageDetectionConfigForModeChange(
-        DEFAULT_CONFIG.languageDetection,
-        "llm",
-        [
-          {
-            ...getProviderById("openai-default"),
-            enabled: false,
-          },
-          {
-            ...getProviderById("jalapenocloud-default"),
-            enabled: false,
-          },
-        ],
-      )
-
-      // Switching to llm mode used to be impossible without a BYOK LLM. Built-in
-      // AI is always capability-compatible, so the mode is now always reachable
-      // and seeds itself with the hosted provider.
-      expect(result).toEqual({ mode: "llm", providerId: "read-frog-free-ai" })
     })
   })
 

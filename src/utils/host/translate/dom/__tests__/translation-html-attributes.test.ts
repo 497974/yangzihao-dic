@@ -102,11 +102,11 @@ describe("translation HTML attribute protection", () => {
 
   it("restores a source attribute that already uses the internal marker name", () => {
     const [node] = createNodes(
-      `<span data-rf-attr="page-owned" class="badge" data-read-frog-walked="walk-id">Hello<!-- hidden -->world</span>`,
+      `<span data-rf-attr="page-owned" class="badge" data-yangzihao-dic-walked="walk-id">Hello<!-- hidden -->world</span>`,
     )
     const protectedHtml = protectTranslationHtmlAttributes([node!], document)
 
-    expect(protectedHtml.sourceHtml).not.toContain("data-read-frog-walked")
+    expect(protectedHtml.sourceHtml).not.toContain("data-yangzihao-dic-walked")
     expect(protectedHtml.sourceHtml).toContain("Hello world")
     expect(protectedHtml.requestHtml).toContain(`data-rf-attr="0"`)
 

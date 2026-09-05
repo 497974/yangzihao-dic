@@ -7,14 +7,14 @@ async function loadStyleInjector() {
 
   vi.doMock("@/assets/styles/custom-translation-node.css?raw", () => ({
     default:
-      "@import '@/assets/styles/host-theme.css';\n[data-read-frog-custom-translation-style='blur'] { opacity: 0.75; }",
+      "@import '@/assets/styles/host-theme.css';\n[data-yangzihao-dic-custom-translation-style='blur'] { opacity: 0.75; }",
   }))
   vi.doMock("@/assets/styles/host-theme.css?raw", () => ({
     default:
-      ":root { --read-frog-primary: oklch(0.205 0 0); --read-frog-brand: oklch(76.034% 0.12361 82.191); }",
+      ":root { --yangzihao-dic-primary: oklch(0.205 0 0); --yangzihao-dic-brand: oklch(76.034% 0.12361 82.191); }",
   }))
   vi.doMock("@/assets/styles/translation-node-preset.css?raw", () => ({
-    default: ".read-frog-translated-content-wrapper { display: inline; }",
+    default: ".yangzihao-dic-translated-content-wrapper { display: inline; }",
   }))
 
   return import("../style-injector")
@@ -36,9 +36,11 @@ describe("style-injector", () => {
 
     ensurePresetStyles(document)
 
-    const presetStyle = document.head.querySelector<HTMLStyleElement>("#read-frog-preset-styles")
+    const presetStyle = document.head.querySelector<HTMLStyleElement>(
+      "#yangzihao-dic-preset-styles",
+    )
     expect(presetStyle).not.toBeNull()
-    expect(presetStyle?.textContent).toContain(".read-frog-translated-content-wrapper")
+    expect(presetStyle?.textContent).toContain(".yangzihao-dic-translated-content-wrapper")
     expect(presetStyle?.textContent).toContain(":root")
     expect(presetStyle?.textContent).not.toContain(":host")
   })
@@ -55,8 +57,8 @@ describe("style-injector", () => {
     ensurePresetStyles(document)
 
     expect(document.adoptedStyleSheets).toHaveLength(1)
-    expect(document.adoptedStyleSheets[0]?.cssRules[0]?.cssText).toContain("--read-frog-brand")
-    expect(document.head.querySelector("#read-frog-preset-styles")).toBeNull()
+    expect(document.adoptedStyleSheets[0]?.cssRules[0]?.cssText).toContain("--yangzihao-dic-brand")
+    expect(document.head.querySelector("#yangzihao-dic-preset-styles")).toBeNull()
   })
 
   it("falls back to style elements when adoptedStyleSheets assignment throws", async () => {
@@ -75,7 +77,9 @@ describe("style-injector", () => {
 
     ensurePresetStyles(document)
 
-    const presetStyle = document.head.querySelector<HTMLStyleElement>("#read-frog-preset-styles")
+    const presetStyle = document.head.querySelector<HTMLStyleElement>(
+      "#yangzihao-dic-preset-styles",
+    )
     expect(presetStyle).not.toBeNull()
     expect(adoptedStyleSheets).toHaveLength(0)
   })
@@ -92,9 +96,9 @@ describe("style-injector", () => {
 
     ensurePresetStyles(shadow)
 
-    const presetStyle = shadow.querySelector<HTMLStyleElement>("#read-frog-preset-styles")
+    const presetStyle = shadow.querySelector<HTMLStyleElement>("#yangzihao-dic-preset-styles")
     expect(presetStyle).not.toBeNull()
-    expect(presetStyle?.textContent).toContain(".read-frog-translated-content-wrapper")
+    expect(presetStyle?.textContent).toContain(".yangzihao-dic-translated-content-wrapper")
     expect(presetStyle?.textContent).toContain(":host")
     expect(presetStyle?.textContent).not.toContain(":root {")
   })
@@ -104,8 +108,12 @@ describe("style-injector", () => {
 
     await ensureCustomCSS(document, ".custom-translation-style { color: red; }")
 
-    const presetStyle = document.head.querySelector<HTMLStyleElement>("#read-frog-preset-styles")
-    const customStyle = document.head.querySelector<HTMLStyleElement>("#read-frog-custom-styles")
+    const presetStyle = document.head.querySelector<HTMLStyleElement>(
+      "#yangzihao-dic-preset-styles",
+    )
+    const customStyle = document.head.querySelector<HTMLStyleElement>(
+      "#yangzihao-dic-custom-styles",
+    )
 
     expect(presetStyle).not.toBeNull()
     expect(customStyle).not.toBeNull()
@@ -127,7 +135,7 @@ describe("style-injector", () => {
     expect(
       Array.from(document.adoptedStyleSheets[1]?.cssRules ?? [], (rule) => rule.cssText).join("\n"),
     ).toContain("color: blue")
-    expect(document.head.querySelector("#read-frog-custom-styles")).toBeNull()
+    expect(document.head.querySelector("#yangzihao-dic-custom-styles")).toBeNull()
   })
 
   it("injects and removes site rule CSS via style elements", async () => {
@@ -136,13 +144,13 @@ describe("style-injector", () => {
     await ensureSiteRuleCSS(document, ".line-clamped { -webkit-line-clamp: unset; }")
 
     const siteRuleStyle = document.head.querySelector<HTMLStyleElement>(
-      "#read-frog-site-rule-styles",
+      "#yangzihao-dic-site-rule-styles",
     )
     expect(siteRuleStyle).not.toBeNull()
     expect(siteRuleStyle?.textContent).toContain("line-clamp")
 
     removeSiteRuleCSS(document)
-    expect(document.head.querySelector("#read-frog-site-rule-styles")).toBeNull()
+    expect(document.head.querySelector("#yangzihao-dic-site-rule-styles")).toBeNull()
   })
 
   it("injects and removes site rule CSS via adoptedStyleSheets when available", async () => {

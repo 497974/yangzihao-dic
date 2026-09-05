@@ -140,7 +140,7 @@ describe("built-in site rules", () => {
 
   it("preserves representative base and add force-block deltas", () => {
     const cases = [
-      { id: "readfrog-github", suffix: "", selectors: ["task-lists"] },
+      { id: "yangzihao-github", suffix: "", selectors: ["task-lists"] },
       { id: "stackoverflow", suffix: ".add", selectors: ["span.comment-copy"] },
     ] as const
 
@@ -309,7 +309,7 @@ describe("built-in site rules", () => {
     ]) {
       const resolved = resolveSiteRule(url, BUILT_IN_SITE_RULES, [], [])
       expect(resolved.injectedCss).toContain(
-        "[data-docs-heading] .read-frog-translated-content-wrapper",
+        "[data-docs-heading] .yangzihao-dic-translated-content-wrapper",
       )
       expect(resolved.injectedCss).toContain("visibility:visible!important")
     }
@@ -345,7 +345,7 @@ describe("built-in site rules", () => {
       [],
     )
 
-    expect(resolved.matchedRuleIds).toContain("readfrog-x-chat")
+    expect(resolved.matchedRuleIds).toContain("yangzihao-x-chat")
     // The footer root covers every branch that renders it (aria-hidden spacer,
     // absolute overlay, and the `contents` wrapper used for long messages).
     expect(resolved.excludeSelector).toContain("div.flex.items-center.ml-auto.shrink-0.gap-1")
@@ -359,7 +359,7 @@ describe("built-in site rules", () => {
     expect(resolved.includeSelector).toBeNull()
 
     const timeline = resolveSiteRule("https://x.com/home", BUILT_IN_SITE_RULES, [], [])
-    expect(timeline.matchedRuleIds).not.toContain("readfrog-x-chat")
+    expect(timeline.matchedRuleIds).not.toContain("yangzihao-x-chat")
   })
 
   it("does not restrict Steam app pages to an obsolete iframe include (issue #1923)", () => {
@@ -375,7 +375,7 @@ describe("built-in site rules", () => {
   })
 
   it("keeps the youtube rule in sync with the subtitle class constants", () => {
-    const youtube = BUILT_IN_SITE_RULES.find((rule) => rule.id === "readfrog-youtube")
+    const youtube = BUILT_IN_SITE_RULES.find((rule) => rule.id === "yangzihao-youtube")
     expect(youtube).toBeDefined()
     expect(youtube!.excludeSelectors).toEqual(
       expect.arrayContaining([

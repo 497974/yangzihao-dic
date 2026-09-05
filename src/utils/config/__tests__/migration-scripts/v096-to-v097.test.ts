@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
 import { migrate } from "../../migration-scripts/v096-to-v097"
 
-const OLD = "read-frog-ultra-ai"
-const NEW = "read-frog-advance-ai"
+const OLD = "yangzihao-dic-ultra-ai"
+const NEW = "yangzihao-dic-advance-ai"
 
 /** A config holding the old id at every one of the eight persisted paths. */
 function configWithOldIdEverywhere() {

@@ -215,11 +215,11 @@ describe("getModelById", () => {
           model: {
             model: "gpt-5.4-mini",
             isCustomModel: true,
-            customModel: "read-frog-gpt-4o",
+            customModel: "yangzihao-dic-gpt-4o",
           },
           providerSpecificSettings: {
             apiMode: "responses",
-            resourceName: "read-frog-openai",
+            resourceName: "yangzihao-dic-openai",
             apiVersion: "2025-04-01-preview",
           },
           headers: {
@@ -235,7 +235,7 @@ describe("getModelById", () => {
     expect(result).toBe("azure-model")
     expect(createAzureMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        resourceName: "read-frog-openai",
+        resourceName: "yangzihao-dic-openai",
         apiVersion: "2025-04-01-preview",
         baseURL: "https://proxy.example.test/openai",
         apiKey: "azure-key",
@@ -246,7 +246,7 @@ describe("getModelById", () => {
     )
     expect(createAzureMock.mock.calls[0]?.[0]).not.toHaveProperty("apiMode")
     expect(createAzureMock.mock.calls[0]?.[0]).not.toHaveProperty("region")
-    expect(azureLanguageModelMock).toHaveBeenCalledWith("read-frog-gpt-4o")
+    expect(azureLanguageModelMock).toHaveBeenCalledWith("yangzihao-dic-gpt-4o")
     expect(azureChatModelMock).not.toHaveBeenCalled()
   })
 
@@ -263,11 +263,11 @@ describe("getModelById", () => {
           model: {
             model: "gpt-5.4-mini",
             isCustomModel: true,
-            customModel: "read-frog-gpt-4o",
+            customModel: "yangzihao-dic-gpt-4o",
           },
           providerSpecificSettings: {
             apiMode: "chat",
-            resourceName: "read-frog-openai",
+            resourceName: "yangzihao-dic-openai",
             apiVersion: "2025-04-01-preview",
           },
         },
@@ -280,7 +280,7 @@ describe("getModelById", () => {
     expect(result).toBe("azure-chat-model")
     expect(createAzureMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        resourceName: "read-frog-openai",
+        resourceName: "yangzihao-dic-openai",
         apiVersion: "2025-04-01-preview",
         baseURL: "https://proxy.example.test/openai",
         apiKey: "azure-key",
@@ -288,7 +288,7 @@ describe("getModelById", () => {
     )
     expect(createAzureMock.mock.calls[0]?.[0]).not.toHaveProperty("apiMode")
     expect(createAzureMock.mock.calls[0]?.[0]).not.toHaveProperty("region")
-    expect(azureChatModelMock).toHaveBeenCalledWith("read-frog-gpt-4o")
+    expect(azureChatModelMock).toHaveBeenCalledWith("yangzihao-dic-gpt-4o")
     expect(azureLanguageModelMock).not.toHaveBeenCalled()
   })
 

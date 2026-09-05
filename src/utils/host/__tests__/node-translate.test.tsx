@@ -112,7 +112,7 @@ describe("node translation", () => {
       })
 
       const siteRuleStyle = document.head.querySelector<HTMLStyleElement>(
-        "#read-frog-site-rule-styles",
+        "#yangzihao-dic-site-rule-styles",
       )
       expect(siteRuleStyle?.textContent).toContain(".clamped-title")
 
@@ -123,7 +123,7 @@ describe("node translation", () => {
         flushBatchedOperations()
       })
 
-      expect(document.head.querySelector("#read-frog-site-rule-styles")).toBeNull()
+      expect(document.head.querySelector("#yangzihao-dic-site-rule-styles")).toBeNull()
       document.elementFromPoint = originalElementFromPoint
     })
 
@@ -155,7 +155,7 @@ describe("node translation", () => {
         flushBatchedOperations()
       })
 
-      expect(document.head.querySelector("#read-frog-site-rule-styles")).not.toBeNull()
+      expect(document.head.querySelector("#yangzihao-dic-site-rule-styles")).not.toBeNull()
 
       const wrapper = node.querySelector(`.${CONTENT_WRAPPER_CLASS}`)
       document.elementFromPoint = vi.fn<(...args: any[]) => any>(() => wrapper as Element)
@@ -164,7 +164,7 @@ describe("node translation", () => {
         flushBatchedOperations()
       })
 
-      expect(document.head.querySelector("#read-frog-site-rule-styles")).toBeNull()
+      expect(document.head.querySelector("#yangzihao-dic-site-rule-styles")).toBeNull()
       document.elementFromPoint = originalElementFromPoint
     })
   })

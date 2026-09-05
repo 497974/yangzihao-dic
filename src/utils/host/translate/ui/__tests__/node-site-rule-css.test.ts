@@ -9,7 +9,7 @@ import {
 } from "../node-site-rule-css"
 
 const SITE_RULE_CSS = ".clamped-title { max-height: none !important; }"
-const SITE_RULE_STYLE_SELECTOR = "#read-frog-site-rule-styles"
+const SITE_RULE_STYLE_SELECTOR = "#yangzihao-dic-site-rule-styles"
 
 function createTranslationWrapper(): HTMLElement {
   const wrapper = document.createElement("span")
