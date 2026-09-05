@@ -37,6 +37,10 @@ export default defineConfig({
     name: "__MSG_extName__",
     description: "__MSG_extDescription__",
     default_locale: "en",
+    // 侧边栏用 chrome.sidePanel（Chrome 114+），朗读用 chrome.offscreen（109+）。
+    // 代码里都做了特性检测不会崩，但装在更老的浏览器上会静默少掉侧栏和朗读，
+    // 用户只会觉得"功能是坏的"。显式声明下限，让浏览器直接拒绝并说明原因。
+    ...(browser !== "firefox" && { minimum_chrome_version: "114" }),
     // Fixed extension ID for development
     ...(mode === "development" &&
       (browser === "chrome" || browser === "edge") && {
@@ -84,8 +88,26 @@ export default defineConfig({
     }),
   }),
   zip: {
-    includeSources: ["**/*", ".env.production"],
-    excludeSources: ["docs/**/*", "assets/**/*", "repos/**/*", "readmes/**/*"],
+    includeSources: ["**/*"],
+    // 源码包走的是自己的白/黑名单，**不看 .gitignore**。
+    // `includeSources: ["**/*"]` 会把工作目录里的一切都塞进去——包括
+    // _storage-backup*/（导词典时从浏览器 LevelDB 拷出来的存储备份，
+    // 里面有明文 API Key）和 .env。这些绝不能随发行包分发出去。
+    excludeSources: [
+      "docs/**/*",
+      "assets/**/*",
+      "repos/**/*",
+      "readmes/**/*",
+      "_storage-backup*/**/*",
+      "_storage-backup*",
+      ".env",
+      ".env.*",
+      "**/*.ldb",
+      "**/*.log",
+      "我的生词-待导入.json",
+      ".output/**/*",
+      "node_modules/**/*",
+    ],
   },
   hooks: {
     "vite:build:extendConfig": (entrypoints, viteConfig) => {
