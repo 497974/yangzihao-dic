@@ -8,7 +8,9 @@ import {
 import { MIN_SIDE_CONTENT_WIDTH } from "@/utils/constants/side"
 import { DEFAULT_TRANSLATION_HUB_SHORTCUT_KEY } from "@/utils/constants/translation-hub"
 import {
+  doesProviderSupportDictionary,
   doesProviderSupportsCapability,
+  getDictionaryProviderIds,
   getProviderIdsForCapability,
 } from "@/utils/providers/provider-registry"
 import { floatingButtonSchema } from "./floating-button"
@@ -206,20 +208,27 @@ export const configSchema = z
       }
     }
 
-    const actionProviderEntries = [
-      {
-        providerId: data.selectionToolbar.builtInActions.dictionary.providerId,
-        path: ["selectionToolbar", "builtInActions", "dictionary", "providerId"] as const,
-      },
-      ...data.selectionToolbar.customActions.map((action, index) => ({
-        providerId: action.providerId,
-        path: ["selectionToolbar", "customActions", index, "providerId"] as const,
-      })),
-    ]
+    // 内置词典比普通自定义动作松一档：输出字段固定，换成纯翻译引擎时能优雅降级
+    // （见 resolveDictionaryProviderRef）。校验必须跟解析同规则，否则 DEFAULT_CONFIG
+    // 里免密钥的 Microsoft Translate 会被判非法，害得 initializeConfig 每次启动都
+    // 认为配置无效、用默认值重建，把用户已存的设置覆盖掉。
+    const dictionaryProviderId = data.selectionToolbar.builtInActions.dictionary.providerId
+    if (
+      !doesProviderSupportDictionary(data.providersConfig, dictionaryProviderId, {
+        requireEnable: true,
+      })
+    ) {
+      ctx.addIssue({
+        code: "invalid_value",
+        values: getDictionaryProviderIds(data.providersConfig, { requireEnable: true }),
+        message: `Invalid provider id "${dictionaryProviderId}".`,
+        path: ["selectionToolbar", "builtInActions", "dictionary", "providerId"],
+      })
+    }
 
-    actionProviderEntries.forEach(({ providerId, path }) => {
+    data.selectionToolbar.customActions.forEach((action, index) => {
       if (
-        !doesProviderSupportsCapability("customAction", data.providersConfig, providerId, {
+        !doesProviderSupportsCapability("customAction", data.providersConfig, action.providerId, {
           requireEnable: true,
         })
       ) {
@@ -228,8 +237,8 @@ export const configSchema = z
           values: getProviderIdsForCapability("customAction", data.providersConfig, {
             requireEnable: true,
           }),
-          message: `Invalid provider id "${providerId}".`,
-          path: [...path],
+          message: `Invalid provider id "${action.providerId}".`,
+          path: ["selectionToolbar", "customActions", index, "providerId"],
         })
       }
     })

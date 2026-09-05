@@ -1,4 +1,5 @@
 import type { Config } from "@/types/config/config"
+import type { ProvidersConfig } from "@/types/config/provider"
 import type {
   SelectionToolbarBuiltInActionState,
   SelectionToolbarCustomAction,
@@ -7,6 +8,10 @@ import { createDefaultDictionaryAction } from "@/utils/constants/config"
 import { BUILT_IN_DICTIONARY_ACTION_ID } from "@/utils/constants/custom-action"
 import { getRandomUUID } from "@/utils/crypto-polyfill"
 import { getUniqueName } from "@/utils/name"
+import {
+  doesProviderSupportsCapability,
+  getProviderIdsForCapability,
+} from "@/utils/providers/provider-registry"
 
 type SelectionToolbarConfig = Config["selectionToolbar"]
 
@@ -106,13 +111,41 @@ export function patchSelectionToolbarAction(
   return replaceSelectionToolbarAction(selectionToolbar, { ...action, ...patch })
 }
 
+/**
+ * 复制一个动作成为新的自定义动作。
+ *
+ * providersConfig 传进来是为了给供应商兜底：内置词典允许挂纯翻译引擎（免密钥，
+ * 见 resolveDictionaryProviderRef），但**普通自定义动作不行**——它靠 systemPrompt
+ * 做结构化抽取，脱离大模型跑不动，schema 也会拒绝。
+ *
+ * 不兜底的后果是真实存在的 bug：全新安装时词典默认挂 Microsoft Translate，
+ * 用户点「自定义」把它复制成自定义动作，写配置时 schema 校验失败抛错，
+ * 按钮看起来毫无反应。这里在复制时就把供应商换成可用的大模型。
+ */
 export function duplicateSelectionToolbarAction(
   action: SelectionToolbarCustomAction,
   allActions: SelectionToolbarCustomAction[],
+  providersConfig?: ProvidersConfig,
 ): SelectionToolbarCustomAction {
-  return {
+  const duplicated = {
     ...structuredClone(action),
     id: getRandomUUID(),
     name: getUniqueName(action.name, new Set(allActions.map((candidate) => candidate.name))),
   }
+
+  if (
+    providersConfig &&
+    !doesProviderSupportsCapability("customAction", providersConfig, duplicated.providerId, {
+      requireEnable: true,
+    })
+  ) {
+    const fallback = getProviderIdsForCapability("customAction", providersConfig, {
+      requireEnable: true,
+    })[0]
+    if (fallback) {
+      duplicated.providerId = fallback
+    }
+  }
+
+  return duplicated
 }

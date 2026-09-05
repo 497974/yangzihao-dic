@@ -1,5 +1,5 @@
 import type { SelectionToolbarCustomAction } from "@/types/config/selection-toolbar"
-import { useAtom, useSetAtom } from "jotai"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { createContext, use, useEffect, useState } from "react"
 import { QuickInsertableTextareaFieldAutoSave } from "@/components/form/quick-insertable-textarea-field-auto-save"
 import {
@@ -90,6 +90,7 @@ function useActionEditorController(
   deleteAction?: () => Promise<void>,
 ): ActionEditorContextValue {
   const [selectionToolbar, setSelectionToolbar] = useAtom(configFieldsAtomMap.selectionToolbar)
+  const providersConfig = useAtomValue(configFieldsAtomMap.providersConfig)
   const setSelectedActionId = useSetAtom(selectedCustomActionIdAtom)
 
   const form = useActionForm(action, async (nextAction) => {
@@ -113,7 +114,11 @@ function useActionEditorController(
         await form.handleSubmit()
       },
       duplicate: async () => {
-        const duplicatedAction = duplicateSelectionToolbarAction(action, allActions)
+        const duplicatedAction = duplicateSelectionToolbarAction(
+          action,
+          allActions,
+          providersConfig,
+        )
         await setSelectionToolbar({
           ...selectionToolbar,
           customActions: [...selectionToolbar.customActions, duplicatedAction],

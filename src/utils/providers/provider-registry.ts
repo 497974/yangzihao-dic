@@ -275,6 +275,46 @@ export function resolveDictionaryProviderRef(
   return null
 }
 
+/**
+ * 词典能不能用这个供应商——与 resolveDictionaryProviderRef 同一套判定。
+ *
+ * 校验必须跟解析走同一条规则，否则会出现「运行时能跑、schema 却判非法」的
+ * 割裂：DEFAULT_CONFIG 把词典设成免密钥的 Microsoft Translate，一旦 schema
+ * 只认大模型，configSchema.safeParse 就会失败，initializeConfig 每次启动都
+ * 判定配置无效并用默认值重建、覆盖用户已存的设置。
+ */
+export function doesProviderSupportDictionary(
+  providersConfig: ProvidersConfig,
+  providerId: string,
+  options: { requireEnable?: boolean } = {},
+): boolean {
+  if (doesProviderSupportsCapability("customAction", providersConfig, providerId, options)) {
+    return true
+  }
+
+  const providerConfig = providersConfig.find((provider) => provider.id === providerId)
+  return (
+    !!providerConfig &&
+    (!options.requireEnable || providerConfig.enabled) &&
+    isPureTranslateProviderConfig(providerConfig)
+  )
+}
+
+/** 词典可选的供应商 id 列表，用于校验失败时告诉用户合法值有哪些。 */
+export function getDictionaryProviderIds(
+  providersConfig: ProvidersConfig,
+  options: { requireEnable?: boolean } = {},
+): string[] {
+  const llmIds = getProviderIdsForCapability("customAction", providersConfig, options)
+  const translateIds = providersConfig
+    .filter(
+      (provider) =>
+        (!options.requireEnable || provider.enabled) && isPureTranslateProviderConfig(provider),
+    )
+    .map((provider) => provider.id)
+  return [...llmIds, ...translateIds]
+}
+
 /** 词典的供应商下拉列表：大模型 + 纯翻译引擎，专供内置词典这一个动作使用。 */
 export function getDictionaryProviders(providersConfig: ProvidersConfig): ProviderSelectorOption[] {
   const llmProviders = getSelectableProvidersForCapability("customAction", providersConfig)
