@@ -32,6 +32,15 @@ function needsSpaceBefore(prev: SentenceToken | undefined, token: SentenceToken)
   return true
 }
 
+/** 键帽样式，跟造句练习页的提示条保持一致 */
+function Kbd({ children }: { children: React.ReactNode }) {
+  return (
+    <kbd className="mx-0.5 rounded border bg-muted px-1.5 py-0.5 font-mono text-[11px]">
+      {children}
+    </kbd>
+  )
+}
+
 export function ClozeCard({
   sentence,
   translation,
@@ -74,12 +83,28 @@ export function ClozeCard({
     [prepared.answers.length, verdicts],
   )
 
+  /**
+   * 揭晓后立刻把焦点从填空框上撤下来。
+   *
+   * 揭晓时每个空都变成 readOnly，而 readOnly 的输入框在真实浏览器里仍然保留焦点。
+   * 焦点还在框里的话，父页面的全局快捷键会把它当成"正在打字"，
+   * 紧接着按的 1/2/3/4 就被吞掉，评分得改用鼠标。
+   * 拼写题型那边也是同样的处理（见 checkSpelling 里的 blur）。
+   */
+  const releaseFocus = useCallback(() => {
+    const el = document.activeElement
+    if (el instanceof HTMLElement && blankRefs.current.includes(el as HTMLInputElement)) {
+      el.blur()
+    }
+  }, [])
+
   const check = useCallback(() => {
     if (settled) return
     const next = checkBlanks(inputs, prepared.answers)
     setVerdicts(next)
     if (next.length > 0 && next.every((v) => v === "correct")) {
       setSettled(true)
+      releaseFocus()
       onDone(true)
       return
     }
@@ -92,8 +117,28 @@ export function ClozeCard({
     setInputs([...prepared.answers])
     setVerdicts(prepared.answers.map(() => "correct" as const))
     setSettled(true)
+    releaseFocus()
     onDone(false)
-  }, [prepared.answers, onDone])
+  }, [prepared.answers, releaseFocus, onDone])
+
+  // 快捷键：手一直在填空框上，不该逼人挪去点按钮。
+  // 用 Ctrl+; 显示答案，跟造句练习保持一致（那边也是 Ctrl+;）。
+  // 不用单键是因为焦点就在输入框里，任何裸按键都会被当成填空内容。
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (settled) return
+      if (!e.ctrlKey && !e.metaKey) return
+      if (e.key === ";") {
+        e.preventDefault()
+        reveal()
+      } else if (e.key === "Enter") {
+        e.preventDefault()
+        check()
+      }
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [settled, reveal, check])
 
   const remaining = verdicts?.filter((v) => v !== "correct").length ?? 0
 
@@ -183,11 +228,17 @@ export function ClozeCard({
       )}
 
       {!settled && (
-        <div className="flex justify-center gap-2">
-          <Button onClick={check}>提交</Button>
-          <Button variant="ghost" onClick={reveal}>
-            显示答案
-          </Button>
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex justify-center gap-2">
+            <Button onClick={check}>提交</Button>
+            <Button variant="ghost" onClick={reveal}>
+              显示答案
+            </Button>
+          </div>
+          <div className="text-[11px] text-muted-foreground">
+            <Kbd>Enter</Kbd> 提交 · <Kbd>Tab</Kbd> 切换空格 · <Kbd>Ctrl</Kbd>
+            <Kbd>;</Kbd> 显示答案
+          </div>
         </div>
       )}
 

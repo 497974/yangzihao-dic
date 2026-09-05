@@ -115,6 +115,39 @@ function isDue(c: ReviewCard) {
  * cloze 考的是"这个位置该填哪个词"，是词汇题，所以放在闪卡这边；
  * 造句练习那个页面是整句全挖、零骨架，考的是从零表达，两者刻意分开。
  */
+/**
+ * 焦点是不是落在"正在打字"的地方。
+ *
+ * 全局快捷键必须先问这一句：复习页同时存在拼写输入框和语境填空的一排输入框，
+ * 只比对某一个 ref 会漏掉其余的，结果就是在填空里打字被当成快捷键吞掉。
+ */
+export function isTypingTarget(el: Element | null): boolean {
+  if (!(el instanceof HTMLElement)) return false
+  if (el.isContentEditable) return true
+  // 只读/禁用的框打不进字，不该算在"正在输入"里。这一条很关键：
+  // 语境填空揭晓后每个空都变成 readOnly，而 readOnly 的输入框在真实浏览器里
+  // **仍然保留焦点**（不像 disabled）。不排除的话，答案刚露脸、评分按钮刚出来，
+  // 1/2/3/4 却被当成"正在打字"吞掉，键盘评分整个失效。
+  if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+    return !el.readOnly && !el.disabled
+  }
+  return el.tagName === "SELECT"
+}
+
+/**
+ * 空格能不能直接揭晓答案。
+ *
+ * 只有正反面题型可以——它就是"想一下，然后翻面"。其余题型都得先真正作答：
+ * 听写/中译英要提交拼写，语境填空要提交或点显示答案。
+ *
+ * 这条边界很要紧：评分按钮是跟着"已揭晓"出现的，一旦让空格在填空题里也能
+ * 置位，答案没露脸评分按钮就冒出来了，等于可以盲按 1/2/3/4 打分并跳下一题，
+ * 复习记录就成了假的。
+ */
+export function canSpaceReveal(quizMode: QuizMode): boolean {
+  return quizMode === "recognition"
+}
+
 type QuizMode = "recognition" | "listening" | "translation" | "cloze"
 type ModePreference = "auto" | "listening" | "translation" | "cloze"
 
@@ -406,10 +439,19 @@ export function ReviewPage() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const typing = document.activeElement === inputRef.current
+      // 光比对 inputRef 是不够的：语境填空有一排自己的输入框，都不等于这个 ref，
+      // 于是在填空里打字会被判成"没在输入"——空格被吃掉、打 1/2/3/4 直接变成评分。
+      // 这里按元素本身判断，页面上任何输入位置都算在打字。
+      const typing = isTypingTarget(document.activeElement)
+
+      // 空格揭晓只属于正反面题型。听写/中译英要先提交拼写，语境填空要先提交或
+      // 点显示答案——它们各自有揭晓的入口。之前这里只排除了拼写类，
+      // 于是在填空题里按一下空格，答案根本没显示，评分按钮却冒出来了，
+      // 变成"没看见答案就能打分"。
       if (e.code === "Space" && !typing) {
+        if (!canSpaceReveal(quizMode)) return
         e.preventDefault()
-        if (!spellingMode && !revealed) setRevealed(true)
+        if (!revealed) setRevealed(true)
         return
       }
       if (typing) return
@@ -421,7 +463,7 @@ export function ReviewPage() {
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [revealed, spellingMode, handleRate])
+  }, [revealed, quizMode, handleRate])
 
   const restart = () => {
     setIdx(0)
