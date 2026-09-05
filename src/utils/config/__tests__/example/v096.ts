@@ -8,7 +8,7 @@ import type { TestSeriesObject } from "./types"
  * Delta from v095: `selectionToolbar.noteSuggestion` gains its own
  * `providerId`, seeded from `selectionToolbar.features.translate.providerId`
  * when that provider is an enabled LLM provider, otherwise the built-in
- * `read-frog-free-ai` provider. Every series here uses an enabled LLM
+ * `yangzihao-dic-free-ai` provider. Every series here uses an enabled LLM
  * selection-translate provider, so the id is copied; edge cases live in
  * `migration-scripts/v095-to-v096.test.ts`.
  */
@@ -1146,7 +1146,7 @@ export const testSeries: TestSeriesObject = {
         builtInActions: {
           dictionary: {
             enabled: false,
-            providerId: "read-frog-free-ai",
+            providerId: "yangzihao-dic-free-ai",
           },
         },
       },

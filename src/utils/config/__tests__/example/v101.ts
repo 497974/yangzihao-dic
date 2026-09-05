@@ -1,13 +1,14 @@
 import type { TestSeriesObject } from "./types"
 
 /**
- * Frozen v099 fixtures. Written out in full on purpose: an example file that
- * spreads the previous version is not a snapshot, because editing v098 would
- * silently change what v099 asserts.
+ * Frozen v101 fixtures. Written out in full on purpose: an example file that
+ * spreads the previous version is not a snapshot, because editing v100 would
+ * silently change what v101 asserts.
  *
- * Delta from v098: every API provider gains the English `description` its type
- * carries in the locale file. The two pure-translation providers that have no
- * description key (google-translate, microsoft-translate) are unchanged.
+ * Delta from v099/v100: v101 把配置里残留的「已移除的托管内置 AI」供应商 id
+ * （yangzihao-dic-free-ai 等）换成这份配置自己真实拥有的供应商。本项目没有
+ * 托管 AI（provider-registry 里 SYSTEM_PROVIDER_DEFS 是空的），留着那些 id
+ * 会让 configSchema 校验失败、进而触发配置被默认值整个重建。
  */
 
 export const testSeries: TestSeriesObject = {
@@ -413,6 +414,7 @@ export const testSeries: TestSeriesObject = {
           container: {
             backgroundOpacity: 75,
           },
+          customCSS: null,
         },
         aiSegmentation: false,
         requestQueueConfig: {
@@ -799,6 +801,7 @@ export const testSeries: TestSeriesObject = {
           container: {
             backgroundOpacity: 75,
           },
+          customCSS: null,
         },
         aiSegmentation: false,
         requestQueueConfig: {
@@ -1203,7 +1206,7 @@ export const testSeries: TestSeriesObject = {
         builtInActions: {
           dictionary: {
             enabled: false,
-            providerId: "yangzihao-dic-free-ai",
+            providerId: "google-default",
           },
         },
       },
@@ -1235,6 +1238,7 @@ export const testSeries: TestSeriesObject = {
           container: {
             backgroundOpacity: 75,
           },
+          customCSS: null,
         },
         aiSegmentation: false,
         requestQueueConfig: {
@@ -1629,6 +1633,7 @@ export const testSeries: TestSeriesObject = {
           container: {
             backgroundOpacity: 75,
           },
+          customCSS: null,
         },
         aiSegmentation: false,
         requestQueueConfig: {

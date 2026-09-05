@@ -6,7 +6,7 @@ import type { TestSeriesObject } from "./types"
  * silently change what v097 asserts.
  *
  * Delta from v096: none. v097 renames the advanced built-in provider id
- * `read-frog-ultra-ai` to `read-frog-advance-ai`, and no v096 series holds
+ * `yangzihao-dic-ultra-ai` to `yangzihao-dic-advance-ai`, and no v096 series holds
  * that id — every series uses an enabled LLM selection-translate provider, so
  * v096's seed copied that provider rather than falling back to the built-in
  * one. Identical content is therefore the correct assertion here: it pins that
@@ -1148,7 +1148,7 @@ export const testSeries: TestSeriesObject = {
         builtInActions: {
           dictionary: {
             enabled: false,
-            providerId: "read-frog-free-ai",
+            providerId: "yangzihao-dic-free-ai",
           },
         },
       },

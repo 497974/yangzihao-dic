@@ -64,7 +64,7 @@ export const testSeries: TestSeriesObject = {
         builtInActions: {
           dictionary: {
             enabled: false,
-            providerId: "read-frog-free-ai",
+            providerId: "yangzihao-dic-free-ai",
           },
         },
         customActions: promptTokenConfig.config.selectionToolbar.customActions,
