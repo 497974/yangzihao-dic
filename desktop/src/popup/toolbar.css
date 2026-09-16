@@ -1,0 +1,97 @@
+/* 照搬扩展网页划词工具栏的样子（selection-toolbar/index.tsx）：一排 28 像素高的按钮，细边框 */
+
+:root {
+  color-scheme: light dark;
+  --popover: oklch(1 0 0);
+  --foreground: oklch(0.141 0.005 285.823);
+  --muted-foreground: oklch(0.552 0.016 285.938);
+  --accent: oklch(0.967 0.001 286.375);
+  --border: oklch(0.92 0.004 286.32);
+  font-family:
+    "Inter Variable", ui-sans-serif, system-ui, "Microsoft YaHei UI", "Source Han Sans SC",
+    "Noto Sans SC", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --popover: oklch(0.21 0.006 285.885);
+    --foreground: oklch(0.985 0 0);
+    --muted-foreground: oklch(0.705 0.015 286.067);
+    --accent: oklch(0.274 0.006 286.033);
+    --border: oklch(1 0 0 / 10%);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--popover);
+  color: var(--foreground);
+}
+
+.bar {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.bar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  min-width: 32px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.bar button:hover {
+  background: var(--accent);
+}
+
+.bar svg {
+  width: 18px;
+  height: 18px;
+}
+
+.letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.divider {
+  width: 1px;
+  height: 18px;
+  margin: 0 3px;
+  background: var(--border);
+}
+
+.bar button.close {
+  min-width: 26px;
+  padding: 0 4px;
+  color: var(--muted-foreground);
+}
+
+.bar button.close svg {
+  width: 14px;
+  height: 14px;
+}

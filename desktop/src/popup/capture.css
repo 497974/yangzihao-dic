@@ -1,0 +1,71 @@
+/* 截图查词的框选层：冻住的屏幕画面 + 一层暗色，框出来的地方是亮的 */
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: crosshair;
+  user-select: none;
+  background: #000;
+  font:
+    13px/1.5 system-ui,
+    "Segoe UI",
+    "Microsoft YaHei",
+    sans-serif;
+}
+
+.shot {
+  position: fixed;
+  inset: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.dim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.38);
+}
+
+/* 选区本身是透明的，用一圈巨大的阴影把选区外面压暗 */
+.selection {
+  position: fixed;
+  box-sizing: border-box;
+  border: 1.5px solid #e0a82e;
+  box-shadow: 0 0 0 100000px rgba(0, 0, 0, 0.38);
+}
+
+.selection[hidden] {
+  display: none;
+}
+
+.size {
+  position: absolute;
+  left: -1.5px;
+  top: -24px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(24, 24, 27, 0.85);
+  color: #fafafa;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.hint {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(24, 24, 27, 0.85);
+  color: #fafafa;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.hint[hidden] {
+  display: none;
+}

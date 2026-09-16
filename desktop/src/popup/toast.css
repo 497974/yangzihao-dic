@@ -1,0 +1,84 @@
+/* 配色取自扩展主题，和查词弹窗一致（见 popup.css） */
+
+:root {
+  color-scheme: light dark;
+  --popover: oklch(1 0 0);
+  --foreground: oklch(0.141 0.005 285.823);
+  --muted-foreground: oklch(0.552 0.016 285.938);
+  --border: oklch(0.92 0.004 286.32);
+  --destructive: oklch(0.577 0.245 27.325);
+  font-family:
+    "Inter Variable", ui-sans-serif, system-ui, "Microsoft YaHei UI", "Source Han Sans SC",
+    "Noto Sans SC", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --popover: oklch(0.21 0.006 285.885);
+    --foreground: oklch(0.985 0 0);
+    --muted-foreground: oklch(0.705 0.015 286.067);
+    --border: oklch(1 0 0 / 10%);
+    --destructive: oklch(0.704 0.191 22.216);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--popover);
+  color: var(--foreground);
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  min-height: 100vh;
+}
+
+.text {
+  min-width: 0;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.toast.error .title {
+  color: var(--destructive);
+}
+
+.message {
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.spinner {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+  border: 2px solid var(--border);
+  border-top-color: var(--muted-foreground);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,405 @@
+/*
+ * 配色、字号、间距照搬浏览器扩展的查词弹窗（src/assets/styles/theme.css 和
+ * components/ui/selection-popover），两边看起来是同一个东西。
+ */
+
+:root {
+  color-scheme: light dark;
+  --popover: oklch(1 0 0);
+  --foreground: oklch(0.141 0.005 285.823);
+  --muted-foreground: oklch(0.552 0.016 285.938);
+  --secondary: oklch(0.967 0.001 286.375);
+  --secondary-foreground: oklch(0.47 0.006 285.885);
+  --border: oklch(0.92 0.004 286.32);
+  --brand: oklch(76.034% 0.12361 82.191);
+  --brand-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --success: oklch(0.6 0.13 163);
+  --source: #52525b;
+  font-family:
+    "Inter Variable", ui-sans-serif, system-ui, "Microsoft YaHei UI", "Source Han Sans SC",
+    "Noto Sans SC", sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --popover: oklch(0.21 0.006 285.885);
+    --foreground: oklch(0.985 0 0);
+    --muted-foreground: oklch(0.705 0.015 286.067);
+    --secondary: oklch(0.274 0.006 286.033);
+    --secondary-foreground: oklch(0.705 0.015 286.067);
+    --border: oklch(1 0 0 / 10%);
+    --destructive: oklch(0.704 0.191 22.216);
+    --success: oklch(0.7 0.14 163);
+    --source: #a1a1aa;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--popover);
+  color: var(--foreground);
+}
+
+.card {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+}
+
+svg.icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+/* ---------- 标题栏：按住可以拖动 ---------- */
+
+.header {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+  /* 按住空白处拖动（见 popup.ts）。不用 -webkit-app-region：Windows 上它会把钉子也当成拖动区 */
+  cursor: grab;
+}
+
+.header.dragging {
+  cursor: grabbing;
+}
+
+.grip {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px;
+  color: var(--muted-foreground);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.header:hover .grip {
+  opacity: 1;
+}
+
+.title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.title .icon {
+  width: 18px;
+  height: 18px;
+  color: var(--muted-foreground);
+}
+
+.title-text {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--secondary-foreground);
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: var(--secondary);
+}
+
+.icon-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  background: transparent;
+}
+
+.icon-button.small {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+}
+
+.icon-button.small .icon {
+  width: 13px;
+  height: 13px;
+}
+
+.icon-button.active {
+  color: var(--foreground);
+}
+
+/* ---------- 内容区 ---------- */
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.source {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.source-text {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--source);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: text;
+}
+
+.source-text.expanded {
+  -webkit-line-clamp: unset;
+  display: block;
+}
+
+.separator {
+  height: 1px;
+  margin: 12px 0 16px;
+  background: var(--border);
+  opacity: 0.6;
+}
+
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--muted-foreground);
+  margin-bottom: 12px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--muted-foreground);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-label {
+  display: flex;
+  height: 24px;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.field-label .icon {
+  width: 12px;
+  height: 12px;
+}
+
+.field-value {
+  font-size: 14px;
+  line-height: 20px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.field-value.pending {
+  color: var(--muted-foreground);
+}
+
+.alert {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in oklch, var(--destructive) 35%, transparent);
+  border-radius: 10px;
+  background: color-mix(in oklch, var(--destructive) 6%, transparent);
+  color: var(--destructive);
+}
+
+.alert .icon {
+  margin-top: 2px;
+}
+
+/* 不是出错，只是告诉一声（浏览器没开时词先记下来） */
+.alert.info {
+  border-color: color-mix(in oklch, var(--success) 35%, transparent);
+  background: color-mix(in oklch, var(--success) 6%, transparent);
+  color: var(--success);
+}
+
+.alert-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.alert-message {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--foreground);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+/* ---------- 底栏 ---------- */
+
+.footer {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.meta {
+  min-width: 0;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footer-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.button {
+  height: 28px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12.8px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.button.brand {
+  background: var(--brand);
+  color: var(--brand-foreground);
+}
+
+.button.brand:hover {
+  background: color-mix(in oklch, var(--brand) 80%, transparent);
+}
+
+.button.brand.saved {
+  background: var(--success);
+}
+
+.button.secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.button.saved:disabled {
+  opacity: 1;
+}
+
+.save-error {
+  font-size: 12px;
+  color: var(--destructive);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- 划词翻译 ---------- */
+
+.title-icon {
+  display: inline-flex;
+}
+
+.translation {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+/* 还在写：末尾一个小圆点，和扩展一样 */
+.translation.streaming::after {
+  content: " ●";
+  color: var(--muted-foreground);
+}
+
+.translation-tools {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}

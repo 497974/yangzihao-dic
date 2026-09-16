@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src data:"
+    />
+    <title>大傻豪词典截图查词</title>
+    <link rel="stylesheet" href="capture.css" />
+  </head>
+  <body>
+    <div id="shot" class="shot"></div>
+    <div id="dim" class="dim"></div>
+    <div id="selection" class="selection" hidden><span id="size" class="size"></span></div>
+    <div id="hint" class="hint">拖动鼠标框出要查的字 · 松开就查 · Esc 或右键取消</div>
+    <script src="capture.js"></script>
+  </body>
+</html>
