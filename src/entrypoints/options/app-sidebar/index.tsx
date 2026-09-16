@@ -1,6 +1,6 @@
 import { IconSearch } from "@tabler/icons-react"
 import { useSetAtom } from "jotai"
-import { FreeProductBadge } from "@/components/free-product-badge"
+import { AppSignature } from "@/components/app-signature"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/base-ui/input-group"
 import { Kbd } from "@/components/ui/base-ui/kbd"
 import {
@@ -42,7 +42,7 @@ export function AppSidebar() {
         <FeaturesNav />
       </SidebarContent>
       <SidebarFooter className="transition-all group-data-[state=expanded]:px-2">
-        <FreeProductBadge variant="sidebar" />
+        <AppSignature />
       </SidebarFooter>
       <CollapseToggle />
     </Sidebar>

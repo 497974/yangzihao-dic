@@ -426,6 +426,68 @@ describe("translate-text", () => {
   })
 
   describe("translateTextForInput", () => {
+    /** 按消息类型分派：页面检测语言、翻译请求各回各的 */
+    function mockDetectedPageLanguage(detected: string) {
+      mockSendMessage.mockImplementation(async (type: string) => {
+        if (type === "getDetectedCode") return detected
+        if (type === "enqueueTranslateRequest") return "translated input"
+        return undefined
+      })
+    }
+
+    function enqueuedLangConfig() {
+      const call = mockSendMessage.mock.calls.find(
+        (args: unknown[]) => args[0] === "enqueueTranslateRequest",
+      )
+      return (call?.[1] as { langConfig?: { sourceCode: string; targetCode: string } })?.langConfig
+    }
+
+    // 默认配置：源语言=自动、母语=中文、输入翻译方向=「母语 → 源语言」。
+    // 在中文界面的站点（Discord、QQ 邮箱……）上，页面被判成中文，
+    // 方向就塌成"中文 → 中文"，原来会悄悄返回空串——按三下空格转圈一闪、字没变。
+    it("源语言自动而页面是母语时，兜底译成英语", async () => {
+      mockDetectedPageLanguage("cmn")
+
+      const result = await translateTextForInput("你好", "targetCode", "sourceCode")
+
+      expect(result).toBe("translated input")
+      expect(enqueuedLangConfig()).toMatchObject({ sourceCode: "cmn", targetCode: "eng" })
+    })
+
+    // 中文页面常被误判成日语，原来打中文按三下空格会变成日文
+    it("源语言自动时不看页面语言：页面被判成日语也译成英语", async () => {
+      mockDetectedPageLanguage("jpn")
+
+      await translateTextForInput("你好", "targetCode", "sourceCode")
+
+      expect(enqueuedLangConfig()).toMatchObject({ sourceCode: "cmn", targetCode: "eng" })
+    })
+
+    it("用户明确选了源语言，就按他选的来", async () => {
+      mockGetConfigFromStorage.mockResolvedValue({
+        ...DEFAULT_CONFIG,
+        language: { ...DEFAULT_CONFIG.language, sourceCode: "jpn" },
+      })
+      mockDetectedPageLanguage("eng")
+
+      await translateTextForInput("你好", "targetCode", "sourceCode")
+
+      expect(enqueuedLangConfig()).toMatchObject({ sourceCode: "cmn", targetCode: "jpn" })
+    })
+
+    it("用户自己把两边设成同一种语言：报出原因，而不是悄悄返回空串", async () => {
+      mockGetConfigFromStorage.mockResolvedValue({
+        ...DEFAULT_CONFIG,
+        language: { ...DEFAULT_CONFIG.language, sourceCode: "cmn", targetCode: "cmn" },
+      })
+      mockDetectedPageLanguage("cmn")
+
+      await expect(translateTextForInput("你好", "targetCode", "sourceCode")).rejects.toThrow(
+        /语言都是/,
+      )
+      expect(enqueuedLangConfig()).toBeUndefined()
+    })
+
     it("skips webpage context loading for non-llm input translations", async () => {
       mockSendMessage.mockResolvedValue("translated input")
 

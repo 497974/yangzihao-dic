@@ -12,7 +12,11 @@
  * 有意跳过的：图片联想（需图库或按词生图，要联网且成本高）；社交排行榜（需服务器）。
  */
 
+import type { WordSource, WordSourcesDb } from "@/utils/word-sources"
 import {
+  IconCards,
+  IconCircleCheck,
+  IconLink,
   IconLoader2,
   IconPencilQuestion,
   IconPlayerStopFilled,
@@ -22,7 +26,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useAtomValue } from "jotai"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Link } from "react-router"
-import { FreeProductBadge } from "@/components/free-product-badge"
 import { Button } from "@/components/ui/base-ui/button"
 import { PageLayout } from "@/entrypoints/options/components/page-layout"
 import { useTextToSpeech } from "@/hooks/use-text-to-speech"
@@ -31,6 +34,13 @@ import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { detectLanguage } from "@/utils/content/language"
 import { cellToText } from "@/utils/notebase/cell-text"
 import { orpcClient } from "@/utils/orpc/client"
+import {
+  buildSourceLink,
+  findWordSource,
+  formatVideoTime,
+  getWordSources,
+  watchWordSources,
+} from "@/utils/word-sources"
 import { ClozeCard } from "./cloze-card"
 
 type Rating = "again" | "hard" | "good" | "easy"
@@ -236,14 +246,31 @@ export function ReviewPage() {
     return map
   }, [notebase])
 
+  // 存词时记下的出处（在哪个网页、视频哪个时间点遇到的，见 utils/word-sources.ts）
+  const [wordSources, setWordSources] = useState<WordSourcesDb>({})
+  useEffect(() => {
+    let cancelled = false
+    void getWordSources().then((db) => {
+      if (!cancelled) setWordSources(db)
+    })
+    const unwatch = watchWordSources(setWordSources)
+    return () => {
+      cancelled = true
+      unwatch()
+    }
+  }, [])
+
   const queue = useMemo(() => (cards ?? []).filter(isDue) as ReviewCard[], [cards])
   const current = queue[idx]
+  const currentSource = current ? findWordSource(wordSources, current.front) : null
   // 例句要先取出来：题型轮换要知道这张卡有没有例句——没有例句就出不了填空题
   const fields = current ? fieldsByRowId.get(current.notebaseRowId) : undefined
   const sentence = fields?.[FIELD.sentence]?.trim() || ""
   const sentenceTranslation = fields?.[FIELD.sentenceTranslation]?.trim() || ""
   const canCloze = !!sentence && !!sentenceTranslation
   const quizMode = current ? resolveQuizMode(current, modePref, canCloze) : "recognition"
+  /** 新卡不管选了什么题型都先走正反面——第一次见这个词，直接考拼写太狠 */
+  const isNewCard = !!current && (current.state === "new" || current.reps === 0)
   const spellingMode = quizMode === "listening" || quizMode === "translation"
 
   // 下一张卡——换题前趁用户还在答当前这题，先把它的语音悄悄合成好（见下面
@@ -484,11 +511,11 @@ export function ReviewPage() {
 
         {!isPending && finished && (
           <div className="rounded-xl border border-dashed py-16 text-center">
-            <div className="text-4xl">🎉</div>
-            <div className="mt-3 text-lg font-medium">今天的复习完成了</div>
-            <div className="mt-1 text-sm text-muted-foreground">本轮复习 {done} 张卡片</div>
+            <IconCircleCheck className="mx-auto size-8 text-emerald-600" />
+            <div className="mt-3 text-lg font-medium">今日复习已完成</div>
+            <div className="mt-1 text-sm text-muted-foreground">本轮共复习 {done} 张卡片</div>
             <Button variant="outline" size="sm" className="mt-5" onClick={restart}>
-              再看一轮
+              再复习一轮
             </Button>
           </div>
         )}
@@ -584,7 +611,7 @@ export function ReviewPage() {
                           : "text-muted-foreground hover:bg-muted"
                       }`}
                     >
-                      🐢 慢速{slow ? "开" : "关"}
+                      慢速朗读{slow ? "：开" : "：关"}
                     </button>
                   </div>
                 )}
@@ -720,6 +747,23 @@ export function ReviewPage() {
                 className="flex min-h-64 cursor-pointer flex-col items-center justify-center gap-5 rounded-xl border bg-card p-8 text-center"
                 onClick={() => !revealed && setRevealed(true)}
               >
+                {/*
+                  别的三种题型都在卡片顶上写了"这是什么题、要你干什么"，
+                  唯独正反面什么都没写，只有一句"按空格显示答案"——
+                  于是拿到卡的人不知道在考什么，也找不到填答案的地方
+                  （它压根就不用填：先在心里回想，再看答案自己对一下）。
+                */}
+                <div className="flex items-center justify-center gap-2 text-xs font-medium text-muted-foreground">
+                  <span className="rounded-full bg-muted px-2 py-0.5">
+                    {isNewCard ? "初次认识" : "看词回忆"}
+                  </span>
+                  <span>
+                    {isNewCard
+                      ? "新词，先照个面：看一眼再翻到背面记意思"
+                      : "先在心里想它的意思，再翻到背面对一下"}
+                  </span>
+                </div>
+
                 <div className="flex items-center gap-2 text-3xl font-semibold">
                   <span>{current.front}</span>
                   <button
@@ -740,8 +784,17 @@ export function ReviewPage() {
                 </div>
 
                 {revealed ? (
-                  <div className="w-full border-t pt-5 text-left text-[15px] leading-relaxed whitespace-pre-line">
-                    {current.back}
+                  <div className="w-full border-t pt-5 text-left">
+                    <div className="text-[15px] leading-relaxed whitespace-pre-line">
+                      {current.back}
+                    </div>
+                    {/* 这一题没有对错判定，全靠自评。不说明的话，
+                        评分按钮突然冒出来，人不知道那四个按钮凭什么按。 */}
+                    <div className="mt-4 text-center text-xs text-muted-foreground">
+                      {isNewCard
+                        ? "记住了吗？下面照实选一个，系统按它安排下次复习"
+                        : "刚才想对了吗？下面照实选一个，系统按它安排下次复习"}
+                    </div>
                   </div>
                 ) : (
                   <div className="text-sm text-muted-foreground">
@@ -751,6 +804,9 @@ export function ReviewPage() {
                 )}
               </div>
             )}
+
+            {/* 出处：答完才显示——网页标题常常就把这个词写在里面，答题时露出来等于提示 */}
+            {revealed && currentSource && <SourceLine source={currentSource} />}
 
             {revealed && (
               <div ref={ratingsRef} className="grid grid-cols-4 gap-2">
@@ -790,8 +846,6 @@ export function ReviewPage() {
             换个方向练：看中文，把整句英文拼出来
           </Link>
         )}
-
-        <FreeProductBadge />
       </div>
     </PageLayout>
   )
@@ -822,13 +876,41 @@ function AudioChip({
   )
 }
 
+/** 这个词是在哪遇到的，一点回到原处（视频从那句开始放，听一遍原声） */
+function SourceLine({ source }: { source: WordSource }) {
+  let site = source.url
+  try {
+    site = new URL(source.url).hostname.replace(/^www\./, "")
+  } catch {
+    // 链接坏了就原样显示
+  }
+  const isVideo = source.videoTimeSec !== undefined
+
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 rounded-lg border border-dashed px-4 py-2.5 text-sm text-muted-foreground">
+      <IconLink className="size-4 shrink-0" />
+      <span className="min-w-0 truncate" title={source.title || source.url}>
+        出处：{source.title || site}
+        {isVideo && ` · ${formatVideoTime(source.videoTimeSec!)}`}
+      </span>
+      <button
+        type="button"
+        onClick={() => window.open(buildSourceLink(source), "_blank", "noopener")}
+        className="shrink-0 rounded-full border px-3 py-1 text-xs transition hover:border-primary hover:text-primary"
+      >
+        {isVideo ? "回到视频听原声" : "回到原网页"}
+      </button>
+    </div>
+  )
+}
+
 function EmptyState({ onRefresh }: { onRefresh: () => void }) {
   return (
     <div className="rounded-xl border border-dashed py-16 text-center">
-      <div className="text-4xl">📚</div>
-      <div className="mt-3 text-lg font-medium">暂时没有要复习的卡片</div>
+      <IconCards className="mx-auto size-8 text-muted-foreground" />
+      <div className="mt-3 text-lg font-medium">当前没有待复习的卡片</div>
       <div className="mt-1 text-sm text-muted-foreground">
-        划词保存生词后会自动生成卡片；已复习的卡片会按记忆规律在之后的日子里再次出现
+        划词保存生词后会自动生成卡片；已复习的卡片会按记忆规律在之后的日期再次出现
       </div>
       <Button variant="outline" size="sm" className="mt-5" onClick={onRefresh}>
         刷新

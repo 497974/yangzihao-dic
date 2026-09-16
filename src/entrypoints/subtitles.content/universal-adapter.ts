@@ -33,6 +33,7 @@ import {
   adPlayingAtom,
   currentTimeMsAtom,
   sourceTrackAtom,
+  farApartTranslationPercentAtom,
   subtitlesPositionAtom,
   subtitlesSettingsPanelOpenAtom,
   subtitlesSettingsPanelViewAtom,
@@ -74,6 +75,8 @@ export interface SubtitlesProvidersAdapter {
   requestAiSubtitles: () => Promise<void>
   downloadSourceSubtitles: () => Promise<void>
   downloadTranslatedSubtitles: () => Promise<void>
+  /** 字幕学习模式要控制播放（逐句暂停、单句循环、上一句下一句）；取不到就是 null */
+  getVideoElement?: () => HTMLVideoElement | null
 }
 
 export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
@@ -115,6 +118,11 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     const currentVideoId = this.config.getVideoId?.()
     return !!(this.sessionVideoId && currentVideoId && currentVideoId !== this.sessionVideoId)
   }
+
+  /** 字幕学习模式用：正在播的视频元素 */
+  getVideoElement = (): HTMLVideoElement | null =>
+    this.subtitlesScheduler?.getVideoElement() ??
+    document.querySelector<HTMLVideoElement>(this.config.selectors.video)
 
   get supportsAiSubtitles(): boolean {
     return !!this.fetchers.ai
@@ -192,6 +200,11 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     const position = config?.videoSubtitles?.position
     if (position) {
       subtitlesStore.set(subtitlesPositionAtom, { ...position })
+    }
+    // 顶部译文的位置是另一份状态，不跟着 position 走——两行各拖各的
+    const farApartPercent = config?.videoSubtitles?.farApartTranslationPercent
+    if (typeof farApartPercent === "number") {
+      subtitlesStore.set(farApartTranslationPercentAtom, farApartPercent)
     }
   }
 

@@ -12,6 +12,18 @@ export const SENTENCE_END_PATTERN = /[,.。?？！!；;…؟۔\n]$/
 
 // On-demand translation constants
 export const TRANSLATION_BATCH_SIZE = 5
+/**
+ * 同时在飞的字幕翻译批次数。
+ *
+ * 协调器原本是一把布尔锁：发一批 → 等它回来 → 才发下一批。而底层 RequestQueue
+ * 放行 8 请求/秒、突发 20，等于把一条能跑 8 并发的通道压成了 1，字幕自然追不上
+ * 播放——刚开播或刚拖完进度条时前面没有缓冲，只能一批批串着补。
+ *
+ * 取 3 而不是更大：3 批 × 5 条 = 15 条同时在译，冷启动填满 30 秒预取窗口足够快；
+ * 再往上就只是让每个请求在服务端排更久，而且用户一旦快进，多发的那些就白花 token 了。
+ * 这个值仍在底层限流之内，不会把接口打爆。
+ */
+export const MAX_CONCURRENT_TRANSLATION_BATCHES = 3
 export const TRANSLATE_LOOK_AHEAD_MS = 30_000
 export const PROCESS_LOOK_AHEAD_MS = 60_000
 export const MAX_LOOKAHEAD_RATE = 4
@@ -74,6 +86,15 @@ export const DEFAULT_DISPLAY_MODE = "bilingual" as const
 export const DEFAULT_TRANSLATION_POSITION = "above" as const
 export const DEFAULT_CONTROLS_HEIGHT = 60
 export const DEFAULT_SUBTITLE_POSITION = { percent: 10, anchor: "bottom" } as const
+/**
+ * 「拉开距离」模式下译文离画面顶端的距离（百分比）。
+ *
+ * 用 8% 而不是贴顶：YouTube 顶部悬浮着标题和分享按钮，全屏时鼠标一动就冒出来，
+ * 贴太近会被压住。这个值让译文在标题条下方，又离底部原文足够远。
+ */
+export const FAR_APART_TRANSLATION_TOP_PERCENT = 8
+/** 译文最多能压到多低。再往下就贴到底部原文了，「拉开距离」也就名存实亡 */
+export const MAX_FAR_APART_TRANSLATION_PERCENT = 60
 // Mnemonic for "captions", and it echoes YouTube's own `C` key without taking it over.
 export const DEFAULT_SUBTITLES_TOGGLE_SHORTCUT_KEY = "Alt+C"
 // Subtitle controls sit on top of arbitrary host pages, so keep their theme fixed for readability.

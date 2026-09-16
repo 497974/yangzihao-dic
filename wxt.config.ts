@@ -12,7 +12,6 @@ import {
 const WXT_API_KEY_PATTERN = /^WXT_.*API_KEY/
 const ALLOWED_BUNDLED_API_KEYS = new Set(["WXT_POSTHOG_API_KEY"])
 const useLocalPackages = isLocalPackagesEnabled(process.env)
-const shouldSkipEnvValidation = process.env.WXT_SKIP_ENV_VALIDATION === "true"
 // Root of the read-frog monorepo whose source is aliased in when developing
 // with local packages. Defaults to the sibling checkout; override with
 // WXT_MONOREPO_PATH to point at a git worktree (relative or absolute).
@@ -40,7 +39,9 @@ export default defineConfig({
     // 侧边栏用 chrome.sidePanel（Chrome 114+），朗读用 chrome.offscreen（109+）。
     // 代码里都做了特性检测不会崩，但装在更老的浏览器上会静默少掉侧栏和朗读，
     // 用户只会觉得"功能是坏的"。显式声明下限，让浏览器直接拒绝并说明原因。
-    ...(browser !== "firefox" && { minimum_chrome_version: "114" }),
+    // 桌面版连接桥靠 WebSocket 让后台保持常驻：Chrome 116 起，WebSocket 上有来往时
+    // 后台才不会被休眠，连接才挂得住。所以下限从 114 提到 116。
+    ...(browser !== "firefox" && { minimum_chrome_version: "116" }),
     // Fixed extension ID for development
     ...(mode === "development" &&
       (browser === "chrome" || browser === "edge") && {
@@ -107,6 +108,8 @@ export default defineConfig({
       "我的生词-待导入.json",
       ".output/**/*",
       "node_modules/**/*",
+      // 桌面程序是另一个独立项目（带着上百 MB 的 Electron），不属于扩展源码
+      "desktop/**/*",
     ],
   },
   hooks: {
@@ -168,6 +171,9 @@ export default defineConfig({
             {
               name: "check-api-key-env",
               buildStart() {
+                // 必须在这里现读：WXT 先加载本配置文件、之后才把 .env 读进 process.env，
+                // 在文件顶层读的话 .env 里的 WXT_SKIP_ENV_VALIDATION=true 永远不生效
+                const shouldSkipEnvValidation = process.env.WXT_SKIP_ENV_VALIDATION === "true"
                 z.object(
                   createExtensionClientEnvSchema(
                     configEnv.mode === "production",

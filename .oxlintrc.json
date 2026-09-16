@@ -22,6 +22,7 @@
     "**/.nx/**",
     "**/.turbo/**",
     "repos/**",
+    "desktop/**",
     "scripts/output/**",
     ".agents/**",
     ".claude/**",

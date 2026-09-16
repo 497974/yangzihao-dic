@@ -9,7 +9,11 @@
 import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { PageLayout } from "@/entrypoints/options/components/page-layout"
+import { readSrsDb } from "@/utils/local-notebase/srs-storage"
+import { readDb } from "@/utils/local-notebase/storage"
 import { orpcClient } from "@/utils/orpc/client"
+import { countByStatus } from "@/utils/vocab-highlight/status"
+import { buildVocabulary } from "@/utils/vocab-highlight/vocabulary"
 
 const WINDOW_DAYS = 30
 const BAR_DAYS = 14
@@ -37,6 +41,15 @@ export function StatsPage() {
     // 字符串可能对应不同的日界，不带上它缓存会串
     queryKey: ["stats-activity", from, to, timezone],
     queryFn: () => orpcClient.stats.activity({ from, to, timezone }),
+  })
+
+  // 生词本里的词各学到什么程度：和网页上生词高亮的三种颜色是同一套判断（见 vocab-highlight/status.ts）
+  const { data: progress } = useQuery({
+    queryKey: ["vocab-progress"],
+    queryFn: async () => {
+      const vocab = buildVocabulary(await readDb(), await readSrsDb())
+      return countByStatus([...vocab.values()].map((entry) => entry.status))
+    },
   })
 
   const dailyMap = useMemo(() => {
@@ -91,6 +104,18 @@ export function StatsPage() {
               <StatCard label="连续学习" value={streak} unit="天" accent={streak > 0} />
               <StatCard label="已学单词" value={learnedCards} unit="个" />
             </div>
+
+            <section className="rounded-xl border bg-card p-5">
+              <h3 className="mb-3 text-sm font-medium text-muted-foreground">生词掌握情况</h3>
+              <div className="grid grid-cols-3 gap-3">
+                <StatCard label="已掌握" value={progress?.mastered ?? 0} unit="个" accent />
+                <StatCard label="学习中" value={progress?.learning ?? 0} unit="个" />
+                <StatCard label="新词" value={progress?.new ?? 0} unit="个" />
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                复习阶段且记忆稳定度达到 21 天的词计为已掌握；网页上的生词标记使用同一套判断。
+              </p>
+            </section>
 
             <section className="rounded-xl border bg-card p-5">
               <h3 className="mb-4 text-sm font-medium text-muted-foreground">最近 14 天复习量</h3>

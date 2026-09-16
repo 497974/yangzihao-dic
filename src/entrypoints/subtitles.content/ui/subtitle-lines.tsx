@@ -1,14 +1,17 @@
 import type { CSSProperties } from "react"
 import type { SubtitleTextStyle } from "@/types/config/subtitles"
 import { useAtomValue } from "jotai"
-import { useEffect, useRef } from "react"
+import { use, useEffect, useMemo, useRef } from "react"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { SUBTITLE_FONT_FAMILIES } from "@/utils/constants/subtitles"
 import { getLanguageDirectionAndLang } from "@/utils/content/language-direction"
 import { cn } from "@/utils/styles/utils"
 import { isTranslationPending } from "@/utils/subtitles/display-rules"
+import { tokenizeSubtitle } from "@/utils/subtitles/study"
 import { displaySubtitleAtom } from "../atoms"
 import { SubtitlePendingLabel } from "./subtitle-pending-label"
+import { SubtitlesUIContext } from "./subtitles-ui-context"
+import { useSubtitleStudyActions } from "./use-subtitle-study"
 
 interface SubtitleLineProps {
   content?: string
@@ -30,17 +33,53 @@ function getTextStyleVars(textStyle: SubtitleTextStyle): CSSProperties {
   } as CSSProperties
 }
 
+/**
+ * 字幕原文，每个英文词都能点：点一下直接查词典（整句当语境，查的时候暂停视频）。
+ * 拖着选一段照旧弹划词工具栏——刚拖选完松手也会触发一次 click，那时有选中的文字，不当成点词。
+ */
+function ClickableWords({ text }: { text: string }) {
+  const study = useSubtitleStudyActions()
+  const tokens = useMemo(() => tokenizeSubtitle(text), [text])
+
+  return tokens.map((token, index) =>
+    token.word ? (
+      <span
+        // oxlint-disable-next-line no-array-index-key -- 同一句里的词顺序固定，下标就是它的身份
+        key={index}
+        className="subtitles-word"
+        title="点一下查词典"
+        // 字幕挂在播放器里面：点击、双击冒上去会被播放器当成「暂停/播放」「全屏」
+        onDoubleClick={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          event.stopPropagation()
+          if (window.getSelection()?.toString().trim()) {
+            return
+          }
+          study.lookupWord(token.text, text, event.currentTarget)
+        }}
+      >
+        {token.text}
+      </span>
+    ) : (
+      token.text
+    ),
+  )
+}
+
 export function MainSubtitle({ content, className }: SubtitleLineProps) {
   const subtitle = useAtomValue(displaySubtitleAtom)
   const { style } = useAtomValue(configFieldsAtomMap.videoSubtitles)
+  const ui = use(SubtitlesUIContext)
   const text = content ?? subtitle?.text ?? ""
+  // 设置里的样式预览传的是固定文字、不在播放器里，不用点词
+  const clickable = content === undefined && !!ui
 
   return (
     <div
       className={cn("subtitles-main text-xl leading-tight", className)}
       style={getTextStyleVars(style.main)}
     >
-      {text}
+      {clickable ? <ClickableWords text={text} /> : text}
     </div>
   )
 }

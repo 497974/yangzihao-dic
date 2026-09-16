@@ -11,6 +11,10 @@ import { createFeatureUsageContext, trackFeatureUsed } from "@/utils/analytics"
 import { classifyResolvedProvider, UNKNOWN_FEATURE_PROVIDER } from "@/utils/analytics-provider"
 import { configFieldsAtomMap, writeConfigAtom } from "@/utils/atoms/config"
 import { BUILT_IN_DICTIONARY_ACTION_ID } from "@/utils/constants/custom-action"
+import {
+  SUBTITLE_WORD_LOOKUP_EVENT,
+  type SubtitleWordLookupDetail,
+} from "@/utils/constants/subtitle-lookup"
 import { findSelectionToolbarAction, patchSelectionToolbarAction } from "@/utils/custom-actions"
 import { onMessage } from "@/utils/message"
 import {
@@ -18,6 +22,7 @@ import {
   resolveDictionaryProviderRef,
   resolveProviderRefForCapability,
 } from "@/utils/providers/provider-registry"
+import { rememberSubtitleLookup } from "@/utils/word-sources"
 import { shadowWrapper } from "../.."
 import { SelectionToolbarErrorAlert } from "../../components/selection-toolbar-error-alert"
 import { SelectionToolbarFooterContent } from "../../components/selection-toolbar-footer-content"
@@ -33,6 +38,7 @@ import { createSelectionToolbarPrecheckError } from "../inline-error"
 import { useSelectionOpenRequestResolver } from "../use-selection-open-request"
 import { CustomActionContent } from "./custom-action-content"
 import { CustomActionToolButton } from "./custom-action-tool-button"
+import { LookupCountBadge } from "./lookup-count-badge"
 import { SaveToNotebaseButton } from "./save-to-notebase-button"
 import { isSaveToNotebaseDialogOpenAtom } from "./save-to-notebase-dialog-atom"
 import { SaveToNotebaseDialogHost } from "./save-to-notebase-dialog-host"
@@ -159,14 +165,15 @@ export function SelectionCustomActionProvider({ children }: { children: ReactNod
       ),
     [cleanSelection, customActionRequest, paragraphsText, webPageContext],
   )
-  const { error, isRunning, resetSessionState, result, thinking } = useCustomActionExecution({
-    bodyRef,
-    analyticsSurface: sourceSurface,
-    executionContext: executionPlan.executionContext,
-    open: isOpen,
-    popoverSessionKey,
-    rerunNonce,
-  })
+  const { error, isRunning, lookupRecord, resetSessionState, result, thinking } =
+    useCustomActionExecution({
+      bodyRef,
+      analyticsSurface: sourceSurface,
+      executionContext: executionPlan.executionContext,
+      open: isOpen,
+      popoverSessionKey,
+      rerunNonce,
+    })
   const displayedResult = executionPlan.executionContext ? result : null
   const displayedError = error ?? executionPlan.error
   const displayedIsRunning =
@@ -340,6 +347,48 @@ export function SelectionCustomActionProvider({ children }: { children: ReactNod
     })
   }, [openContextMenuCustomAction])
 
+  // 视频字幕里点了一个词（字幕学习模式，见 subtitles.content）：不弹工具栏，直接用词典查，
+  // 整句字幕当语境——和在工具栏上点「词典」走的是同一套打开流程
+  useEffect(() => {
+    const handleSubtitleWordLookup = (event: Event) => {
+      const detail = (event as CustomEvent<SubtitleWordLookupDetail>).detail
+      const text = detail?.text?.trim()
+      if (!text) {
+        return
+      }
+      const dictionary = findSelectionToolbarAction(
+        selectionToolbarConfig,
+        BUILT_IN_DICTIONARY_ACTION_ID,
+      )
+      if (!dictionary || dictionary.enabled === false) {
+        toastManager.add({
+          type: "error",
+          title: createSelectionToolbarPrecheckError("customAction", "actionUnavailable")
+            .description,
+        })
+        return
+      }
+      const sentence = detail.sentence?.trim() || text
+      if (typeof detail.videoTimeMs === "number") {
+        // 接着存这个词时，出处带上视频时间点（见 utils/word-sources.ts）
+        rememberSubtitleLookup(window.location.href, detail.videoTimeMs)
+      }
+      openActionRequest({
+        actionId: BUILT_IN_DICTIONARY_ACTION_ID,
+        anchor: detail.anchor,
+        surface: ANALYTICS_SURFACE.SELECTION_TOOLBAR,
+        session: {
+          id: --nextEphemeralSessionIdRef.current,
+          createdAt: Date.now(),
+          selectionSnapshot: { text, ranges: [] },
+          contextSnapshot: { text: sentence, paragraphs: [sentence] },
+        },
+      })
+    }
+    window.addEventListener(SUBTITLE_WORD_LOOKUP_EVENT, handleSubtitleWordLookup)
+    return () => window.removeEventListener(SUBTITLE_WORD_LOOKUP_EVENT, handleSubtitleWordLookup)
+  }, [openActionRequest, selectionToolbarConfig])
+
   useEffect(() => {
     if (!isOpen || !executionPlan.error || executionPlan.executionContext) {
       return
@@ -439,6 +488,7 @@ export function SelectionCustomActionProvider({ children }: { children: ReactNod
           >
             {activeAction && (
               <>
+                <LookupCountBadge record={lookupRecord} />
                 <SaveToNotebaseButton
                   action={activeAction}
                   isRunning={displayedIsRunning}

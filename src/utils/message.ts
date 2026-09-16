@@ -13,6 +13,7 @@ import type {
   EdgeTTSSynthesizeRequest,
   EdgeTTSSynthesizeWireResponse,
 } from "@/types/edge-tts"
+import type { DictionaryLookupRecord } from "@/types/lookup-history"
 import type { ProxyRequest, ProxyResponse } from "@/types/proxy-fetch"
 import type {
   TTSPlaybackStartRequest,
@@ -22,9 +23,11 @@ import type {
 import type { HostedAiStatus } from "@/utils/hosted-ai/types"
 import type { SerializableProviderRef } from "@/utils/providers/provider-ref"
 import type { EdgeTTSVoice } from "@/utils/server/edge-tts/types"
+import type { WordInfo } from "@/utils/wordlist/lookup"
+import type { MixBand, MixTermInfo } from "@/utils/wordlist/reverse"
 import { defineExtensionMessaging } from "@webext-core/messaging"
 
-interface ProtocolMap {
+export interface ProtocolMap {
   // navigation
   openPage: (data: { url: string; active?: boolean }) => void
   openOptionsPage: (data?: { route?: `/${string}` }) => void
@@ -171,6 +174,16 @@ interface ProtocolMap {
   // offscreen internal
   ttsOffscreenPlay: (data: TTSPlaybackStartRequest) => Promise<TTSPlaybackStartResponse>
   ttsOffscreenStop: (data: TTSPlaybackStopRequest) => Promise<{ ok: true }>
+  // 查词次数（网页词典查完一个词记一笔；见 background/lookup-history.ts）
+  recordDictionaryLookup: (data: { text: string }) => Promise<DictionaryLookupRecord | null>
+  // 离线词表批量查词，只返回查到的词（见 background/wordlist.ts）
+  lookupWords: (data: { words: string[] }) => Promise<Record<string, WordInfo>>
+  // 离线词表反查中文词，按难度范围挑英文说法（中文网页混入英文词用）
+  lookupChineseTerms: (data: {
+    terms: string[]
+    level: number
+    band: MixBand
+  }) => Promise<Record<string, MixTermInfo>>
 }
 
 export const { sendMessage, onMessage } = defineExtensionMessaging<ProtocolMap>()

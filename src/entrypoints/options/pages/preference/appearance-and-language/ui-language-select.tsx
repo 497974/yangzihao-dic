@@ -16,28 +16,11 @@ import { i18n } from "@/utils/i18n"
 // regardless of the current interface language and never need translation.
 const LANGUAGE_ENDONYMS: Record<Exclude<UiLanguage, "auto">, string> = {
   en: "English",
-  es: "Español",
-  ja: "日本語",
-  ko: "한국어",
-  ru: "Русский",
-  tr: "Türkçe",
-  vi: "Tiếng Việt",
   "zh-CN": "简体中文",
   "zh-TW": "繁體中文",
 }
 
-const UI_LANGUAGE_ORDER: UiLanguage[] = [
-  "auto",
-  "en",
-  "es",
-  "ja",
-  "ko",
-  "ru",
-  "tr",
-  "vi",
-  "zh-CN",
-  "zh-TW",
-]
+const UI_LANGUAGE_ORDER: UiLanguage[] = ["auto", "en", "zh-CN", "zh-TW"]
 
 // Resolved at render so the "auto" label follows a runtime interface-language switch.
 function labelFor(language: UiLanguage): string {

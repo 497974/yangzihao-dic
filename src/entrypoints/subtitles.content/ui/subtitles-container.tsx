@@ -7,6 +7,7 @@ import { StateMessage } from "./state-message"
 import { SubtitlesSettingsPanel } from "./subtitles-settings-panel"
 import { SubtitlesUIContext } from "./subtitles-ui-context"
 import { SubtitlesView } from "./subtitles-view"
+import { useSubtitleStudyEngine } from "./use-subtitle-study"
 import { useSubtitlesCustomCSS } from "./use-subtitles-custom-css"
 
 export function SubtitlesContainer() {
@@ -20,6 +21,8 @@ export function SubtitlesContainer() {
   const shadowWrapper = use(ShadowWrapperContext)
 
   useSubtitlesCustomCSS()
+  // 字幕学习模式：逐句暂停、单句循环（开关在悬停字幕时出现的小工具条上）
+  useSubtitleStudyEngine()
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-visible">

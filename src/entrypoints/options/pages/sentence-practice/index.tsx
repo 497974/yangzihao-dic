@@ -12,11 +12,10 @@
  * 句子直接取自生词本里划词存下的例句（句子 + 句子翻译），不额外联网、不花 token。
  */
 
-import { IconLoader2, IconVolume } from "@tabler/icons-react"
+import { IconCircleCheck, IconLoader2, IconPencilQuestion, IconVolume } from "@tabler/icons-react"
 import { useQuery } from "@tanstack/react-query"
 import { useAtomValue } from "jotai"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { FreeProductBadge } from "@/components/free-product-badge"
 import { Button } from "@/components/ui/base-ui/button"
 import { PageLayout } from "@/entrypoints/options/components/page-layout"
 import { useTextToSpeech } from "@/hooks/use-text-to-speech"
@@ -549,28 +548,28 @@ export function SentencePracticePage() {
 
         {!isPending && queue.length === 0 && (
           <div className="rounded-xl border border-dashed py-16 text-center">
-            <div className="text-4xl">✍️</div>
-            <div className="mt-3 text-lg font-medium">这个题库还没有可练的句子</div>
+            <IconPencilQuestion className="mx-auto size-8 text-muted-foreground" />
+            <div className="mt-3 text-lg font-medium">该题库暂无可练习的句子</div>
             <div className="mt-1 text-sm text-muted-foreground">
-              造句是从零拼整句，只收 {MAX_WORDS_FOR_CONSTRUCTION} 词以内的句子——
-              生词本里的例句大多偏长，被过滤掉了。切到「常用表达」先练内置的那批。
+              造句练习需要从零拼出整句，只收录 {MAX_WORDS_FOR_CONSTRUCTION} 词以内的句子，
+              生词本中的例句大多偏长而被过滤。可切换到「常用表达」练习内置句库。
             </div>
           </div>
         )}
 
         {!isPending && finished && (
           <div className="rounded-xl border border-dashed py-16 text-center">
-            <div className="text-4xl">🎉</div>
-            <div className="mt-3 text-lg font-medium">这一轮练完了</div>
+            <IconCircleCheck className="mx-auto size-8 text-emerald-600" />
+            <div className="mt-3 text-lg font-medium">本轮练习已完成</div>
             <div className="mt-1 text-sm text-muted-foreground">
               共 {queue.length} 句 · 做对 {solvedCount} 句 · 用时 {formatElapsed(elapsedMs)}
             </div>
             <div className="mt-4 flex items-center justify-center gap-6 text-sm">
-              <span className="text-amber-600">★ Perfect {perfectCount} 句</span>
-              <span className="text-amber-600">🔥 最高连对 {bestCombo}</span>
+              <span className="text-amber-600">★ 一次通过 {perfectCount} 句</span>
+              <span className="text-amber-600">最高连对 {bestCombo} 句</span>
             </div>
             <Button variant="outline" size="sm" className="mt-5" onClick={restart}>
-              再来一轮
+              再练一轮
             </Button>
           </div>
         )}
@@ -582,7 +581,7 @@ export function SentencePracticePage() {
                 第 {idx + 1} / {queue.length} 句
               </span>
               <div className="flex items-center gap-4">
-                {combo >= 2 && <span className="font-medium text-amber-600">🔥 连对 {combo}</span>}
+                {combo >= 2 && <span className="font-medium text-amber-600">连对 {combo}</span>}
                 <span>做对 {solvedCount}</span>
                 <span className="tabular-nums">{formatElapsed(elapsedMs)}</span>
               </div>
@@ -767,7 +766,6 @@ export function SentencePracticePage() {
         )}
 
         {/* 放在所有分支之外：空状态和完成页也要能看到 */}
-        <FreeProductBadge />
       </div>
     </PageLayout>
   )

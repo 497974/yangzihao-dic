@@ -132,9 +132,10 @@ const siteControlSchema = z.object({
 // `.default("auto")` is load-bearing: it lets configs stored before this field existed still
 // parse successfully, avoiding the destructive fallback-to-DEFAULT_CONFIG path in
 // `writeConfigAtom` / `initializeConfig` during the upgrade window.
-const uiLanguageSchema = z
-  .enum(["auto", "en", "es", "ja", "ko", "ru", "tr", "vi", "zh-CN", "zh-TW"])
-  .default("auto")
+// `.catch("auto")` 同样是承重的：界面语言从九种收窄到三种后，老配置里可能存着
+// "ja" 这类已经不支持的值——没有 catch 的话整份配置会校验失败，走到
+// fallback-to-DEFAULT_CONFIG 那条毁灭性分支，把用户设置全清空。
+const uiLanguageSchema = z.enum(["auto", "en", "zh-CN", "zh-TW"]).default("auto").catch("auto")
 export type UiLanguage = z.infer<typeof uiLanguageSchema>
 
 // Complete config schema

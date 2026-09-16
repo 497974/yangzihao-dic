@@ -99,6 +99,18 @@ async function generateCards(notebaseId: string, templateId?: string) {
   const nb = nbDb.notebases[notebaseId]
   if (!nb) return { created: 0, txid: 0 }
 
+  // 每行都已经有卡片就不写存储：闪卡页、统计、桌面版的复习提醒每次都会先调这里，
+  // 原来每次都把整份复习数据重写一遍
+  const current = await readSrsDb()
+  const covered = new Set(
+    Object.values(current.cards)
+      .filter((c) => c.templateId === tpl.id)
+      .map((c) => c.notebaseRowId),
+  )
+  if (nb.notebaseRows.every((row) => covered.has(row.id))) {
+    return { created: 0, txid: current.txid }
+  }
+
   return mutateSrsDb((db) => {
     const have = new Set(
       Object.values(db.cards)

@@ -1,33 +1,22 @@
 /// <reference types="@modyfi/vite-plugin-yaml/modules" />
 import type { Resource } from "i18next"
 import en from "@/locales/en.yml"
-import es from "@/locales/es.yml"
-import ja from "@/locales/ja.yml"
-import ko from "@/locales/ko.yml"
-import ru from "@/locales/ru.yml"
-import tr from "@/locales/tr.yml"
-import vi from "@/locales/vi.yml"
 import zhCN from "@/locales/zh-CN.yml"
 import zhTW from "@/locales/zh-TW.yml"
 
 /**
  * The interface languages the runtime i18next engine can switch between.
  *
+ * 本项目面向中文用户，只保留英文（兜底）和简繁中文：每种语言的全部文案都会被打进
+ * 每一个 bundle（含每个内容脚本），六种用不到的语言白占好几 MB。要加回某种语言，
+ * 把 src/locales/<code>.yml 放回来，再在这里、uiLanguageSchema、界面语言下拉框
+ * 三处各加一行即可。
+ *
  * MUST stay in sync with the `uiLanguage` enum in `@/types/config/config` and the
  * files under `src/locales/`. `@wxt-dev/i18n/module` still reads those same files to
  * emit `_locales/*` for manifest name/description localization (browser-locale-bound).
  */
-export const SUPPORTED_UI_LOCALES = [
-  "en",
-  "es",
-  "ja",
-  "ko",
-  "ru",
-  "tr",
-  "vi",
-  "zh-CN",
-  "zh-TW",
-] as const
+export const SUPPORTED_UI_LOCALES = ["en", "zh-CN", "zh-TW"] as const
 
 export type SupportedUiLocale = (typeof SUPPORTED_UI_LOCALES)[number]
 
@@ -63,12 +52,6 @@ function convertTree(node: LocaleTree): LocaleTree {
 
 const rawResources: Record<SupportedUiLocale, LocaleTree> = {
   en,
-  es,
-  ja,
-  ko,
-  ru,
-  tr,
-  vi,
   "zh-CN": zhCN,
   "zh-TW": zhTW,
 }

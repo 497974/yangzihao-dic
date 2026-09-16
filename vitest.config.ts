@@ -6,7 +6,7 @@ export default defineConfig({
   // TODO: remove any
   plugins: [WxtVitest() as any, react()],
   test: {
-    exclude: [...configDefaults.exclude, "**/.claude/**", "**/repos/**"],
+    exclude: [...configDefaults.exclude, "**/.claude/**", "**/repos/**", "desktop/**"],
     environment: "node",
     environmentOptions: {
       // jsdom defaults to http://localhost:3000/, which built-in site rules

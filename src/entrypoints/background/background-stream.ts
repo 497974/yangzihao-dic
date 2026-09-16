@@ -42,6 +42,11 @@ import { buildLocalGenerateTextParams } from "@/utils/providers/generate-params"
 import { getLanguageModelForConfig, getModelById } from "@/utils/providers/model"
 import { isBuiltInAiProviderId } from "@/utils/providers/provider-registry"
 import { attachRequestErrorMeta } from "@/utils/request/retry-policy"
+import {
+  readCachedStructuredResult,
+  structuredResultCacheKey,
+  writeCachedStructuredResult,
+} from "./structured-result-cache"
 
 const invalidStreamStartPayloadMessage = "Invalid stream start payload"
 const aiStreamProtocolErrorMessage = "Invalid AI stream response."
@@ -853,7 +858,38 @@ async function createHostedStructuredObjectPartStream(
   }
 }
 
+/**
+ * 结构化查词。payload.cache 开着时先查缓存：查过的词直接用上次的结果，不再调用大模型
+ * （见 structured-result-cache.ts）；「重新生成」传 refresh，重新问模型并覆盖旧结果。
+ */
 export async function runStructuredObjectStreamInBackground(
+  serializablePayload: BackgroundStreamStructuredObjectSerializablePayload,
+  options: StreamRuntimeOptions<BackgroundStructuredObjectStreamSnapshot> = {},
+): Promise<BackgroundStructuredObjectStreamSnapshot> {
+  // cache 只是开关，不能跟着请求交给模型
+  const { cache, ...payload } = serializablePayload
+  if (!cache) {
+    return runStructuredObjectStreamUncached(payload, options)
+  }
+
+  const key = await structuredResultCacheKey(payload)
+  if (cache === "use") {
+    const cached = await readCachedStructuredResult(key).catch(() => null)
+    if (cached) {
+      const snapshot = createStreamSnapshot(cached, { status: "complete", text: "" })
+      options.onChunk?.(snapshot)
+      return snapshot
+    }
+  }
+
+  const snapshot = await runStructuredObjectStreamUncached(payload, options)
+  await writeCachedStructuredResult(key, snapshot.output).catch((error) => {
+    logger.warn("[Background] 查词结果写入缓存失败", error)
+  })
+  return snapshot
+}
+
+async function runStructuredObjectStreamUncached(
   serializablePayload: BackgroundStreamStructuredObjectSerializablePayload,
   options: StreamRuntimeOptions<BackgroundStructuredObjectStreamSnapshot> = {},
 ): Promise<BackgroundStructuredObjectStreamSnapshot> {

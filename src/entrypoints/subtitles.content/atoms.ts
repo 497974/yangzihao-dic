@@ -1,9 +1,14 @@
 import type { ViewId } from "./ui/subtitles-settings-panel/views"
 import type { SubtitlesSource } from "@/utils/constants/subtitles"
+import type { DictationStats } from "@/utils/subtitles/dictation"
 import type { StateData, SubtitlesFragment, SubtitlesState } from "@/utils/subtitles/types"
 import { atom, createStore } from "jotai"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
-import { DEFAULT_SUBTITLE_POSITION, SUBTITLES_SOURCE } from "@/utils/constants/subtitles"
+import {
+  DEFAULT_SUBTITLE_POSITION,
+  FAR_APART_TRANSLATION_TOP_PERCENT,
+  SUBTITLES_SOURCE,
+} from "@/utils/constants/subtitles"
 import { hasRenderableSubtitleByMode, isAwaitingTranslation } from "@/utils/subtitles/display-rules"
 import { ROOT_VIEW } from "./ui/subtitles-settings-panel/views"
 
@@ -43,6 +48,21 @@ export const displaySubtitleAtom = atom((get): SubtitlesFragment | null => {
   return get(sourceTrackAtom).find((f) => f.start <= timeMs && f.end > timeMs) ?? null
 })
 
+/** 字幕学习模式：每句播完自动暂停（开关记在存储里，见 use-subtitle-study.ts） */
+export const studyAutoPauseAtom = atom<boolean>(false)
+
+/** 字幕学习模式：正在单句循环的那一句；null = 没在循环 */
+export const studyLoopCueAtom = atom<SubtitlesFragment | null>(null)
+
+/**
+ * 字幕听写模式（阶段五实现方案 · 步骤 3）：原文遮住、译文隐藏，每句播完暂停，打出听到的内容再对答案。
+ * 不持久化——听写是一次专门的练习，下次打开视频还是正常看。
+ */
+export const dictationModeAtom = atom<boolean>(false)
+
+/** 本次听写做了几句、正确率累计（关掉听写就清零） */
+export const dictationStatsAtom = atom<DictationStats>({ lines: 0, accuracySum: 0 })
+
 export const subtitlesStateAtom = atom<StateData | null>(null)
 
 export const subtitlesVisibleAtom = atom<boolean>(false)
@@ -79,6 +99,9 @@ export interface SubtitlePosition {
 }
 
 export const subtitlesPositionAtom = atom<SubtitlePosition>({ ...DEFAULT_SUBTITLE_POSITION })
+
+/** 「拉开距离」模式下顶部译文的距顶百分比。拖动时实时更新，松手才写进配置。 */
+export const farApartTranslationPercentAtom = atom<number>(FAR_APART_TRANSLATION_TOP_PERCENT)
 
 export const subtitlesDisplayAtom = atom((get) => {
   const subtitle = get(displaySubtitleAtom)

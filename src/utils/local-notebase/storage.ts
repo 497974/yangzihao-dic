@@ -64,6 +64,8 @@ export interface LocalNotebaseDb {
 }
 
 const DB_KEY = "local:localNotebaseDb"
+/** 生词本整份数据的存储键；网页生词高亮订阅它，存了新词马上跟着标 */
+export const LOCAL_NOTEBASE_DB_KEY = DB_KEY
 
 function emptyDb(): LocalNotebaseDb {
   return { txid: 0, notebases: {} }

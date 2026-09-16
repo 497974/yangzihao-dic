@@ -64,7 +64,9 @@ export interface LocalSrsDb {
   revlogs: LocalRevlog[]
 }
 
-const SRS_KEY = "local:localSrsDb"
+/** 闪卡库在存储里的键；网页上的生词高亮要监听它来刷新学习状态 */
+export const LOCAL_SRS_DB_KEY = "local:localSrsDb" as const
+const SRS_KEY = LOCAL_SRS_DB_KEY
 
 function emptyDb(): LocalSrsDb {
   return { txid: 0, templates: {}, cards: {}, revlogs: [] }

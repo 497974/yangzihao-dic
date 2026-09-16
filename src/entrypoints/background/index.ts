@@ -23,10 +23,12 @@ import {
   cleanupAllTranslationCache,
   setUpDatabaseCleanup,
 } from "./db-cleanup"
+import { setUpDesktopBridge } from "./desktop-bridge/setup"
 import { setupEdgeTTSMessageHandlers } from "./edge-tts"
 import { setupHostedAiStatusHandler } from "./hosted-ai-status"
 import { setupIframeInjection } from "./iframe-injection"
 import { setupLLMGenerateTextMessageHandlers } from "./llm-generate-text"
+import { setupLookupHistoryMessageHandlers } from "./lookup-history"
 import { initMockData } from "./mock-data"
 import { newUserGuide } from "./new-user-guide"
 import { setupNotebasePendingSaveProcessor } from "./notebase-pending-save"
@@ -35,6 +37,7 @@ import { setupSidePanelMessageHandler } from "./side-panel"
 import { setUpSubtitlesTranslationQueue, setUpWebPageTranslationQueue } from "./translation-queues"
 import { translationMessage } from "./translation-signal"
 import { setupTTSPlaybackMessageHandlers } from "./tts-playback"
+import { setupWordlistMessageHandlers } from "./wordlist"
 
 export default defineBackground({
   type: "module",
@@ -140,9 +143,15 @@ export default defineBackground({
     proxyFetch()
     setupHostedAiStatusHandler()
     setupNotebasePendingSaveProcessor(() => backgroundReady)
+    // 桌面版连接桥（QQ、Word 里取词查词）；默认关闭，设置页打开后才会连
+    setUpDesktopBridge()
     setupEdgeTTSMessageHandlers()
+    // 查词次数：查过几次、存过的词又查了就提前复习
+    setupLookupHistoryMessageHandlers()
     setupLLMGenerateTextMessageHandlers()
     setupTTSPlaybackMessageHandlers()
+    // 离线词表（难度档、简短释义）：行内释义提示、页面难度要用
+    setupWordlistMessageHandlers()
     void initMockData()
 
     // Setup on-demand iframe injection after page translation is enabled.

@@ -93,7 +93,48 @@ options:
     toggle: Toggle sidebar
     settings: Settings
     features: Features
+    vocabulary: Vocabulary
+    practice: Practice
+    reading: Reading & Translation
+    selection: Selection Tools
     product: Product
+  readingAssist:
+    title: Reading Assist
+    pageDescription: "Learn words as you read: mark the ones you saved, or replace a few Chinese words with English"
+    level:
+      title: My English level
+      description: Both level-based hints and English words on Chinese pages are chosen against this level.
+      fromVocabTest: Estimated from your vocabulary test result. You can change it here.
+      fromDefault: Not set yet, so high-school level is assumed. Take the vocabulary test to estimate it.
+    highlight:
+      title: Mark saved words on web pages
+      description: Words and phrases you saved get a dotted underline wherever they appear; hover to see the phonetic and meaning. Inflections like obtains and obtained count too
+      showMastered:
+        title: Also mark mastered words
+        description: By default only new and learning words are marked. Underlining every mastered word buries the ones that still need attention
+      legend: "Marker colors: sky-blue dashes for new words (not yet reviewed), amber dashes for words you are learning, green dots for mastered words. Status comes from your flashcard history; a word counts as mastered once it is in review with a memory stability of at least 21 days."
+    wordWise:
+      title: Hints by level
+      hints:
+        title: Inline Chinese glosses
+        description: Shows a short Chinese gloss above English words beyond your level, only on the first occurrence per page. Words in your notebook are left to the saved-word markers. Works on English-dominant pages only
+      range:
+        title: Hint range
+        description: Choose how difficult a word must be before it gets a gloss
+      badge:
+        title: Page difficulty
+        description: Shows in the bottom-right corner of English pages how much of the text is within your level and how many words are beyond it. Click × to hide it for the current page
+      source: Glosses and difficulty levels come from the open-source ECDICT dictionary (MIT License), about 15,000 exam words, available offline.
+    chineseMix:
+      title: Mix English words into Chinese pages
+      description: Replaces a few Chinese words with their English counterparts while you read. Hover to see the original, phonetic and level; click to switch back. Words from your notebook come first; the rest are picked from the offline wordlist to match your level, and words that are too easy are left alone
+      band:
+        title: Difficulty of replaced words
+        description: "Consolidate: at your level. Improve: one or two levels above. Challenge: two or more levels above. Mixed: anything from your level up"
+      density:
+        title: Words replaced per page
+        description: Replacing too many words hurts readability; the same word is replaced at most twice per page
+      limitation: Matching follows the browser's built-in Chinese word segmentation, so whole words are replaced (留学生 becomes international student, never half of it). Segmentation is occasionally off; click any word to see the original
   tools:
     translationHub: Translation Hub
   product:
@@ -1059,6 +1100,15 @@ options:
   videoSubtitles:
     title: Video Subtitles
     pageDescription: Translate subtitles as you watch, with their own provider, style, and request settings.
+    study:
+      title: Subtitle study mode
+      description: |-
+        Hover the subtitles while a video plays and a row of buttons appears: previous line, replay, next line, pause each line, loop one line.
+        Click any English word in the subtitles to pause the video and look it up with the whole line as context; dragging to select still opens the usual selection toolbar.
+        Turn on dictation to hide the subtitles and pause after each line; type what you heard and press Enter to see which words you missed.
+      autoPause:
+        title: Pause after each line
+        description: Stops the video at the end of every subtitle line so you can repeat it out loud. The same switch sits in the row of buttons over the subtitles.
     preference:
       title: Basics
       enable:
@@ -1097,6 +1147,8 @@ options:
         title: Translation position
         above: Above
         below: Below
+        farApart: Far apart (translation on top)
+      farApartTranslationPercent: Translation distance from top
       generalSettings: General
       mainSubtitle: Main subtitle
       translationSubtitle: Translation subtitle
@@ -1235,6 +1287,9 @@ action:
   saveToNotebase: Save to Notebase
   saveToNotebaseSaving: Saving...
   saveToNotebaseSuccess: Saved to Notebase
+  saveToNotebaseDuplicate: Already in your Notebase, not added again
+  lookupCount: "Looked up $1 times"
+  lookupCountReviewBumped: "Moved to today's review"
   saveToNotebaseFailed: Failed to save to Notebase
   saveToNotebaseLoginRequired: Could not save to your notebook
   saveToNotebaseAccessDenied: This account cannot access the selected Notebase

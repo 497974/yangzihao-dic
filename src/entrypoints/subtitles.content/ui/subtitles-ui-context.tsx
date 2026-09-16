@@ -15,6 +15,8 @@ interface SubtitlesUIContextValue {
   embedded?: boolean
   openBelow?: boolean
   containerShrinkRatio?: (container: HTMLElement) => number | null
+  /** 字幕学习模式控制播放用 */
+  getVideoElement?: () => HTMLVideoElement | null
 }
 
 export const SubtitlesUIContext = createContext<SubtitlesUIContextValue | null>(null)
@@ -47,6 +49,7 @@ export function SubtitlesProviders({
       embedded: adapter.embedded,
       openBelow,
       containerShrinkRatio: adapter.containerShrinkRatio,
+      getVideoElement: adapter.getVideoElement,
     }),
     [adapter, openBelow],
   )

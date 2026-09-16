@@ -19,6 +19,7 @@ import {
 import { i18n } from "@/utils/i18n"
 import { logger } from "@/utils/logger"
 import { sendMessage } from "@/utils/message"
+import { cellToText } from "@/utils/notebase/cell-text"
 import {
   classifyConnectedNotebaseOwnership,
   createNotebaseConnectedAccountSnapshot,
@@ -26,6 +27,7 @@ import {
   refreshNotebaseConnectionAccountSnapshot,
   sanitizeCustomActionNotebaseConnection,
 } from "@/utils/notebase/connection"
+import { findDuplicateNotebaseRow } from "@/utils/notebase/duplicate"
 import {
   isORPCForbiddenError,
   isORPCNoteLimitExceededError,
@@ -42,6 +44,7 @@ import {
   getNotebaseDetailUrl,
 } from "@/utils/notebase/pending-save"
 import { orpc, orpcClient } from "@/utils/orpc/client"
+import { recordWordSource, videoTimeForSave } from "@/utils/word-sources"
 import { showNotebaseLimitExceededToast } from "./notebase-limit-toast"
 import { saveToNotebaseDialogAtom } from "./save-to-notebase-dialog-atom"
 
@@ -241,7 +244,37 @@ export function useSaveToNotebase() {
     return "saved"
   }
 
+  /**
+   * 存好了就记下出处（这个网页；从视频字幕点出来的还带时间点），复习闪卡时能一点回到原处。
+   * 已经存过的词也记：老词第一次有了视频出处，复习时就能回去听原声（合并规则见 word-sources.ts）。
+   * 出处是附加信息，记不上不影响存词，所以不等它、也不报错。
+   */
+  const recordSource = (request: SaveToNotebaseRequest) => {
+    const [result] = request.results
+    const termField = request.action.outputSchema[0]?.name
+    const term = request.results.length === 1 && termField ? cellToText(result?.[termField]) : ""
+    if (!term.trim()) {
+      return
+    }
+    const url = window.location.href
+    const videoTimeSec = videoTimeForSave(url)
+    void recordWordSource(term, {
+      url,
+      title: document.title,
+      savedAt: Date.now(),
+      ...(videoTimeSec !== undefined ? { videoTimeSec } : {}),
+    }).catch((error) => logger.warn("[SaveToNotebase] 记出处失败", error))
+  }
+
   const save = async (request: SaveToNotebaseRequest): Promise<SaveToNotebaseOutcome> => {
+    const outcome = await saveRows(request)
+    if (outcome === "saved") {
+      recordSource(request)
+    }
+    return outcome
+  }
+
+  const saveRows = async (request: SaveToNotebaseRequest): Promise<SaveToNotebaseOutcome> => {
     const { action, results, actionDraft, analyticsSource, analyticsProvider } = request
     if (results.length === 0) {
       return "failed"
@@ -371,6 +404,20 @@ export function useSaveToNotebase() {
       const cellsList = results.map(
         (result) => buildNotebaseRowCells(actionWithRefreshedConnection, schema, result).cells,
       )
+      const [firstCells] = cellsList
+      // 同一个词已经存过就不再加一行（和桌面版存词同一套规则，见 utils/notebase/duplicate.ts）
+      if (cellsList.length === 1 && firstCells) {
+        const notebase = await orpcClient.notebase.get({ id: refreshedConnection.notebaseId })
+        if (findDuplicateNotebaseRow(notebase.notebaseColumns, notebase.notebaseRows, firstCells)) {
+          toastManager.add({
+            type: "success",
+            title: i18n.t("action.saveToNotebaseDuplicate"),
+            description: refreshedConnection.notebaseNameSnapshot,
+          })
+          return "saved"
+        }
+      }
+
       savingNotebaseNameRef.current = refreshedConnection.notebaseNameSnapshot
       const trackingLookup = getGuideDictionaryNotebaseTracking(action.id)
       savingGuideTrackingRef.current = trackingLookup ? await trackingLookup : null
@@ -378,7 +425,6 @@ export function useSaveToNotebase() {
       // Row-save failures are toasted by the mutation onError handlers; the
       // outer catch below only handles pre-save failures (list/getSchema).
       try {
-        const [firstCells] = cellsList
         if (cellsList.length === 1 && firstCells) {
           await saveMutation.mutateAsync({
             notebaseId: refreshedConnection.notebaseId,

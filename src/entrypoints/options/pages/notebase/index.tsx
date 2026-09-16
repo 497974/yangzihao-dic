@@ -1,8 +1,8 @@
 /**
- * 笔记库页
+ * 生词本页
  *
- * 上游把笔记库放在官网，本项目的数据完全存在 chrome.storage 里，没有服务器。
- * 之前"打开笔记库"指向 WXT_API_URL（本机临时起的服务器），分发给别人时对方
+ * 上游把生词本放在官网，本项目的数据完全存在 chrome.storage 里，没有服务器。
+ * 之前"打开生词本"指向 WXT_API_URL（本机临时起的服务器），分发给别人时对方
  * 机器上根本没有那个服务，点了只会连接失败，而且那个地址读的是另一份数据，
  * 会出现"明明保存成功了却看不到新词"的假象 —— 所以改为扩展自带的页面。
  *
@@ -12,7 +12,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { useParams } from "react-router"
+import { Link, useParams } from "react-router"
 import { toastManager } from "@/components/ui/base-ui/toast"
 import { cellToText } from "@/utils/notebase/cell-text"
 import { orpcClient } from "@/utils/orpc/client"
@@ -72,6 +72,10 @@ const STYLES = `
 .nb-menu-hint{padding:5px 11px 7px;color:var(--nb-muted);font-size:11.5px;line-height:1.5}
 .nb-dot{display:inline-block;width:8px;height:8px;border-radius:50%;
   background:#4a9d5f;margin-right:6px;vertical-align:middle}
+.nb-toggle{margin-left:auto;display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+  user-select:none;font-size:13.5px}
+.nb-link{text-decoration:none;color:var(--nb-accent);font-weight:500}
+.nb-link:hover{text-decoration:underline}
 `
 
 interface Column {
@@ -133,8 +137,8 @@ export function NotebasePage() {
 
   /**
    * react-query v5 里 `enabled: false` 的查询 isPending 恒为 true。新装机的用户
-   * 还没有笔记库，详情查询被禁用 —— 直接用它当加载态，页面会永远停在"加载中…"，
-   * 连"怎么添加第一个词"的引导都看不到。没有笔记库时不算加载中。
+   * 还没有生词本，详情查询被禁用 —— 直接用它当加载态，页面会永远停在"加载中…"，
+   * 连"怎么添加第一个词"的引导都看不到。没有生词本时不算加载中。
    */
   const isPending = notebasesPending || (!!notebaseId && detailPending)
 
@@ -230,11 +234,14 @@ export function NotebasePage() {
         <h1>本地生词本</h1>
         <span className="nb-stat">
           <span className="nb-dot" />
-          存在本机 · 无需联网
+          数据存放在本机
         </span>
-        <span className="nb-stat">
-          {notebase ? `${notebase.name} · ${rows.length} 条（无上限）` : ""}
-        </span>
+        <span className="nb-stat">{notebase ? `${notebase.name} · 共 ${rows.length} 条` : ""}</span>
+        {/* 这两个开关管的是「网页读起来什么样」，不是「存了哪些词」，
+            已经挪到「阅读辅助」页；这里留个入口，免得老用户找不着 */}
+        <Link className="nb-toggle nb-link" to="/reading-assist">
+          网页上怎么显示这些词 →
+        </Link>
       </header>
 
       <main className="nb-main">
@@ -266,10 +273,10 @@ export function NotebasePage() {
           <div className="nb-empty">加载中…</div>
         ) : !notebase ? (
           <div className="nb-empty">
-            还没有笔记库。
+            还没有生词本。
             <br />
             <br />
-            在网页上划词 → 词典 → <b>保存到笔记库</b>，第一个生词会自动为你建好。
+            在网页上划词 → 词典 → <b>保存到生词本</b>，第一个生词会自动为你建好。
           </div>
         ) : (
           <>
@@ -314,7 +321,7 @@ export function NotebasePage() {
                     还没有笔记。
                     <br />
                     <br />
-                    在网页上划词 → 词典 → <b>保存到笔记库</b>，就会写到这里。
+                    在网页上划词 → 词典 → <b>保存到生词本</b>，就会写到这里。
                   </>
                 ) : (
                   `没有匹配「${keyword.trim()}」的记录`

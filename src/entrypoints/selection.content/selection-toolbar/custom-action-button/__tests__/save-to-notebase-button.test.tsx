@@ -98,6 +98,7 @@ vi.mock("@/utils/orpc/client", () => ({
   orpcClient: {
     notebase: {
       create: vi.fn<(...args: any[]) => any>(),
+      get: vi.fn<(...args: any[]) => any>(),
       getSchema: vi.fn<(...args: any[]) => any>(),
       list: vi.fn<(...args: any[]) => any>(),
     },
@@ -225,6 +226,16 @@ function createSchemaForAction(action: SelectionToolbarCustomAction): NotebaseGe
   }
 }
 
+type NotebaseGetOutput = Awaited<ReturnType<typeof orpcClient.notebase.get>>
+
+/** 存词去重只看列和行，其余字段在这里用不上 */
+function notebaseWithRows(
+  columns: NotebaseGetSchemaOutput["notebaseColumns"],
+  rows: Array<{ id: string; cells: Record<string, unknown> }>,
+): NotebaseGetOutput {
+  return { notebaseColumns: columns, notebaseRows: rows } as unknown as NotebaseGetOutput
+}
+
 function renderButton(config: Config, action: SelectionToolbarCustomAction) {
   const store = createStore()
   store.set(configAtom, config)
@@ -270,6 +281,8 @@ describe("saveToNotebaseButton notebase availability", () => {
       { id: "notebase-1", name: "Summarize Notes" },
     ])
     vi.mocked(orpcClient.notebase.getSchema).mockResolvedValue(createSchema())
+    // 存词前会查一遍生词本里有没有这个词；默认是空的，照常存
+    vi.mocked(orpcClient.notebase.get).mockResolvedValue(notebaseWithRows([], []))
     notebaseRowCreateMock.mockResolvedValue({ txid: 1 })
     vi.mocked(sendMessage).mockResolvedValue(undefined)
     guideTrackingMocks.canUseGuideDictionaryNotebaseTracking.mockReturnValue(false)
@@ -283,6 +296,27 @@ describe("saveToNotebaseButton notebase availability", () => {
     renderButton(config, createAction())
 
     expect(screen.getByRole("button", { name: i18n.t("action.saveToNotebase") })).toBeEnabled()
+  })
+
+  it("同一个词已经在生词本里：提示已存在，不再加一行", async () => {
+    const config = cloneConfig(DEFAULT_CONFIG)
+    config.betaExperience.enabled = true
+    vi.mocked(orpcClient.notebase.get).mockResolvedValueOnce(
+      // 大小写、空白不同也算同一个词
+      notebaseWithRows(createSchema().notebaseColumns, [
+        { id: "row-1", cells: { "column-summary": "  a short SUMMARY " } },
+      ]),
+    )
+    renderButton(config, createConnectedAction())
+
+    fireEvent.click(screen.getByRole("button", { name: i18n.t("action.saveToNotebase") }))
+
+    await waitFor(() => {
+      expect(toastManagerMock.add).toHaveBeenCalledWith(
+        expect.objectContaining({ title: i18n.t("action.saveToNotebaseDuplicate") }),
+      )
+    })
+    expect(notebaseRowCreateMock).not.toHaveBeenCalled()
   })
 
   it("silently creates the notebase and saves instead of asking first", async () => {

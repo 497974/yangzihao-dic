@@ -18,3 +18,14 @@
   color: var(--rf-subtitle-color, inherit);
   font-weight: var(--rf-subtitle-font-weight, inherit);
 }
+
+/* 字幕学习模式：原文里的每个英文词都能点着查词典，鼠标移上去淡淡地亮一下 */
+.subtitles-word {
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.12s;
+}
+
+.subtitles-word:hover {
+  background-color: rgba(255, 255, 255, 0.22);
+}

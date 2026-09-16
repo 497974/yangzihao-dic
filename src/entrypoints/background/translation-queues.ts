@@ -4,6 +4,10 @@ import type { ProviderConfig } from "@/types/config/provider"
 import type { BatchQueueConfig, RequestQueueConfig } from "@/types/config/translate"
 import type { SubtitlePromptContext, WebPagePromptContext } from "@/types/content"
 import type { PromptResolver } from "@/utils/host/translate/api/ai"
+import type {
+  EnqueueTranslateDispatch,
+  EnqueueTranslateRequestData,
+} from "@/utils/host/translate/translate-text"
 import type { SerializableProviderRef } from "@/utils/providers/provider-ref"
 import { LANG_CODE_TO_EN_NAME } from "@read-frog/definitions"
 import { browser, storage } from "#imports"
@@ -453,6 +457,25 @@ function watchQueueConfig(
   })
 }
 
+/** 由 setUpWebPageTranslationQueue 装配；装配前为 null */
+let backgroundEnqueueTranslate: EnqueueTranslateDispatch | null = null
+
+/**
+ * 后台自己需要翻译时的入口——目前是桌面版查词走「快速词典」时用。
+ *
+ * 网页端是 sendMessage("enqueueTranslateRequest") 交给后台；可后台给自己发消息
+ * 没有接收方，会直接失败。这里直接调用同一个处理函数，缓存、限流、批处理与
+ * 网页发来的请求完全一致。后台发起的请求不属于任何网页翻译会话，没有取消作用域。
+ */
+export function enqueueTranslateRequestInBackground(
+  data: EnqueueTranslateRequestData,
+): Promise<string> {
+  if (!backgroundEnqueueTranslate) {
+    return Promise.reject(new Error("网页翻译队列尚未初始化"))
+  }
+  return backgroundEnqueueTranslate(data)
+}
+
 const selectWebPageQueueConfig = (config: Config) => ({
   requestQueueConfig: config.pageTranslation.requestQueueConfig,
   batchQueueConfig: config.pageTranslation.batchQueueConfig,
@@ -487,27 +510,28 @@ export function setUpWebPageTranslationQueue(): void {
   // MV3 wake-triggering message can no longer be dropped while init awaits.
   watchQueueConfig("webpage", queuesPromise, selectWebPageQueueConfig)
 
-  onMessage("enqueueTranslateRequest", async (message) => {
+  // 处理体提成函数：消息监听和后台直接调用（桌面版查词）走同一条路，
+  // 缓存、限流、批处理、取消判定完全一致。
+  const enqueueTranslate = async (
+    request: EnqueueTranslateRequestData,
+    scope: ReturnType<typeof buildTranslationScopeKey> | undefined,
+  ): Promise<string> => {
     const { requestQueue, batchQueue } = await queuesPromise
     const {
-      data: {
-        text,
-        langConfig,
-        providerRef,
-        scheduleAt,
-        hash,
-        textFormat,
-        preserveLineBreaks,
-        webTitle,
-        webDescription,
-        webContent,
-        webSummary,
-        sessionId,
-        forceRetranslation = false,
-        hostedFeature,
-      },
-    } = message
-    const scope = buildTranslationScopeKey(message.sender, sessionId)
+      text,
+      langConfig,
+      providerRef,
+      scheduleAt,
+      hash,
+      textFormat,
+      preserveLineBreaks,
+      webTitle,
+      webDescription,
+      webContent,
+      webSummary,
+      forceRetranslation = false,
+      hostedFeature,
+    } = request
 
     const validateHtmlAttributeMarkers =
       textFormat === "html" && hasHtmlAttributeMarkerProtocol(text)
@@ -583,7 +607,16 @@ export function setUpWebPageTranslationQueue(): void {
     }
 
     return result
-  })
+  }
+
+  backgroundEnqueueTranslate = (data) => enqueueTranslate(data, undefined)
+
+  onMessage("enqueueTranslateRequest", (message) =>
+    enqueueTranslate(
+      message.data,
+      buildTranslationScopeKey(message.sender, message.data.sessionId),
+    ),
+  )
 
   onMessage("getOrGenerateWebPageSummary", async (message) => {
     const { requestQueue } = await queuesPromise

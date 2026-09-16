@@ -22,7 +22,9 @@ import {
   DEFAULT_BACKGROUND_OPACITY,
   DEFAULT_DISPLAY_MODE,
   DEFAULT_TRANSLATION_POSITION,
+  FAR_APART_TRANSLATION_TOP_PERCENT,
   MAX_BACKGROUND_OPACITY,
+  MAX_FAR_APART_TRANSLATION_PERCENT,
   MIN_BACKGROUND_OPACITY,
 } from "@/utils/constants/subtitles"
 import { i18n } from "@/utils/i18n"
@@ -35,11 +37,20 @@ export function GeneralSettings() {
   const displayModeId = "video-subtitles-display-mode"
   const translationPositionId = "video-subtitles-translation-position"
   const [draftBackgroundOpacity, setDraftBackgroundOpacity] = useState(container.backgroundOpacity)
+  const [draftFarApartPercent, setDraftFarApartPercent] = useState(
+    videoSubtitlesConfig.farApartTranslationPercent,
+  )
 
   useEffect(() => {
     // eslint-disable-next-line react/set-state-in-effect
     setDraftBackgroundOpacity(container.backgroundOpacity)
   }, [container.backgroundOpacity])
+
+  useEffect(() => {
+    // 视频上拖动译文也会改这个值，设置页开着的话要跟着动
+    // eslint-disable-next-line react/set-state-in-effect
+    setDraftFarApartPercent(videoSubtitlesConfig.farApartTranslationPercent)
+  }, [videoSubtitlesConfig.farApartTranslationPercent])
 
   const handleDisplayModeChange = (value: SubtitlesDisplayMode | null) => {
     if (!value) return
@@ -50,6 +61,12 @@ export function GeneralSettings() {
     if (!value) return
     void setVideoSubtitlesConfig(
       deepmerge(videoSubtitlesConfig, { style: { translationPosition: value } }),
+    )
+  }
+
+  const handleFarApartPercentCommit = (value: number) => {
+    void setVideoSubtitlesConfig(
+      deepmerge(videoSubtitlesConfig, { farApartTranslationPercent: value }),
     )
   }
 
@@ -67,6 +84,7 @@ export function GeneralSettings() {
             backgroundOpacity: DEFAULT_BACKGROUND_OPACITY,
           },
         },
+        farApartTranslationPercent: FAR_APART_TRANSLATION_TOP_PERCENT,
       }),
     )
   }
@@ -140,9 +158,31 @@ export function GeneralSettings() {
                   <SelectItem value="below">
                     {i18n.t("options.videoSubtitles.style.translationPosition.below")}
                   </SelectItem>
+                  <SelectItem value="farApart">
+                    {i18n.t("options.videoSubtitles.style.translationPosition.farApart")}
+                  </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
+          </Field>
+        )}
+
+        {displayMode === "bilingual" && translationPosition === "farApart" && (
+          <Field orientation="responsive">
+            <FieldTitle>
+              {i18n.t("options.videoSubtitles.style.farApartTranslationPercent")}
+            </FieldTitle>
+            <SliderComfortable
+              variant="scrubber"
+              aria-label={i18n.t("options.videoSubtitles.style.farApartTranslationPercent")}
+              min={0}
+              max={MAX_FAR_APART_TRANSLATION_PERCENT}
+              step={1}
+              value={draftFarApartPercent}
+              onChange={setDraftFarApartPercent}
+              onCommit={handleFarApartPercentCommit}
+              formatValue={(v) => `${v}%`}
+            />
           </Field>
         )}
 

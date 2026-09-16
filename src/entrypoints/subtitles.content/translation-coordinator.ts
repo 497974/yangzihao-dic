@@ -2,7 +2,11 @@ import type { SegmentationPipeline } from "./segmentation-pipeline"
 import type { SubtitlesVideoContext } from "@/utils/subtitles/processor/translator"
 import type { SubtitlesFragment, SubtitlesState } from "@/utils/subtitles/types"
 import { getLocalConfig } from "@/utils/config/storage"
-import { TRANSLATE_LOOK_AHEAD_MS, TRANSLATION_BATCH_SIZE } from "@/utils/constants/subtitles"
+import {
+  MAX_CONCURRENT_TRANSLATION_BATCHES,
+  TRANSLATE_LOOK_AHEAD_MS,
+  TRANSLATION_BATCH_SIZE,
+} from "@/utils/constants/subtitles"
 import { effectiveLookAheadMs } from "@/utils/subtitles/lookahead"
 import { translateSubtitles } from "@/utils/subtitles/processor/translator"
 import { adPlayingAtom, subtitlesStore } from "./atoms"
@@ -26,7 +30,15 @@ export class TranslationCoordinator {
   private failedStarts = new Set<number>()
   /** Identity of the cue (end+text) associated with a booked start. */
   private knownIdentities = new Map<number, string>()
-  private isTranslating = false
+  /**
+   * 正在飞的批次数。
+   *
+   * 原本这里是一把布尔锁：发一批 → 等它回来 → 才发下一批，同一时刻永远只有
+   * 一个请求。底层 RequestQueue 允许 8 请求/秒、突发 20，等于把一条能跑 8 并发
+   * 的通道压成了 1。后果就是字幕永远追不上播放——尤其是刚开播或刚拖完进度条时，
+   * 前面没有任何缓冲，得一批一批串着补，人只能盯着"翻译中…"干等。
+   */
+  private inFlight = 0
   /** False after stop(); blocks chained ticks and in-flight result application. */
   private active = false
   /** Bumped on stop() so in-flight batches cannot apply after stop/start. */
@@ -74,7 +86,7 @@ export class TranslationCoordinator {
     this.runId += 1
     // Allow a subsequent start() to translate immediately; the in-flight batch is
     // invalidated by runId and must not leave locks stuck.
-    this.isTranslating = false
+    this.inFlight = 0
     this.translatingStarts.clear()
     this.detachVideoListeners()
     this.segmentationPipeline?.stop()
@@ -94,7 +106,7 @@ export class TranslationCoordinator {
     this.translatedStarts.clear()
     this.failedStarts.clear()
     this.knownIdentities.clear()
-    this.isTranslating = false
+    this.inFlight = 0
     this.lastEmittedState = "idle"
     this.videoContext = { videoTitle: "", subtitlesTextContent: "" }
   }
@@ -184,21 +196,41 @@ export class TranslationCoordinator {
       this.segmentationPipeline.restart()
     }
 
-    if (this.isTranslating) return
-    void this.translateNearby(currentTimeMs)
+    // 一次 tick 把并发填满，而不是只发一批就走。冷启动时这是关键：
+    // 三批同时出发，缓冲建立速度就是原来的三倍。
+    while (this.inFlight < MAX_CONCURRENT_TRANSLATION_BATCHES) {
+      if (!this.startNextBatch(currentTimeMs)) break
+    }
   }
 
-  private async translateNearby(currentTimeMs: number) {
-    if (!this.active) return
+  /**
+   * 挑出下一批并发出去，返回是否真的发了。
+   *
+   * 选批和"标记为翻译中"必须在同一个同步块里做完，中间不能有 await——
+   * 否则并发的下一次调用会挑到同一批字幕，白白重复请求。
+   */
+  private startNextBatch(currentTimeMs: number): boolean {
+    if (!this.active) return false
 
-    const fragments = this.getFragments()
+    const batch = this.pickNextBatch(currentTimeMs)
+    if (batch.length === 0) return false
 
+    this.inFlight += 1
+    batch.forEach((f) => {
+      this.translatingStarts.add(f.start)
+      this.rememberIdentity(f)
+    })
+    void this.runBatch(batch, currentTimeMs, this.runId)
+    return true
+  }
+
+  private pickNextBatch(currentTimeMs: number): SubtitlesFragment[] {
     const lookAheadMs = effectiveLookAheadMs(
       TRANSLATE_LOOK_AHEAD_MS,
       this.getVideoElement()?.playbackRate,
     )
 
-    const batch = fragments
+    return this.getFragments()
       .filter(
         (f) =>
           !this.translatedStarts.has(f.start) &&
@@ -208,18 +240,10 @@ export class TranslationCoordinator {
           f.start <= currentTimeMs + lookAheadMs,
       )
       .slice(0, TRANSLATION_BATCH_SIZE)
+  }
 
-    if (batch.length === 0) {
-      return
-    }
-
-    const runId = this.runId
-    this.isTranslating = true
-    batch.forEach((f) => {
-      this.translatingStarts.add(f.start)
-      this.rememberIdentity(f)
-    })
-
+  /** 执行一批翻译。选批与标记已在 startNextBatch 里同步做完。 */
+  private async runBatch(batch: SubtitlesFragment[], currentTimeMs: number, runId: number) {
     try {
       const translated = await translateSubtitles(batch, this.videoContext)
       if (!this.active || runId !== this.runId) {
@@ -282,9 +306,11 @@ export class TranslationCoordinator {
       this.lastEmittedState = "error"
       this.onStateChange("error", { message: errorMessage })
     } finally {
-      // Only the current generation may clear the lock / chain another tick.
+      // 换了一集/重新分句之后，旧世代的请求回来了也不该再动计数——
+      // 那个计数已经在 runId 递增时清零了，再减就会变成负数，
+      // 于是并发上限形同虚设。
       if (runId === this.runId) {
-        this.isTranslating = false
+        this.inFlight = Math.max(0, this.inFlight - 1)
         if (this.active) {
           this.handleTranslationTick()
         }

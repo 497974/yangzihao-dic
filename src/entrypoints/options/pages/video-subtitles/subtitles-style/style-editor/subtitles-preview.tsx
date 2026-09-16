@@ -39,11 +39,60 @@ export function SubtitlesPreview({
   const sampleTranslation = translationText
 
   const translationAbove = translationPosition === "above"
+  const farApart = translationPosition === "farApart"
   const showMain = displayMode !== "translationOnly"
   const showTranslation = displayMode !== "originalOnly"
 
   const containerStyle = {
     backgroundColor: `rgba(0, 0, 0, ${container.backgroundOpacity / 100})`,
+  }
+
+  // 拉开距离模式：译文单独一个框顶在上面，中间留白，
+  // 预览得把"离得远"这件事本身画出来，否则选了跟没选看不出区别
+  if (farApart) {
+    return (
+      <GradientBackground>
+        <ShadowPreviewFrame
+          customCSS={previewCSS ?? style.customCSS ?? ""}
+          className="relative h-fit w-fit min-w-full rounded-lg"
+        >
+          <div
+            className={cn(
+              SUBTITLES_VIEW_CLASS,
+              "flex min-h-32 w-full flex-col justify-between gap-8 p-4",
+            )}
+          >
+            <Activity mode={showTranslation ? "visible" : "hidden"}>
+              <div className="flex justify-center">
+                <div
+                  className={cn(
+                    SUBTITLES_BOX_CLASS,
+                    "max-w-[90%] rounded px-3 py-2 text-center text-white",
+                  )}
+                  style={containerStyle}
+                >
+                  <TranslationSubtitle content={sampleTranslation} className="text-sm" />
+                </div>
+              </div>
+            </Activity>
+
+            <Activity mode={showMain ? "visible" : "hidden"}>
+              <div className="flex justify-center">
+                <div
+                  className={cn(
+                    SUBTITLES_BOX_CLASS,
+                    "max-w-[90%] rounded px-3 py-2 text-center text-white",
+                  )}
+                  style={containerStyle}
+                >
+                  <MainSubtitle content={sampleOriginal} className="text-sm" />
+                </div>
+              </div>
+            </Activity>
+          </div>
+        </ShadowPreviewFrame>
+      </GradientBackground>
+    )
   }
 
   return (

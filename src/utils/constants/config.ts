@@ -24,6 +24,7 @@ import {
   DEFAULT_FONT_WEIGHT,
   DEFAULT_SUBTITLE_COLOR,
   DEFAULT_SUBTITLE_POSITION,
+  FAR_APART_TRANSLATION_TOP_PERCENT,
   DEFAULT_SUBTITLES_TOGGLE_SHORTCUT_KEY,
   DEFAULT_TRANSLATION_POSITION,
 } from "./subtitles"
@@ -49,7 +50,7 @@ export const GOOGLE_DRIVE_TOKEN_STORAGE_KEY = "__googleDriveToken"
 
 export const THEME_STORAGE_KEY = "theme"
 export const DEFAULT_DETECTED_CODE = "eng" as const
-export const CONFIG_SCHEMA_VERSION = 101
+export const CONFIG_SCHEMA_VERSION = 102
 
 export const DEFAULT_FLOATING_BUTTON_POSITION = 0.66
 export const DEFAULT_FLOATING_BUTTON_SIDE: FloatingButtonSide = "right"
@@ -224,6 +225,7 @@ export const DEFAULT_CONFIG: Config = {
     },
     customPromptsConfig: DEFAULT_SUBTITLE_TRANSLATE_PROMPTS_CONFIG,
     position: DEFAULT_SUBTITLE_POSITION,
+    farApartTranslationPercent: FAR_APART_TRANSLATION_TOP_PERCENT,
   },
   siteControl: {
     mode: "blacklist",

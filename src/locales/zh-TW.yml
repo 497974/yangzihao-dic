@@ -93,7 +93,48 @@ options:
     toggle: 切換側邊欄
     settings: 設定
     features: 功能
+    vocabulary: 詞彙
+    practice: 練習
+    reading: 閱讀與翻譯
+    selection: 取詞工具
     product: 產品
+  readingAssist:
+    title: 閱讀輔助
+    pageDescription: 在日常閱讀中記單字：標出已儲存的生詞，或在中文網頁中替換少量英文詞
+    level:
+      title: 我的英語程度
+      description: 「依程度提示生詞」和「中文網頁混入英文詞」都依此程度挑詞。
+      fromVocabTest: 目前依詞彙量測試結果推算，可手動修改。
+      fromDefault: 尚未設定，暫依高中程度處理；完成一次詞彙量測試可自動推算。
+    highlight:
+      title: 在網頁上標出生詞本裡的詞
+      description: 已儲存的英文單字和片語出現在任意網頁時加虛線底線，滑鼠停留顯示音標與釋義，obtains、obtained 等變化形式同樣可辨識
+      showMastered:
+        title: 已掌握的詞也標出
+        description: 預設只標新詞和學習中的詞。已掌握的詞滿頁都是底線時，容易淹沒真正需要留意的詞
+      legend: 標記顏色：天藍色虛線為新詞（尚未複習），琥珀色虛線為學習中，綠色點線為已掌握。學習狀態取自閃卡複習記錄：複習階段且記憶穩定度達到 21 天視為已掌握。
+    wordWise:
+      title: 依程度提示生詞
+      hints:
+        title: 行內中文釋義
+        description: 在超出你程度的英文詞上方顯示簡短的中文釋義，同一個詞每頁只標註第一次出現。生詞本中的詞由生詞標記負責，不重複標註。僅在以英文為主的頁面生效
+      range:
+        title: 提示範圍
+        description: 選擇從多難的詞開始顯示釋義
+      badge:
+        title: 頁面難度提示
+        description: 在英文網頁右下角顯示本頁有多少比例的詞在你的程度內，以及超綱詞的數量。點擊 × 可關閉目前頁面的提示
+      source: 釋義與難度分級來自開源詞典 ECDICT（MIT 授權），共收錄約 1.5 萬個考試詞彙，無需連網。
+    chineseMix:
+      title: 中文網頁混入英文詞
+      description: 閱讀中文文章時，將少量中文詞替換為對應的英文詞。滑鼠停留顯示中文原文、音標和難度，點擊可切回中文。生詞本裡的詞優先，其餘依你的英語程度從離線詞表中挑選，過於簡單的詞不替換
+      band:
+        title: 替換詞難度
+        description: 鞏固：與你的程度相當；提升：高一到兩檔；挑戰：高兩檔及以上；綜合：從你的程度到最難的詞都有
+      density:
+        title: 每頁替換數量
+        description: 替換過多會影響閱讀；同一個詞在一頁中最多替換兩處
+      limitation: 依瀏覽器內建的中文分詞比對整詞（「留學生」會整體換成 international student，不會只換其中的「學生」）。分詞偶有偏差，點擊該詞即可查看中文原文
   tools:
     translationHub: 翻譯中心
   product:
@@ -1059,6 +1100,15 @@ options:
   videoSubtitles:
     title: 影片字幕
     pageDescription: 邊看邊譯影片字幕，並單獨設定提供者、樣式和請求參數。
+    study:
+      title: 字幕學習模式
+      description: |-
+        播放影片時將滑鼠移到字幕上，上方會出現一排按鈕：上一句 / 重播本句 / 下一句 / 逐句暫停 / 單句循環。
+        點擊字幕中的英文詞，影片會暫停並開啟字典，以整句字幕作為語境；拖曳選取字幕仍會開啟劃詞工具列。
+        開啟「聽寫」後，原文遮住、譯文隱藏，每句播完自動暫停，輸入聽到的內容並按 Enter，逐詞標出漏聽和聽錯的詞。
+      autoPause:
+        title: 每句播完自動暫停
+        description: 每句字幕播放完畢後自動暫停，便於跟讀，按播放鍵繼續。此開關與影片畫面中那排按鈕為同一項設定。
     preference:
       title: 基礎設定
       enable:
@@ -1097,6 +1147,8 @@ options:
         title: 譯文位置
         above: 上方
         below: 下方
+        farApart: 拉開距離（譯文置頂）
+      farApartTranslationPercent: 譯文距頂距離
       generalSettings: 通用設定
       mainSubtitle: 主字幕
       translationSubtitle: 翻譯字幕
@@ -1235,6 +1287,9 @@ action:
   saveToNotebase: 儲存到筆記庫
   saveToNotebaseSaving: 儲存中…
   saveToNotebaseSuccess: 已儲存到筆記庫
+  saveToNotebaseDuplicate: 已在生詞本裡，沒有重複新增
+  lookupCount: "第 $1 次查"
+  lookupCountReviewBumped: "已提前到今天複習"
   saveToNotebaseFailed: 儲存到筆記庫失敗
   saveToNotebaseLoginRequired: 請先到 本機 登入後再儲存到筆記庫
   saveToNotebaseAccessDenied: 目前帳號無法存取所選筆記庫

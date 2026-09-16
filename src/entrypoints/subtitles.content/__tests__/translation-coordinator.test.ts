@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest"
+import { MAX_CONCURRENT_TRANSLATION_BATCHES } from "@/utils/constants/subtitles"
 import { TranslationCoordinator } from "../translation-coordinator"
 
 describe("translation coordinator loading state", () => {
@@ -98,7 +99,11 @@ describe("translation coordinator loading state", () => {
 
     coordinator.start()
     await Promise.resolve()
-    expect(spy).toHaveBeenCalledTimes(1)
+    // 6 条字幕、每批 5 条：一次 tick 会把并发填到 2 批（第 3 批已无内容可取）。
+    // 这里原本断言 1，编码的是"发一批等一批"的串行行为——那正是字幕追不上
+    // 播放的原因，现在改成并发调度。
+    expect(spy).toHaveBeenCalledTimes(2)
+    const inFlightBefore = spy.mock.calls.length
 
     coordinator.stop()
     const firstCall = spy.mock.calls[0]!
@@ -108,7 +113,7 @@ describe("translation coordinator loading state", () => {
     await Promise.resolve()
 
     // In-flight call may finish, but stop must not chain another nearby batch.
-    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledTimes(inFlightBefore)
     expect(onTranslated).not.toHaveBeenCalled()
 
     spy.mockRestore()
@@ -293,5 +298,121 @@ describe("translation coordinator loading state", () => {
 
     spy.mockRestore()
     configSpy.mockRestore()
+  })
+})
+
+describe("字幕翻译的并发调度", () => {
+  /** 造 n 条连续字幕，每条 1 秒，全部落在 30 秒预取窗口内 */
+  function makeFragments(n: number) {
+    return Array.from({ length: n }, (_, i) => ({
+      text: `line-${i}`,
+      start: i * 1000,
+      end: i * 1000 + 1000,
+    }))
+  }
+
+  function makeCoordinator(fragments: ReturnType<typeof makeFragments>) {
+    return new TranslationCoordinator({
+      getFragments: () => fragments,
+      getVideoElement: () =>
+        ({
+          currentTime: 0,
+          playbackRate: 1,
+          addEventListener: vi.fn<(...args: any[]) => any>(),
+          removeEventListener: vi.fn<(...args: any[]) => any>(),
+        }) as unknown as HTMLVideoElement,
+      getCurrentState: () => "idle",
+      segmentationPipeline: null,
+      onTranslated: vi.fn<(...args: any[]) => any>(),
+      onStateChange: vi.fn<(...args: any[]) => any>(),
+    })
+  }
+
+  it("一次 tick 就把并发填满，不再发一批等一批", async () => {
+    // 这是"字幕永远追不上播放"的根因：协调器原本用一把布尔锁串行跑，
+    // 而底层 RequestQueue 放行 8 请求/秒。刚开播或刚拖完进度条时前面没有缓冲，
+    // 串行补就只能盯着"翻译中…"干等。
+    const translator = await import("@/utils/subtitles/processor/translator")
+    const spy = vi
+      .spyOn(translator, "translateSubtitles")
+      // 永不 resolve：这样数到的就是"同时在飞"的批次数
+      .mockImplementation(() => new Promise(() => {}) as any)
+
+    const coordinator = makeCoordinator(makeFragments(30))
+    coordinator.start()
+    await Promise.resolve()
+
+    // 这里要锁的性质是"不再串行"，所以拿字面量 1 比，而不是拿
+    // MAX_CONCURRENT_TRANSLATION_BATCHES 比——用常量当期望值等于自己跟自己比，
+    // 常量被改回 1 时测试照样绿，什么都锁不住。
+    expect(spy.mock.calls.length).toBeGreaterThan(1)
+    expect(spy).toHaveBeenCalledTimes(MAX_CONCURRENT_TRANSLATION_BATCHES)
+
+    coordinator.stop()
+    spy.mockRestore()
+  })
+
+  it("并发有上限，不会把字幕一次全发出去", async () => {
+    const translator = await import("@/utils/subtitles/processor/translator")
+    const spy = vi
+      .spyOn(translator, "translateSubtitles")
+      .mockImplementation(() => new Promise(() => {}) as any)
+
+    // 100 条字幕远多于并发上限能覆盖的量，但仍只应发出上限那么多批
+    const coordinator = makeCoordinator(makeFragments(100))
+    coordinator.start()
+    await Promise.resolve()
+    coordinator.requestTick()
+    coordinator.requestTick()
+    await Promise.resolve()
+
+    expect(spy).toHaveBeenCalledTimes(MAX_CONCURRENT_TRANSLATION_BATCHES)
+
+    coordinator.stop()
+    spy.mockRestore()
+  })
+
+  it("并发的各批之间不会挑到同一条字幕", async () => {
+    const translator = await import("@/utils/subtitles/processor/translator")
+    const spy = vi
+      .spyOn(translator, "translateSubtitles")
+      .mockImplementation(() => new Promise(() => {}) as any)
+
+    const coordinator = makeCoordinator(makeFragments(30))
+    coordinator.start()
+    await Promise.resolve()
+
+    // 选批与标记若不在同一个同步块里完成，并发的下一次调用就会挑到同一批，
+    // 白白重复请求、多花 token
+    const allStarts = spy.mock.calls.flatMap((call) =>
+      (call[0] as Array<{ start: number }>).map((f) => f.start),
+    )
+    expect(new Set(allStarts).size).toBe(allStarts.length)
+
+    coordinator.stop()
+    spy.mockRestore()
+  })
+
+  it("停掉之后回来的旧批次不会把并发计数减成负数", async () => {
+    const translator = await import("@/utils/subtitles/processor/translator")
+    const resolvers: Array<(v: any) => void> = []
+    const spy = vi
+      .spyOn(translator, "translateSubtitles")
+      .mockImplementation(() => new Promise((r) => resolvers.push(r)) as any)
+
+    const coordinator = makeCoordinator(makeFragments(30))
+    coordinator.start()
+    await Promise.resolve()
+    coordinator.stop()
+
+    // stop() 已经把计数清零；旧世代的请求回来时若还去减一，计数会变成负数，
+    // 并发上限就形同虚设了
+    resolvers.forEach((r) => r([]))
+    await Promise.resolve()
+    await Promise.resolve()
+
+    expect((coordinator as any).inFlight).toBeGreaterThanOrEqual(0)
+
+    spy.mockRestore()
   })
 })

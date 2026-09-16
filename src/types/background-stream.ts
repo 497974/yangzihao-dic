@@ -80,6 +80,11 @@ export type BackgroundStructuredObjectStreamSnapshot = BackgroundStreamSnapshot<
 export type BackgroundStreamStructuredObjectSerializablePayload =
   BaseBackgroundStreamSerializablePayload & {
     outputSchema: BackgroundStructuredObjectOutputField[]
+    /**
+     * 查词结果缓存（见 background/structured-result-cache.ts）：use = 查过的直接用上次结果，
+     * refresh = 「重新生成」，重新问模型并覆盖旧结果。不传就不碰缓存。
+     */
+    cache?: "use" | "refresh"
   }
 
 export type BackgroundStreamNoteSuggestionSerializablePayload =

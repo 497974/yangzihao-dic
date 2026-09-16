@@ -1,4 +1,5 @@
 import type { LangCodeISO6393, LangLevel } from "@read-frog/definitions"
+import type { ProtocolMap } from "../../message"
 import type { HostedAiTextStreamRoute } from "@/types/background-stream"
 import type { Config } from "@/types/config/config"
 import type { TranslationTextFormat } from "@/types/config/translate"
@@ -252,6 +253,14 @@ export async function resolvePageProviderRef(
   return providerRef
 }
 
+/** 发给翻译队列的请求体，与消息 enqueueTranslateRequest 的数据完全一致 */
+export type EnqueueTranslateRequestData = Parameters<ProtocolMap["enqueueTranslateRequest"]>[0]
+
+/** 翻译队列的派发函数：网页端走消息，后台端直接调用（见 enqueueTranslateRequestInBackground） */
+export type EnqueueTranslateDispatch = (
+  data: EnqueueTranslateRequestData,
+) => Promise<Awaited<ReturnType<ProtocolMap["enqueueTranslateRequest"]>>>
+
 export interface TranslateTextOptions {
   text: string
   langConfig: {
@@ -270,6 +279,11 @@ export interface TranslateTextOptions {
   // NOT part of the cache hash — cache identity must not vary per session.
   sessionId?: string
   forceRetranslation?: boolean
+  /**
+   * 把准备好的请求交给翻译队列。默认经消息层发给后台；
+   * 后台自己调用时必须传入直接派发的函数——后台给自己 sendMessage 没有接收方。
+   */
+  dispatch?: EnqueueTranslateDispatch
   /**
    * Which hosted route a system provider bills against; local providers
    * ignore it. Required so every entry point states its route where the
@@ -296,6 +310,7 @@ export async function translateTextCore(options: TranslateTextOptions): Promise<
     sessionId,
     forceRetranslation = false,
     hostedFeature,
+    dispatch,
   } = options
 
   const preparedText = prepareTranslationText(text)
@@ -337,7 +352,7 @@ export async function translateTextCore(options: TranslateTextOptions): Promise<
     throw new TranslationCancelledError(sessionId)
   }
 
-  const result = await sendMessage("enqueueTranslateRequest", {
+  const request: EnqueueTranslateRequestData = {
     text: preparedText,
     langConfig,
     providerRef,
@@ -352,7 +367,10 @@ export async function translateTextCore(options: TranslateTextOptions): Promise<
     sessionId,
     forceRetranslation,
     hostedFeature,
-  })
+  }
+  const result = dispatch
+    ? await dispatch(request)
+    : await sendMessage("enqueueTranslateRequest", request)
   // The sentinel must be mapped here and only here: every batch-pipeline
   // consumer (page paragraphs, document title, input translation, selection
   // toolbar standard path) routes through this function and already handles

@@ -125,6 +125,9 @@ function setTextWithUndo(
   }
 }
 
+/** 固定 id：连按几次失败只留一条提示，不会叠一串 */
+const INPUT_TRANSLATION_ERROR_TOAST_ID = "input-translation-error"
+
 export function useInputTranslation() {
   const inputTranslationConfig = useAtomValue(configFieldsAtomMap.inputTranslation)
   const providersConfig = useAtomValue(configFieldsAtomMap.providersConfig)
@@ -231,6 +234,15 @@ export function useInputTranslation() {
             type: "error",
             title: error.message,
             id: HOSTED_UNAVAILABLE_TOAST_ID,
+          })
+        } else {
+          // 失败不能只写进 console：按三下空格后转圈一闪、字没变，
+          // 用户看不到任何原因，只会以为这个功能坏了。
+          toastManager.add({
+            type: "error",
+            title: "输入翻译没成功",
+            description: error instanceof Error ? error.message : String(error),
+            id: INPUT_TRANSLATION_ERROR_TOAST_ID,
           })
         }
         console.error("Input translation error:", error)

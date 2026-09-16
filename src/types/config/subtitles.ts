@@ -21,7 +21,14 @@ export const subtitleCustomPromptsConfigSchema = createCustomPromptsConfigSchema
 )
 
 export const subtitlesDisplayModeSchema = z.enum(["bilingual", "originalOnly", "translationOnly"])
-export const subtitlesTranslationPositionSchema = z.enum(["above", "below"])
+/**
+ * 译文相对原文的位置。
+ *
+ * `farApart` 是学习向的：双语两行贴在一起时，眼睛会顺手先扫到中文，
+ * 原文等于白放。把译文甩到画面顶端、原文留在底部，中间隔着整个画面，
+ * 就不会一眼同时看到——想看译文得特意抬眼，于是先读原文成了默认动作。
+ */
+export const subtitlesTranslationPositionSchema = z.enum(["above", "below", "farApart"])
 export const subtitlesFontFamilySchema = z.enum(["system", "roboto", "noto-sans", "noto-serif"])
 
 export const subtitleTextStyleSchema = z.object({
@@ -61,6 +68,14 @@ export const videoSubtitlesSchema = z.object({
   batchQueueConfig: batchQueueConfigSchema,
   customPromptsConfig: subtitleCustomPromptsConfigSchema,
   position: subtitlePositionSchema,
+  /**
+   * 「拉开距离」模式下顶部译文离画面顶端的百分比。
+   *
+   * 单独存一个数字而不是复用 subtitlePositionSchema：这一行的存在意义就是"待在上面
+   * 离原文足够远"，允许它锚到底部等于把这个模式本身取消掉。上限 60 也是同一个道理，
+   * 再往下就贴到原文了。
+   */
+  farApartTranslationPercent: z.number().min(0).max(60),
 })
 
 export type SubtitlesDisplayMode = z.infer<typeof subtitlesDisplayModeSchema>

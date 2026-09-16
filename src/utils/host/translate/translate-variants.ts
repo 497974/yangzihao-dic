@@ -3,7 +3,7 @@ import type { HostedAiTextStreamRoute } from "@/types/background-stream"
 import type { Config, InputTranslationLang } from "@/types/config/config"
 import type { TranslationTextFormat } from "@/types/config/translate"
 import { isLLMProviderConfig } from "@/types/config/provider"
-import { getDetectedCodeFromStorage, getFinalSourceCode } from "@/utils/config/languages"
+import { getFinalSourceCode } from "@/utils/config/languages"
 import { logger } from "@/utils/logger"
 import {
   HostedAiProviderUnavailableError,
@@ -208,13 +208,25 @@ export async function translateTextForPageTitle(text: string): Promise<string> {
   })
 }
 
+/**
+ * 「源语言」设成自动时，输入翻译用的外语：固定英语。
+ *
+ * 输入翻译默认方向是「目标语言 → 源语言」，意思是"我打母语，转成我在读的那门外语"。
+ * 原来源语言为自动时，"那门外语"取当前页面检测出来的语言，结果两头都不对：
+ * - 页面本身是母语（中文界面的 Discord、QQ 邮箱）→ "中文 → 中文"，字没变
+ * - 中文页面、夹着汉字的页面常被判成日语 → 打中文按三下空格变成了日文
+ *
+ * 这是个学英语的工具，只在中英之间翻。想译成别的语言，就在设置里把源语言明确选成那门语言。
+ */
+const INPUT_AUTO_FOREIGN_LANG: LangCodeISO6393 = "eng"
+
 async function resolveInputLang(
   lang: InputTranslationLang,
   globalLangConfig: Config["language"],
 ): Promise<LangCodeISO6393> {
   if (lang === "sourceCode") {
-    const detectedCode = await getDetectedCodeFromStorage()
-    return getFinalSourceCode(globalLangConfig.sourceCode, detectedCode)
+    // 用户明确选了某个源语言，就尊重他的选择；自动时不看页面，一律英语
+    return getFinalSourceCode(globalLangConfig.sourceCode, INPUT_AUTO_FOREIGN_LANG)
   }
   if (lang === "targetCode") {
     return globalLangConfig.targetCode
@@ -247,8 +259,15 @@ export async function translateTextForInput(
   const resolvedFromLang = await resolveInputLang(fromLang, config.language)
   const resolvedToLang = await resolveInputLang(toLang, config.language)
 
+  // 两边解析成同一种语言时，原来是悄悄返回空串——调用方拿到空串就不替换文字，
+  // 用户只看到转圈一闪、字没变，完全不知道为什么。改成抛出带原因的错误，
+  // 由输入框那边弹提示。（源语言为"自动"的常见情况已在 resolveInputLang 里兜底，
+  // 走到这里说明是用户自己把两边设成了同一种语言。）
   if (resolvedFromLang === resolvedToLang) {
-    return ""
+    throw new Error(
+      `输入翻译的原文和译文语言都是「${resolvedFromLang}」，没有可翻的。` +
+        `请到设置 → 输入翻译里把两边改成不同的语言。`,
+    )
   }
 
   const webPageContext = await getWebPagePromptContext(

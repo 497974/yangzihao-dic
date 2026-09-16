@@ -25,8 +25,23 @@ const SentencePracticePage = lazy(() =>
 const ReviewPage = lazy(() =>
   import("./pages/review").then((module) => ({ default: module.ReviewPage })),
 )
+const ConversationPage = lazy(() =>
+  import("./pages/conversation").then((module) => ({ default: module.ConversationPage })),
+)
+const ReadingAssistPage = lazy(() =>
+  import("./pages/reading-assist").then((module) => ({ default: module.ReadingAssistPage })),
+)
+const WritingPage = lazy(() =>
+  import("./pages/writing").then((module) => ({ default: module.WritingPage })),
+)
+const VocabTestPage = lazy(() =>
+  import("./pages/vocab-test").then((module) => ({ default: module.VocabTestPage })),
+)
 const StatsPage = lazy(() =>
   import("./pages/stats").then((module) => ({ default: module.StatsPage })),
+)
+const DesktopPage = lazy(() =>
+  import("./pages/desktop").then((module) => ({ default: module.DesktopPage })),
 )
 const CustomActionsPage = lazy(() =>
   import("./pages/custom-actions").then((module) => ({ default: module.CustomActionsPage })),
@@ -128,7 +143,12 @@ const ROUTE_COMPONENTS: Record<RoutePath, ComponentType> = {
   "/notebase/:notebaseId": NotebasePage,
   "/review": ReviewPage,
   "/sentence-practice": SentencePracticePage,
+  "/vocab-test": VocabTestPage,
+  "/writing": WritingPage,
+  "/conversation": ConversationPage,
+  "/reading-assist": ReadingAssistPage,
   "/stats": StatsPage,
+  "/desktop": DesktopPage,
   "/page-translation": TranslationPage,
   "/video-subtitles": VideoSubtitlesPage,
   "/floating-button": FloatingButtonPage,

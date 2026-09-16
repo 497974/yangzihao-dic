@@ -32,6 +32,7 @@ import {
   DEFAULT_FONT_WEIGHT,
   DEFAULT_SUBTITLE_COLOR,
   DEFAULT_TRANSLATION_POSITION,
+  MAX_FAR_APART_TRANSLATION_PERCENT,
   MAX_BACKGROUND_OPACITY,
   MAX_FONT_SCALE,
   MAX_FONT_WEIGHT,
@@ -292,10 +293,30 @@ export function StyleView() {
                   <SelectItem value="below">
                     {i18n.t("options.videoSubtitles.style.translationPosition.below")}
                   </SelectItem>
+                  <SelectItem value="farApart">
+                    {i18n.t("options.videoSubtitles.style.translationPosition.farApart")}
+                  </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
           </SettingRow>
+        </Activity>
+
+        {/* 只在拉开距离模式下有意义：其余模式译文就贴在原文旁边，没有"距顶"这回事 */}
+        <Activity
+          mode={
+            displayMode === "bilingual" && translationPosition === "farApart" ? "visible" : "hidden"
+          }
+        >
+          <SliderRow
+            label={i18n.t("options.videoSubtitles.style.farApartTranslationPercent")}
+            value={config.farApartTranslationPercent}
+            formatValue={(v) => `${v}%`}
+            min={0}
+            max={MAX_FAR_APART_TRANSLATION_PERCENT}
+            step={1}
+            onChange={(v) => void setConfig(deepmerge(config, { farApartTranslationPercent: v }))}
+          />
         </Activity>
 
         <SliderRow
