@@ -134,6 +134,16 @@ export function DesktopPage() {
               ：在任何程序里选中文字后按，直接查词典
             </dd>
             <dt>
+              <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-xs">
+                Ctrl+Alt+T
+              </kbd>
+            </dt>
+            <dd className="text-muted-foreground">
+              <span className="font-medium text-foreground">弹出划词工具栏</span>
+              ：选中大段文字后按，旁边弹出翻译、朗读、词典等按钮。 自动弹出只认得拖动和双击三击，用
+              Shift+点击、Ctrl+A 或者拖到一半页面自动滚动时可能不弹，按这个键一定弹
+            </dd>
+            <dt>
               <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-xs">空格 ×3</kbd>
             </dt>
             <dd className="text-muted-foreground">
