@@ -19,9 +19,17 @@ import { log } from "./logger"
 import { placePopup } from "./popup-position"
 import { isLeftButtonDown } from "./windows-input"
 
+/** 查词、短句翻译用这个宽度 */
 export const POPUP_WIDTH = 420
+/** 长文本翻译用更宽的窗口：420 宽显示整段译文，一屏只有十来个字，读着很累 */
+export const POPUP_WIDE_WIDTH = 620
+/** 超过这么多字就算长文本，弹窗加宽 */
+export const WIDE_TEXT_LENGTH = 80
 const MIN_HEIGHT = 120
-const MAX_HEIGHT = 620
+/** 高度上限：小屏幕按工作区算，别顶到屏幕外 */
+const MAX_HEIGHT_CAP = 900
+const MAX_HEIGHT_MARGIN = 120
+const MIN_MAX_HEIGHT = 400
 
 export interface PopupHandlers {
   onSave: () => Promise<SaveOutcome>
@@ -36,6 +44,7 @@ export function createPopupWindow(handlers: PopupHandlers) {
   let lastState: PopupState | null = null
   let anchor: Point = { x: 0, y: 0 }
   let height = 180
+  let width = POPUP_WIDTH
   let pinned = false
   /** 用户拖动过弹窗：之后只改高度，不再按鼠标位置重新摆 */
   let userPlaced = false
@@ -69,7 +78,7 @@ export function createPopupWindow(handlers: PopupHandlers) {
     }
     if (!userPlaced) {
       const { workArea } = screen.getDisplayNearestPoint(anchor)
-      current.setBounds(placePopup(anchor, { width: POPUP_WIDTH, height }, workArea))
+      current.setBounds(placePopup(anchor, { width, height }, workArea))
       return
     }
     // 拖过的：保持左上角不动，只是别超出屏幕底边
@@ -80,9 +89,18 @@ export function createPopupWindow(handlers: PopupHandlers) {
     current.setBounds({
       x: bounds.x,
       y: Math.max(workArea.y, Math.min(bounds.y, maxY)),
-      width: POPUP_WIDTH,
+      width,
       height: nextHeight,
     })
+  }
+
+  /** 这块屏幕上弹窗最高能有多高 */
+  function maxHeight(): number {
+    const current = alive()
+    const { workArea } = current
+      ? screen.getDisplayMatching(current.getBounds())
+      : screen.getDisplayNearestPoint(anchor)
+    return Math.max(MIN_MAX_HEIGHT, Math.min(MAX_HEIGHT_CAP, workArea.height - MAX_HEIGHT_MARGIN))
   }
 
   function ensureWindow(): BrowserWindow {
@@ -210,7 +228,7 @@ export function createPopupWindow(handlers: PopupHandlers) {
     if (!isPopup(event) || typeof requested !== "number" || !Number.isFinite(requested)) {
       return
     }
-    height = Math.min(Math.max(Math.ceil(requested), MIN_HEIGHT), MAX_HEIGHT)
+    height = Math.min(Math.max(Math.ceil(requested), MIN_HEIGHT), maxHeight())
     applyBounds()
   })
 
@@ -221,6 +239,13 @@ export function createPopupWindow(handlers: PopupHandlers) {
     },
     setState(state: PopupState) {
       lastState = state
+      // 长文本（整段翻译、截图识别出的一段字）用更宽的窗口
+      const source = "text" in state ? (state.text ?? "") : ""
+      const nextWidth = source.length >= WIDE_TEXT_LENGTH ? POPUP_WIDE_WIDTH : POPUP_WIDTH
+      if (nextWidth !== width) {
+        width = nextWidth
+        applyBounds()
+      }
       const current = ensureWindow()
       if (loaded) {
         current.webContents.send("popup:state", state)

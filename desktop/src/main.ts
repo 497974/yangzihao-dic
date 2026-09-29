@@ -86,6 +86,19 @@ const APP_NAME = "大傻豪词典"
 const HOTKEY_CANDIDATES = ["Ctrl+Alt+D", "Ctrl+Shift+Alt+D"] as const
 /** 截图查词快捷键（框选屏幕上的字，认出来再查），同样按顺序试 */
 const SCREENSHOT_HOTKEY_CANDIDATES = ["Ctrl+Alt+S", "Ctrl+Shift+Alt+S"] as const
+/**
+ * 强制弹出划词工具栏的快捷键。
+ *
+ * 鼠标钩子只认「拖动超过一段距离」和「双击三击」两种动作（见 selection-gesture.ts），
+ * 选一大段文字的其他做法——Shift+点击、Ctrl+A、键盘选中、拖到一半页面自动滚动——
+ * 都可能认不出来。按这个键则不看鼠标动作，直接在光标旁边弹工具栏。
+ */
+const TOOLBAR_HOTKEY_CANDIDATES = [
+  "Ctrl+Alt+T",
+  "Ctrl+Alt+G",
+  "Ctrl+Alt+R",
+  "Ctrl+Shift+Alt+T",
+] as const
 /** 截图查词弹窗的来源、标题 */
 const SCREENSHOT_SOURCE = "截图"
 const SCREENSHOT_HEADER: PopupHeader = { title: "截图识别翻译", icon: "dictionary" }
@@ -295,6 +308,7 @@ function startApp() {
   })
   const regionSelector = createRegionSelector()
   let screenshotHotkey: string | null = null
+  let toolbarHotkey: string | null = null
   const tripleSpace = createTripleSpaceDetector()
   let keyboardHook: KeyboardHook | null = null
 
@@ -1054,10 +1068,17 @@ function startApp() {
   async function onSelectionGesture(gesture: SelectionGesture) {
     // 扩展没连上也弹：可以先把词记下来（见 buildToolbarEntries）
     if (capturing) {
+      log("划词工具栏", "正忙着上一次取词，这次不弹")
       return
     }
     const app = getForegroundApp()
-    if (skipReason(app.exe, selfExe) || isForegroundFullscreen()) {
+    const skipped = skipReason(app.exe, selfExe)
+    if (skipped) {
+      log("划词工具栏", `${app.exe ?? "未知程序"} 不弹：${skipped}`)
+      return
+    }
+    if (isForegroundFullscreen()) {
+      log("划词工具栏", "当前是全屏程序，不弹")
       return
     }
     // 双击选中一个词：托盘里开了「双击直接查词」就不弹工具栏，直接查词典（三击、拖选照旧弹工具栏）
@@ -1066,8 +1087,24 @@ function startApp() {
       return
     }
     if (!settings.selectionToolbar) {
+      log("划词工具栏", "托盘里关掉了，不弹")
       return
     }
+    log(
+      "划词工具栏",
+      `${gesture.kind === "drag" ? "拖选" : `连点 ${gesture.clicks} 下`}，在 ${app.name ?? app.exe ?? "未知程序"} 里弹出`,
+    )
+    await showSelectionToolbar(screen.screenToDipPoint({ x: gesture.x, y: gesture.y }), app)
+  }
+
+  /**
+   * 在指定位置弹出划词工具栏。鼠标动作和快捷键两条路都走这里。
+   * @param point 工具栏弹在哪（DIP 坐标）
+   */
+  async function showSelectionToolbar(
+    point: { x: number; y: number },
+    app: { handle: bigint | null; name: string | null; exe: string | null },
+  ) {
     toolbarEntries = buildToolbarEntries()
     toolbarContext = { handle: app.handle, source: app.name, exe: app.exe }
     // 读文字的小进程闲置时会关掉：趁用户还在看工具栏，先把它拉起来
@@ -1076,9 +1113,40 @@ function startApp() {
     void refreshToolbarInfo()
     await sleep(80)
     toolbarWindow.showAt(
-      screen.screenToDipPoint({ x: gesture.x, y: gesture.y }),
+      point,
       toolbarEntries.map(({ kind, name, icon }) => ({ kind, name, icon })),
     )
+  }
+
+  /**
+   * 按快捷键强制弹出划词工具栏：不看鼠标动作，选中文字的方式不限
+   * （Shift+点击、Ctrl+A、键盘选中、拖到一半自动滚动都行）。
+   * 和鼠标那条路不同，这里不受托盘里「划词工具栏」开关的限制——按了键就是想要它。
+   */
+  async function onToolbarHotkey() {
+    if (capturing) {
+      return
+    }
+    const app = getForegroundApp()
+    if (skipReason(app.exe, selfExe) || isForegroundFullscreen()) {
+      log("划词工具栏", `快捷键：当前程序不弹（${app.exe ?? "未知"}）`)
+      return
+    }
+    log("划词工具栏", `快捷键：在 ${app.name ?? app.exe ?? "未知程序"} 里弹出`)
+    await showSelectionToolbar(screen.getCursorScreenPoint(), app)
+  }
+
+  function registerToolbarHotkey(): string | null {
+    for (const candidate of TOOLBAR_HOTKEY_CANDIDATES) {
+      try {
+        if (globalShortcut.register(candidate, () => void onToolbarHotkey())) {
+          return candidate
+        }
+      } catch (error) {
+        console.error(`注册快捷键 ${candidate} 失败`, error)
+      }
+    }
+    return null
   }
 
   /** 点了工具栏上的按钮：这时才去复制选中的文字，然后翻译 / 朗读 / 查词 */
@@ -1151,8 +1219,15 @@ function startApp() {
             downOnText = isTextCursor()
           }
           const gesture = gestures.handle(event)
-          if (gesture && downOnText) {
-            setImmediate(() => void onSelectionGesture(gesture))
+          if (gesture) {
+            // 按下时光标是 I 形最可靠；但选一大段时常常按在已选中的文字上、
+            // 或者在 PDF 阅读器这类自定义光标的程序里，按下那一刻并不是 I 形。
+            // 所以松开时再看一次，任一时刻在文字上就认。误判的代价只是多一个会自己消失的工具栏
+            if (downOnText || isTextCursor()) {
+              setImmediate(() => void onSelectionGesture(gesture))
+            } else {
+              log("划词工具栏", "认出了选中动作，但按下和松开时光标都不在文字上，没弹")
+            }
           }
         })
         log("划词工具栏", "已开启")
@@ -1256,6 +1331,9 @@ function startApp() {
       hotkey
         ? { label: `查词：选中文字后按 ${hotkey}`, enabled: false }
         : { label: "⚠ 查词快捷键已被其他程序占用", enabled: false },
+      toolbarHotkey
+        ? { label: `弹出划词工具栏：选中文字后按 ${toolbarHotkey}`, enabled: false }
+        : { label: "⚠ 划词工具栏快捷键已被其他程序占用", enabled: false },
       {
         label: "连按三次空格翻译（浏览器以外的程序，如 QQ、微信）",
         type: "checkbox",
@@ -1359,7 +1437,12 @@ function startApp() {
     })
     hotkey = registerHotkey()
     screenshotHotkey = registerScreenshotHotkey()
-    log("启动", `快捷键=${hotkey ?? "注册失败"}，截图查词=${screenshotHotkey ?? "注册失败"}`)
+    toolbarHotkey = registerToolbarHotkey()
+    log(
+      "启动",
+      `快捷键=${hotkey ?? "注册失败"}，截图查词=${screenshotHotkey ?? "注册失败"}，` +
+        `划词工具栏=${toolbarHotkey ?? "注册失败"}`,
+    )
     popup.preload()
     toast.preload()
     toolbarWindow.preload()

@@ -15,7 +15,11 @@ import { BrowserWindow, ipcMain, nativeTheme, screen } from "electron"
 import { placePopup } from "./popup-position"
 
 /** 不理它多久自动消失 */
-const AUTO_HIDE_MS = 4_000
+/**
+ * 弹出来多久没动就自己消失。选了一大段文字的人往往要先看一眼选中的范围，
+ * 4 秒太短，经常一回头工具栏已经没了，看起来像没弹出来
+ */
+const AUTO_HIDE_MS = 10_000
 /** 鼠标从工具栏上移开后多久消失 */
 const LEAVE_HIDE_MS = 1_500
 /** 工具栏在鼠标松开处的右下方一点，不挡住刚选中的字 */

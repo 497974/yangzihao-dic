@@ -383,10 +383,11 @@ svg.icon {
   display: inline-flex;
 }
 
+/* 整段译文常常有好几行，行距比查词结果宽松一点才好读 */
 .translation {
   margin: 0;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 15px;
+  line-height: 1.75;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   user-select: text;
