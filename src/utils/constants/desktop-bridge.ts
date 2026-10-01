@@ -34,6 +34,8 @@ export const DESKTOP_BRIDGE_FEATURES = [
   "speak",
   // 复习提醒：今天有几个词该复习、打开闪卡复习页
   "reviewStatus",
+  // 每日必学：目标没完成时桌面版锁屏答题，题目和判分由扩展出
+  "dailyGoal",
 ] as const
 
 /**

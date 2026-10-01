@@ -3,9 +3,11 @@
  * 查词、翻译用的设置都在浏览器扩展里，这里只放桌面版独有的。
  */
 
+import type { DailyGoalSettings } from "./daily-goal"
 import fs from "node:fs"
 import path from "node:path"
 import { app } from "electron"
+import { DEFAULT_DAILY_GOAL, normalizeDailyGoal } from "./daily-goal"
 
 export interface DesktopSettings {
   /** 在浏览器以外的地方连按三下空格，把输入框里的字翻译成外语 */
@@ -18,6 +20,8 @@ export interface DesktopSettings {
   reviewReminder: boolean
   /** 上次提醒复习是哪天（本地日期 YYYY-MM-DD），一天只提醒一次 */
   lastReviewReminderDate: string | null
+  /** 每日必学（强制）：目标没完成就锁屏答题，默认关 */
+  dailyGoal: DailyGoalSettings
 }
 
 const DEFAULTS: DesktopSettings = {
@@ -26,6 +30,7 @@ const DEFAULTS: DesktopSettings = {
   doubleClickLookup: false,
   reviewReminder: true,
   lastReviewReminderDate: null,
+  dailyGoal: DEFAULT_DAILY_GOAL,
 }
 
 function settingsFile() {
@@ -34,7 +39,8 @@ function settingsFile() {
 
 export function loadSettings(): DesktopSettings {
   try {
-    const raw: unknown = JSON.parse(fs.readFileSync(settingsFile(), "utf8"))
+    // 记事本、PowerShell 存的文件开头会带 BOM，不去掉 JSON.parse 会报错、设置被当成空的
+    const raw: unknown = JSON.parse(fs.readFileSync(settingsFile(), "utf8").replace(/^\uFEFF/, ""))
     const saved = typeof raw === "object" && raw !== null ? (raw as Record<string, unknown>) : {}
     return {
       tripleSpaceTranslate:
@@ -55,6 +61,7 @@ export function loadSettings(): DesktopSettings {
         typeof saved.lastReviewReminderDate === "string"
           ? saved.lastReviewReminderDate
           : DEFAULTS.lastReviewReminderDate,
+      dailyGoal: normalizeDailyGoal(saved.dailyGoal),
     }
   } catch {
     return { ...DEFAULTS }

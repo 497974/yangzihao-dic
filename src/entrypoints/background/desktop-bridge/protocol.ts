@@ -10,6 +10,7 @@
  *                 speak   { id, text }                          按扩展的朗读设置合成语音
  *                 reviewStatus { id }                           今天有几个词该复习（复习提醒）
  *                 openReview   { id }                           打开闪卡复习页
+ *                 dailyGoal    { id, action, ... }              每日必学：status 看进度 / next 要下一题 / answer 交答案
  *                 pong    {}                                    回应保活
  *   扩展 → 桌面   hello   { client, version, protocol }         连上时先发，自报家门
  *                 lookupProgress { id, progress }               大模型边生成边发（字段逐个填上）
@@ -22,6 +23,7 @@
  * 连接桥是对外开的口子，不能假设对面一定守规矩。
  */
 
+import type { DailyGoalResult } from "./daily-goal"
 import type { DesktopLookupProgress, DesktopLookupResult } from "./dictionary-lookup"
 import type { DesktopTranslateResult } from "./input-translate"
 import type { DesktopReviewStatus } from "./review-status"
@@ -100,6 +102,26 @@ const openReviewMessageSchema = z.object({
   id: requestIdSchema,
 })
 
+/** 每日必学锁屏：看进度、要下一题、交一道题的结果 */
+const dailyGoalMessageSchema = z.discriminatedUnion("action", [
+  z.object({ type: z.literal("dailyGoal"), id: requestIdSchema, action: z.literal("status") }),
+  z.object({
+    type: z.literal("dailyGoal"),
+    id: requestIdSchema,
+    action: z.literal("next"),
+    /** 刚做过的卡，这次尽量别再出 */
+    exclude: z.array(z.string().max(100)).max(50).optional(),
+  }),
+  z.object({
+    type: z.literal("dailyGoal"),
+    id: requestIdSchema,
+    action: z.literal("answer"),
+    cardId: z.string().min(1).max(100),
+    correct: z.boolean(),
+    durationMs: z.number().min(0).max(3_600_000).optional(),
+  }),
+])
+
 const pongMessageSchema = z.object({
   type: z.literal("pong"),
 })
@@ -112,6 +134,7 @@ export const desktopIncomingMessageSchema = z.discriminatedUnion("type", [
   speakMessageSchema,
   reviewStatusMessageSchema,
   openReviewMessageSchema,
+  dailyGoalMessageSchema,
   pongMessageSchema,
 ])
 
@@ -170,6 +193,8 @@ export type ExtensionOutgoingMessage =
   | { type: "reviewStatusResult"; id: string; ok: false; error: BridgeErrorPayload }
   | { type: "openReviewResult"; id: string; ok: true; result: { opened: true } }
   | { type: "openReviewResult"; id: string; ok: false; error: BridgeErrorPayload }
+  | { type: "dailyGoalResult"; id: string; ok: true; result: DailyGoalResult }
+  | { type: "dailyGoalResult"; id: string; ok: false; error: BridgeErrorPayload }
 
 /**
  * 把异常整理成回给桌面的错误。

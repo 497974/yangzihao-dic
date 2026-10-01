@@ -1,0 +1,308 @@
+:root {
+  color-scheme: dark;
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --line: #334155;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --good: #34d399;
+  --bad: #f87171;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px 16px;
+}
+
+.cover {
+  justify-content: center;
+  text-align: center;
+  color: var(--muted);
+  font-size: 22px;
+}
+
+.banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 4px;
+  text-align: center;
+  background: #854d0e;
+  color: #fef3c7;
+  font-size: 12px;
+}
+
+.top {
+  width: min(720px, 100%);
+  margin-bottom: 18px;
+}
+
+.top h1 {
+  margin: 0 0 14px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.bar > div {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--good));
+  transition: width 0.4s ease;
+}
+
+.count {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: right;
+}
+
+.card {
+  width: min(720px, 100%);
+  flex: 0 1 620px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px 32px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow-y: auto;
+}
+
+.card > * {
+  flex-shrink: 0;
+}
+
+.mode {
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+.word {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 17px;
+}
+
+.definition {
+  font-size: 26px;
+  line-height: 1.5;
+}
+
+.sentence {
+  font-size: 20px;
+  line-height: 1.7;
+}
+
+.sentence-tr {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.mnemonic {
+  padding: 10px 14px;
+  border-left: 3px solid var(--accent);
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 16px;
+  letter-spacing: 0.2em;
+}
+
+.answer-row {
+  margin-top: auto;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+input.answer {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 24px;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  outline: none;
+  user-select: text;
+}
+
+input.answer:focus {
+  border-color: var(--accent);
+}
+
+input.answer.good {
+  border-color: var(--good);
+}
+
+input.answer.bad {
+  border-color: var(--bad);
+}
+
+button {
+  padding: 12px 20px;
+  font-size: 16px;
+  color: var(--text);
+  background: #334155;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #475569;
+}
+
+button.primary {
+  background: #0284c7;
+}
+
+button.primary:hover {
+  background: #0ea5e9;
+}
+
+.feedback {
+  min-height: 28px;
+  font-size: 18px;
+}
+
+.feedback.good {
+  color: var(--good);
+}
+
+.feedback.bad {
+  color: var(--bad);
+}
+
+.center {
+  margin: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.center h2 {
+  margin: 0;
+  font-size: 32px;
+}
+
+.center p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.7;
+  max-width: 520px;
+}
+
+.foot {
+  margin-top: 16px;
+  width: min(720px, 100%);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.link {
+  padding: 4px 8px;
+  background: none;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.link:hover {
+  background: none;
+  color: var(--muted);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 23, 0.85);
+}
+
+.modal-box {
+  width: min(560px, 90%);
+  padding: 28px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-box p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.phrase {
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 18px;
+  text-align: center;
+}
+
+.shake {
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}

@@ -17,6 +17,8 @@ import type { IncomingMessage } from "node:http"
 import type { Duplex } from "node:stream"
 import type {
   BridgeErrorPayload,
+  DailyGoalRequest,
+  DailyGoalResult,
   DesktopOutgoingMessage,
   LookupProgress,
   LookupRequest,
@@ -247,7 +249,8 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
         message.type === "toolbarResult" ||
         message.type === "speakResult" ||
         message.type === "reviewStatusResult" ||
-        message.type === "openReviewResult"
+        message.type === "openReviewResult" ||
+        message.type === "dailyGoalResult"
       ) {
         const request = pending.get(message.id)
         if (!request || request.client !== client) {
@@ -466,6 +469,17 @@ export function createBridgeServer(options: BridgeServerOptions = {}) {
       }
       return request<ReviewStatus>(
         { type: "reviewStatus", id: randomUUID() },
+        { timeoutMs: 10_000 },
+      )
+    },
+
+    /** 每日必学锁屏：看进度、要下一题、交一道题的结果；旧版扩展不支持时直接拒绝 */
+    dailyGoal(goal: DailyGoalRequest): Promise<DailyGoalResult> {
+      if (!clients.at(-1)?.features.includes("dailyGoal")) {
+        return Promise.reject(new BridgeRequestError("unsupported", "浏览器扩展还不支持每日必学"))
+      }
+      return request<DailyGoalResult>(
+        { type: "dailyGoal", id: randomUUID(), ...goal },
         { timeoutMs: 10_000 },
       )
     },

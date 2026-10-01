@@ -31,15 +31,18 @@ import {
   globalShortcut,
   Menu,
   nativeImage,
+  powerMonitor,
   screen,
   shell,
   Tray,
 } from "electron"
 import { BridgeRequestError, createBridgeServer } from "./bridge-server"
 import { restoreClipboard, snapshotClipboard } from "./clipboard-snapshot"
+import { createDailyGoalController } from "./daily-goal-controller"
 import { runInputTranslate } from "./input-translate-flow"
 import { skipReason } from "./input-translate-flow"
 import { startKeyboardHook } from "./keyboard-hook"
+import { createLockWindow } from "./lock-window"
 import { log, logFilePath } from "./logger"
 import { startMouseHook } from "./mouse-hook"
 import { assembleText, chooseOcrAction, createOcrReader, trimForLookup } from "./ocr"
@@ -104,6 +107,8 @@ const SCREENSHOT_SOURCE = "截图"
 const SCREENSHOT_HEADER: PopupHeader = { title: "截图识别翻译", icon: "dictionary" }
 /** 开机自启时带上这个参数，这样开机时不弹"已在托盘运行"的提示 */
 const AUTOSTART_ARG = "--autostart"
+/** 命令行带上它就完全不锁屏：每日必学万一出问题时的后路 */
+const NO_LOCK_ARG = "--no-lock"
 /** 打包版 exe 和桌面快捷方式的名字（见 scripts/package.cjs） */
 const PRODUCT_NAME = "大傻豪词典桌面版"
 /** 连着扩展时，隔这么久把离线记下、上次没查成的词再试一遍 */
@@ -313,8 +318,11 @@ function startApp() {
   let keyboardHook: KeyboardHook | null = null
 
   const server = createBridgeServer({
+    // 只给自动化测试用：换个端口、换个数据目录，不去碰正在用的那份
+    port: process.env.DIC_BRIDGE_PORT ? Number(process.env.DIC_BRIDGE_PORT) : undefined,
     onStatusChange: (status) => {
       refreshTray(status)
+      void dailyGoal.evaluate()
       if (status.connected && !wasConnected) {
         const features = server.clientFeatures()
         log(
@@ -349,6 +357,46 @@ function startApp() {
       }
     },
     onSpeak: (text) => void speakText(text),
+  })
+
+  /** 每日必学（强制）：目标没完成就锁屏答题；题目和判分在扩展里，这里管窗口和开关 */
+  const lockWindow = createLockWindow({
+    getInit: () => dailyGoal.getInit(),
+    next: (exclude) => dailyGoal.next(exclude),
+    submit: (cardId, typed, durationMs) => dailyGoal.submit(cardId, typed, durationMs),
+    speak: (text) => dailyGoal.speak(text),
+    openBrowser: () => void shell.openExternal("https://www.bing.com"),
+    emergency: (phrase) => dailyGoal.emergency(phrase),
+  })
+  const dailyGoal = createDailyGoalController({
+    server,
+    settings,
+    save: () => saveSettings(settings),
+    lock: lockWindow,
+    now: () => new Date(),
+    log,
+    errorCode: errorCodeOf,
+    openBrowser: () => void shell.openExternal("https://www.bing.com"),
+    disabledByFlag: process.argv.includes(NO_LOCK_ARG),
+    onChange: () => refreshTray(server.getStatus()),
+    confirmEnable: async () => {
+      const { response } = await dialog.showMessageBox({
+        type: "warning",
+        title: `${APP_NAME} · 每日必学`,
+        message: `开启后，每天没答完 ${settings.dailyGoal.target} 个单词，屏幕会被锁住`,
+        detail:
+          "· 锁屏时只能答题，答够数才放开；答的是生词本里到期的词，和闪卡复习同一份进度。\n" +
+          "· 一天只用完成一次，完成后当天不再锁。\n" +
+          "· 浏览器没开、扩展没连上时也会锁，点锁屏上的「启动浏览器」即可。\n" +
+          "· 真有急事：锁屏右下角「紧急解锁」，手敲一句话，当天不再锁。\n" +
+          "· 彻底出问题：Ctrl+Shift+Esc 打开任务管理器，结束「大傻豪词典桌面版」。\n" +
+          "· 随时可以在托盘菜单里关掉。",
+        buttons: ["开启每日必学", "取消"],
+        defaultId: 1,
+        cancelId: 1,
+      })
+      return response === 0
+    },
   })
 
   function setPopupState(state: PopupState) {
@@ -1377,6 +1425,7 @@ function startApp() {
           log("复习提醒", item.checked ? "已开启" : "已关闭")
         },
       },
+      ...dailyGoal.menuItems(),
       {
         label: "开机自动启动",
         type: "checkbox",
@@ -1458,6 +1507,8 @@ function startApp() {
     applyKeyboardHook()
     applySelectionToolbar()
     refreshTray(server.getStatus())
+    powerMonitor.on("resume", () => void dailyGoal.evaluate())
+    powerMonitor.on("unlock-screen", () => void dailyGoal.evaluate())
 
     try {
       await server.start()
@@ -1470,6 +1521,8 @@ function startApp() {
       app.quit()
       return
     }
+
+    dailyGoal.start()
 
     if (!process.argv.includes(AUTOSTART_ARG)) {
       tray.displayBalloon({
@@ -1489,6 +1542,11 @@ function startApp() {
 
 // 托盘程序没有常开的窗口；查词弹窗关了也不能退出
 app.on("window-all-closed", () => {})
+
+if (process.env.DIC_USER_DATA) {
+  // 只给自动化测试用：换个数据目录，才不会和正在用的那份抢"只开一个"的锁
+  app.setPath("userData", process.env.DIC_USER_DATA)
+}
 
 if (app.requestSingleInstanceLock()) {
   app.setAppUserModelId("com.yangzihao.dic.desktop")

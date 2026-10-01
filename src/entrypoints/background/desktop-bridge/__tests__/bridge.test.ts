@@ -1,4 +1,5 @@
 import type { BridgeSocket } from "../bridge"
+import type { DailyGoalResult } from "../daily-goal"
 import type { DesktopLookupProgress, DesktopLookupResult } from "../dictionary-lookup"
 import type { DesktopTranslateResult } from "../input-translate"
 import type { DesktopReviewStatus } from "../review-status"
@@ -100,6 +101,9 @@ function setup() {
   const speak = vi.fn<(...args: any[]) => Promise<DesktopSpeakResult>>(async () => SPEAK_RESULT)
   const reviewStatus = vi.fn<() => Promise<DesktopReviewStatus>>(async () => REVIEW_STATUS)
   const openReview = vi.fn<() => Promise<{ opened: true }>>(async () => ({ opened: true }))
+  const dailyGoal = vi.fn<(...args: any[]) => Promise<DailyGoalResult>>(async () => ({
+    status: { doneToday: 3, available: 7 },
+  }))
   const bridge = createDesktopBridge({
     url: "ws://127.0.0.1:1/test",
     version: "9.9.9",
@@ -116,6 +120,7 @@ function setup() {
     speak,
     reviewStatus,
     openReview,
+    dailyGoal,
     setStatus: (status) => statuses.push(status),
     now: () => 1234,
   })
@@ -134,6 +139,7 @@ function setup() {
     speak,
     reviewStatus,
     openReview,
+    dailyGoal,
     latest,
     replies,
   }
@@ -169,6 +175,7 @@ describe("桌面版连接桥", () => {
           "customActions",
           "speak",
           "reviewStatus",
+          "dailyGoal",
         ],
       })
       expect(statuses.at(-1)).toEqual({ connected: true, lastConnectedAt: 1234 })
@@ -357,6 +364,37 @@ describe("桌面版连接桥", () => {
       expect(replies()).toEqual([
         { type: "openReviewResult", id: "req-o", ok: true, result: { opened: true } },
       ])
+    })
+
+    it("每日必学：把请求（不含 type 和 id）交给出题服务，结果带 id 回去", async () => {
+      const { bridge, latest, dailyGoal, replies } = setup()
+      bridge.start()
+      latest().open()
+
+      latest().receive({ type: "dailyGoal", id: "req-g", action: "next", exclude: ["c1"] })
+      await flush()
+
+      expect(dailyGoal).toHaveBeenCalledWith({ action: "next", exclude: ["c1"] })
+      expect(replies()).toEqual([
+        {
+          type: "dailyGoalResult",
+          id: "req-g",
+          ok: true,
+          result: { status: { doneToday: 3, available: 7 } },
+        },
+      ])
+    })
+
+    it("每日必学：答题消息格式不对就丢弃，不会交给出题服务", async () => {
+      const { bridge, latest, dailyGoal, replies } = setup()
+      bridge.start()
+      latest().open()
+
+      latest().receive({ type: "dailyGoal", id: "bad", action: "answer", cardId: "c1" })
+      await flush()
+
+      expect(dailyGoal).not.toHaveBeenCalled()
+      expect(replies()).toEqual([])
     })
 
     it("读不到时把原因转给桌面", async () => {

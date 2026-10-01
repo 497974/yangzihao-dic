@@ -16,6 +16,7 @@ import {
   DESKTOP_BRIDGE_URL,
 } from "@/utils/constants/desktop-bridge"
 import { createDesktopBridge } from "./bridge"
+import { handleDailyGoal } from "./daily-goal"
 import { lookupDictionaryForDesktop } from "./dictionary-lookup"
 import { translateInputForDesktop } from "./input-translate"
 import { getReviewStatusForDesktop, openReviewPageForDesktop } from "./review-status"
@@ -57,6 +58,7 @@ export function setUpDesktopBridge(): void {
     speak: (request) => speakForDesktop(request),
     reviewStatus: () => getReviewStatusForDesktop(),
     openReview: () => openReviewPageForDesktop(),
+    dailyGoal: (request) => handleDailyGoal(request),
     setStatus: (status: DesktopBridgeStatus) => {
       void storage.setItem(DESKTOP_BRIDGE_STATUS_KEY, status)
     },

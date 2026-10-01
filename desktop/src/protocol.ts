@@ -10,6 +10,7 @@
  *   桌面 → 扩展   lookup  { id, text, context?, sourceTitle?, fresh? }   查一个词（fresh = 重新生成，不用缓存）
  *                 save    { id, fields }                        把查到的结果存进生词本
  *                 speak   { id, text }                          按扩展的朗读设置合成语音
+ *                 dailyGoal { id, action, ... }                 每日必学锁屏：status 看进度 / next 要下一题 / answer 交答案
  *                 pong    {}                                    回应保活
  *   扩展 → 桌面   hello   { client, version, protocol }         连上时先发，自报家门
  *                 lookupProgress { id, progress }               大模型边生成边发（字段逐个填上）
@@ -110,6 +111,40 @@ export interface ToolbarInfo {
   actions: ToolbarAction[]
 }
 
+/** 每日必学锁屏上的一道题；mode：intro 照着打一遍（新词）、spell 中译英、cloze 例句填空 */
+export interface DailyGoalQuestion {
+  cardId: string
+  mode: "intro" | "spell" | "cloze"
+  word: string
+  /** 都算对的写法（词条本身，加上例句里实际出现的变形） */
+  answers: string[]
+  phonetic: string
+  partOfSpeech: string
+  definition: string
+  /** intro 是完整例句；cloze 是挖掉词之后的句子；spell 为空 */
+  sentence: string
+  sentenceTranslation: string
+  mnemonic: string
+}
+
+export interface DailyGoalStatus {
+  /** 今天已经答对的题数（含在闪卡复习页答的） */
+  doneToday: number
+  /** 现在还能出的题数 */
+  available: number
+}
+
+export interface DailyGoalResult {
+  status: DailyGoalStatus
+  /** next 请求带回下一题；没有题可出是 null */
+  question?: DailyGoalQuestion | null
+}
+
+export type DailyGoalRequest =
+  | { action: "status" }
+  | { action: "next"; exclude?: string[] }
+  | { action: "answer"; cardId: string; correct: boolean; durationMs?: number }
+
 export interface LookupRequest {
   text: string
   context?: string
@@ -135,6 +170,7 @@ export type DesktopOutgoingMessage =
   | { type: "speak"; id: string; text: string }
   | { type: "reviewStatus"; id: string }
   | { type: "openReview"; id: string }
+  | ({ type: "dailyGoal"; id: string } & DailyGoalRequest)
   | { type: "pong" }
 
 export type ExtensionIncomingMessage =
@@ -162,6 +198,8 @@ export type ExtensionIncomingMessage =
   | { type: "reviewStatusResult"; id: string; ok: false; error: BridgeErrorPayload }
   | { type: "openReviewResult"; id: string; ok: true; result: { opened: true } }
   | { type: "openReviewResult"; id: string; ok: false; error: BridgeErrorPayload }
+  | { type: "dailyGoalResult"; id: string; ok: true; result: DailyGoalResult }
+  | { type: "dailyGoalResult"; id: string; ok: false; error: BridgeErrorPayload }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
@@ -232,7 +270,8 @@ export function parseExtensionMessage(raw: string): ExtensionIncomingMessage | n
     json.type === "toolbarResult" ||
     json.type === "speakResult" ||
     json.type === "reviewStatusResult" ||
-    json.type === "openReviewResult"
+    json.type === "openReviewResult" ||
+    json.type === "dailyGoalResult"
   ) {
     if (json.ok === true && isRecord(json.result)) {
       return json as ExtensionIncomingMessage

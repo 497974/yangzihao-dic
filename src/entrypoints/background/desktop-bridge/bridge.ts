@@ -12,6 +12,7 @@
  * - 关掉开关（stop）后不再重连
  */
 
+import type { DailyGoalRequest, DailyGoalResult } from "./daily-goal"
 import type {
   DesktopLookupProgress,
   DesktopLookupRequest,
@@ -70,6 +71,7 @@ export interface DesktopBridgeDeps {
   speak: (request: DesktopSpeakRequest) => Promise<DesktopSpeakResult>
   reviewStatus: () => Promise<DesktopReviewStatus>
   openReview: () => Promise<{ opened: true }>
+  dailyGoal: (request: DailyGoalRequest) => Promise<DailyGoalResult>
   setStatus: (status: DesktopBridgeStatus) => void
   now: () => number
 }
@@ -333,6 +335,23 @@ export function createDesktopBridge(deps: DesktopBridgeDeps) {
     }
   }
 
+  const handleDailyGoal = async (
+    message: Extract<DesktopIncomingMessage, { type: "dailyGoal" }>,
+  ) => {
+    const { id, type: _type, ...request } = message
+    try {
+      const result = await deps.dailyGoal(request)
+      send({ type: "dailyGoalResult", id, ok: true, result })
+    } catch (error) {
+      send({
+        type: "dailyGoalResult",
+        id,
+        ok: false,
+        error: toBridgeError(error, "每日必学出题失败"),
+      })
+    }
+  }
+
   const handleMessage = async (message: DesktopIncomingMessage) => {
     if (message.type === "lookup") {
       await handleLookup(message)
@@ -348,6 +367,8 @@ export function createDesktopBridge(deps: DesktopBridgeDeps) {
       await handleReviewStatus(message.id)
     } else if (message.type === "openReview") {
       await handleOpenReview(message.id)
+    } else if (message.type === "dailyGoal") {
+      await handleDailyGoal(message)
     }
     // 剩下的只有 pong：保活的回应，不用处理
   }
