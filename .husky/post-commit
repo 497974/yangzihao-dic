@@ -1,0 +1,6 @@
+# 每次提交完自动推到 GitHub（推送前 pre-push 会先跑格式、lint 和全部测试，约 1~2 分钟）。
+# 临时不想推：AUTO_PUSH=0 git commit ...
+if [ "$AUTO_PUSH" = "0" ]; then
+  exit 0
+fi
+git push origin HEAD || echo "⚠ 自动推送失败，提交已保存在本地；修好后手动 git push"
