@@ -7,6 +7,7 @@ import { useHostedAiProviderOptions } from "@/components/llm-providers/use-hoste
 import { toastManager } from "@/components/ui/base-ui/toast"
 import { SelectionPopover } from "@/components/ui/selection-popover"
 import { ANALYTICS_FEATURE, ANALYTICS_SURFACE } from "@/types/analytics"
+import { isPureTranslateProviderConfig } from "@/types/config/provider"
 import { createFeatureUsageContext, trackFeatureUsed } from "@/utils/analytics"
 import { classifyResolvedProvider, UNKNOWN_FEATURE_PROVIDER } from "@/utils/analytics-provider"
 import { configFieldsAtomMap, writeConfigAtom } from "@/utils/atoms/config"
@@ -151,10 +152,21 @@ export function SelectionCustomActionProvider({ children }: { children: ReactNod
     }),
     [activeAction, language, providersConfig],
   )
-  const baseCustomActionProviders = useMemo(
-    () => getSelectableProvidersForCapability("customAction", providersConfig),
-    [providersConfig],
-  )
+  const isDictionaryAction = activeAction?.id === BUILT_IN_DICTIONARY_ACTION_ID
+  const baseCustomActionProviders = useMemo(() => {
+    const providers = getSelectableProvidersForCapability("customAction", providersConfig)
+    if (!isDictionaryAction) {
+      return providers
+    }
+    // 词典可以挂纯翻译供应商（默认就是免费的微软翻译），底部选择器的候选列表也要有它们，
+    // 否则找不到"当前供应商"，选择器没东西可显示
+    return [
+      ...providers,
+      ...providersConfig.filter(
+        (provider) => provider.enabled && isPureTranslateProviderConfig(provider),
+      ),
+    ]
+  }, [isDictionaryAction, providersConfig])
   const executionPlan = useMemo(
     () =>
       buildCustomActionExecutionPlan(

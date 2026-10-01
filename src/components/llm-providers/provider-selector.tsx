@@ -173,13 +173,19 @@ function GroupedSelect({
     >
       <SelectTrigger className={className} size={triggerSize}>
         <SelectValue placeholder={placeholder}>
-          {(provider: ProviderSelectorOption) => (
-            <ProviderIcon
-              logo={getProviderLogo(provider, theme)}
-              name={getProviderName(provider)}
-              size="sm"
-            />
-          )}
+          {(provider: ProviderSelectorOption | null) =>
+            // 当前供应商不在候选列表里时 Select 会传 null 进来；这里不能直接读它，
+            // 否则整个划词弹窗在渲染时崩掉，表现为"点了按钮什么都没发生"
+            provider ? (
+              <ProviderIcon
+                logo={getProviderLogo(provider, theme)}
+                name={getProviderName(provider)}
+                size="sm"
+              />
+            ) : (
+              (placeholder ?? null)
+            )
+          }
         </SelectValue>
       </SelectTrigger>
       <SelectContent {...selectContentProps}>
@@ -240,13 +246,19 @@ function UngroupedSelect({
     >
       <SelectTrigger className={className} size={triggerSize}>
         <SelectValue placeholder={placeholder}>
-          {(provider: ProviderSelectorOption) => (
-            <ProviderIcon
-              logo={getProviderLogo(provider, theme)}
-              name={getProviderName(provider)}
-              size="sm"
-            />
-          )}
+          {(provider: ProviderSelectorOption | null) =>
+            // 当前供应商不在候选列表里时 Select 会传 null 进来；这里不能直接读它，
+            // 否则整个划词弹窗在渲染时崩掉，表现为"点了按钮什么都没发生"
+            provider ? (
+              <ProviderIcon
+                logo={getProviderLogo(provider, theme)}
+                name={getProviderName(provider)}
+                size="sm"
+              />
+            ) : (
+              (placeholder ?? null)
+            )
+          }
         </SelectValue>
       </SelectTrigger>
       <SelectContent {...selectContentProps}>
